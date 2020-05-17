@@ -1,9 +1,11 @@
 import pandas as pd 
 import numpy as np
 from random import choices
-import sklearn.linear_model as skl_lm
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 from math import sqrt, pow
+from yahoo_data_prep import create_features
 
 #Define function to perform scaling of features.
 def scaling_function (dataframe):
@@ -65,7 +67,7 @@ def k_nearest_neighbor(in_data, population, k):
 #
 ####################################################################################################################################################################################
 
-
+'''
 weight_height_data_0 = pd.read_csv('weight-height.csv')
 
 weight_height_data_1 = scaling_function(weight_height_data_0)
@@ -80,12 +82,40 @@ female_data = weight_height_data[female_condition]
 
 #Find the nearest points to in_data.
 in_data = [-1.5, -1.02]
-k_neighbors = k_nearest_neighbor(in_data, weight_height_data_1, 10)
-print(k_neighbors)
+#k_neighbors = k_nearest_neighbor(in_data, weight_height_data_1, 10)
+#print(k_neighbors)
+'''
 
+#Classify using in-built classes from sklearn.
+#fname = "currency_data.xlsx"
+fname = "index_data.xlsx"
+#df = create_features(fname, "USDZAR")
+df = create_features(fname, "SP500")
+df = df[df['return_sign'] != 0.0]
+cols = ['ret_1', 'ret_2']
+X_train = df.loc[:, cols]
+y_classifier = df.return_sign
+
+scaler = StandardScaler()
+scaled_df = scaler.fit_transform(X_train)   # Output is a numpy ndarray.
+k_neighbors = 10
+metric = ['manhattan', 'euclidean', 'mahalanobis']
+clf = KNeighborsClassifier(k_neighbors, weights='uniform', metric=metric[1])
+clf.fit(scaled_df, y_classifier)
+X_test = df[['ret_1', 'ret_2']]
+prob_of_upmove = clf.predict_proba(X_test)
+
+fig = plt.figure(figsize=(10, 6))
+x_data = df.ret_1.values.reshape(-1, 1)
+plt.scatter(x_data, y_classifier, color = 'r')
+plt.scatter(x_data, prob_of_upmove[:, 1], color='b')
+
+plt.show()
+
+'''
 #Plot the results
 fig = plt.figure(figsize=(10, 6))
 plt.scatter(male_data['Height'], male_data['Weight'], color = 'b')
 plt.scatter(female_data['Height'], female_data['Weight'], color = 'g')
 plt.show()
-
+'''
