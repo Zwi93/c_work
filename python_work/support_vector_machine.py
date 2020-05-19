@@ -4,56 +4,20 @@ from random import choices
 from sklearn import svm
 import matplotlib.pyplot as plt
 from math import sqrt, pow
-from yahoo_data_prep import create_features
+from yahoo_data_prep import create_features, get_colums_names
+from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split, cross_val_score, ShuffleSplit, KFold, GridSearchCV
 
-'''
-iris_data = pd.read_csv("Iris.csv")
-#Sort out data to split unwanted categories.
-iris_data_np = np.array(iris_data)
-iris_data_np[iris_data_np == 'Iris-setosa'] = 1
-iris_data_np[iris_data_np == 'Iris-virginica'] = 0
+#Function to compute powerset of a list.
+def powerset(s):
+    x = len(s)
+    power_set = []
+    for i in range(1 << x):
+        subset = [s[j] for j in range(x) if (i & (1 << j))]
+        power_set.append(subset)
 
-colms = np.array([1, 2, 5])
-setosa_condition = np.where(iris_data_np[:, -1:] == 1)
-setosa_iris_data = iris_data_np[setosa_condition[0][:, None], colms]
+    return power_set 
 
-versicolor_condition = np.where(iris_data_np[:, -1:] == 0)
-versicolor_iris_data = iris_data_np[versicolor_condition[0][:, None], colms]
-
-plt.scatter(setosa_iris_data[:, 0], setosa_iris_data[:, 1], color = 'b')
-plt.scatter(versicolor_iris_data[:, 0], versicolor_iris_data[:, 1], color = 'g')
-
-sliced_iris_data = np.concatenate((setosa_iris_data, versicolor_iris_data), axis=0)
-
-y_id = sliced_iris_data[:, 2].astype('int')
-X_train = sliced_iris_data[:, : 2]
-'''
-'''
-#fname = "index_data.xlsx"
-#df = create_features(fname, "SP500")
-fname = "currency_data.xlsx"
-df = create_features(fname, "USDZAR")
-df = df[df['return_sign'] != 0.0]  # Remove any zero returns to avoiding multi-class classification.
-cols = ['ret_1', 'ret_2']
-X_train = df.loc[:, cols]
-y_classifier = df.return_sign
-
-#Seperate points into up/down moves.
-up_moves = df[df['return_sign'] == 1.0]
-down_moves = df[df['return_sign'] == -1.0]
-plt.scatter(up_moves['ret_1'], up_moves['ret_2'], color='g')
-plt.scatter(down_moves['ret_1'], down_moves['ret_2'], color='r')
-
-#clf = svm.LinearSVC(C=1) 
-#clf = svm.SVC(kernel='linear', C=1000)
-#clf.fit(X_train, y_classifier)
-
-#X_test = np.array([0.2, 0.1]).reshape(1, -1)
-
-#print(clf.predict(X_test))
-
-#plt.show()
-'''
 
 class SVMClassifier (svm.SVC):
     def get_train_data (self, fname, asset_class, cols):
@@ -64,12 +28,22 @@ class SVMClassifier (svm.SVC):
 
         return X_train, y_classifier
 
-    def fit_test_model (self, fname, asset_class, cols):
+    def scaling_function (self, fname, asset_class, cols):
+        scaler = StandardScaler()
         X_train, y_classifier = self.get_train_data(fname, asset_class, cols)
+        #Scale the training data. Also, test data must be scaled.
+        scaled_df = scaler.fit_transform(X_train)
+
+        return scaled_df, y_classifier
+
+    def fit_test_model (self, fname, asset_class, cols):
+        #Data is scaled 1st. Next change the dataframe to a numpy array.
+        X_train = self.scaling_function(fname, asset_class, cols)[0]
+        y_classifier = self.scaling_function(fname, asset_class, cols)[1]
         self.fit(X_train, y_classifier)
         X_test = np.array([0.2, 0.1]).reshape(1, -1)
 
-        return self.predict(X_test)
+        return self.dual_coef_, self.n_support_
 
     def get_feature_scatter_plt (self, fname, asset_class, cols, ax):
         df = create_features(fname, asset_class)
@@ -78,17 +52,17 @@ class SVMClassifier (svm.SVC):
         #Seperate points into up/down moves.
         up_moves = df[df['return_sign'] == 1.0]
         down_moves = df[df['return_sign'] == -1.0]
-        ax.scatter(up_moves['ret_1'], up_moves['ret_2'], color='g', s=1)
-        ax.scatter(down_moves['ret_1'], down_moves['ret_2'], color='r', s=1)
+        ax.scatter(up_moves[cols[0]], up_moves[cols[1]], color='g', s=1)
+        ax.scatter(down_moves[cols[0]], down_moves[cols[1]], color='r', s=1)
 
     def svm_decision_boundary_plot (self, fname, asset_class, cols, ax):
         #Setup the axes environment parameters.
         #xlim = ax.get_xlim()
         xlim = (-0.1, 0.1)
         #ylim = ax.get_ylim()
-        ylim = (-0.1, 0.1)
-        x_grid = np.linspace(xlim[0], xlim[1], 30)
-        y_grid = np.linspace(ylim[0], ylim[1], 30)
+        ylim = (-10, 10)
+        x_grid = np.linspace(xlim[0], xlim[1], 5)
+        y_grid = np.linspace(ylim[0], ylim[1], 5)
         Y, X = np.meshgrid(y_grid, x_grid)
         xy_grid = np.vstack([X.ravel(), Y.ravel()]).T
 
@@ -104,21 +78,42 @@ class SVMClassifier (svm.SVC):
         margin_vectors = self.support_vectors_
         ax.scatter(margin_vectors[:, 0], margin_vectors[:, 1], s=20, facecolors='none', color='orange')
 
+    def scoring_selection_gridCV (self, fname, asset_class, cols, ax):
+        #Perform scoring and selection of best estimator from a range of parameters. Try different combinations of clomns.
+        params_grid = {'C': [0.01, 0.02, 0.05, 0.1, 0.2]}
+        cv_1 = KFold(n_splits=3, shuffle=False, random_state=1)
+        cv_2 = KFold(n_splits=3, shuffle=False, random_state=1)
+        #cols_subsets = [cols, cols[:3], cols[3:], cols[-3:], cols[:-3]]
+        cols_subsets = powerset(cols)[1:]
+        #Create dictionary for storing scores.
+        scores_array = {}
+        index = 0
 
+        for cols in cols_subsets:
+            #Create object of GridSearchCV to use for scoring. 
+            clf = GridSearchCV(estimator = self, param_grid=params_grid, cv = cv_1)
+            X, y = self.get_train_data(fname, asset_class, cols)
+            nested_score = cross_val_score(clf, X=X, y=y, cv=cv_2)
+            index += 1
+            scores_array[index] = nested_score.mean()
 
+        x = list(scores_array.keys()); y = scores_array.values()
+
+        ax.scatter(x, y)
 
 #fname = "currency_data.xlsx"
 fname = "index_data.xlsx"
-cols = ['ret_1', 'ret_2']
+cols = ['ret_1', 'momentum_1d']
 #asset_class = 'USDZAR'
-asset_class = 'SP500'
+asset_class = 'VIX'
+all_cols = get_colums_names(fname, asset_class)
 ax = plt.gca()
 
 #Create SVM object.
-svm_object = SVMClassifier(C=1e5, kernel='linear')
+svm_object = SVMClassifier(C=0.01, kernel='linear', cache_size = 1000)
 #svm_predict = svm_object.fit_test_model(fname, asset_class, cols)
 #print(svm_predict)
-svm_object.svm_decision_boundary_plot(fname, asset_class, cols, ax)
-svm_object.get_feature_scatter_plt(fname, asset_class, cols, ax)
-
+#svm_object.svm_decision_boundary_plot(fname, asset_class, cols, ax)
+#svm_object.get_feature_scatter_plt(fname, asset_class, cols, ax)
+svm_object.scoring_selection_gridCV(fname, asset_class, all_cols, ax)
 plt.show()

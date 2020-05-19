@@ -9,9 +9,9 @@ def get_ticker(ticker, start, end):
     
     return ticker
 
-#tickers = [['ZAR=X', 'USDZAR'], ['GBPUSD=X', 'GBPUSD']]#, ['^FTSE', 'FTSE100']]
+#tickers = [['^DJI', 'DOW'], ['^NYA', 'STI']]#, ['^FTSE', 'FTSE100']]
 #prices = pd.DataFrame({ ticker[1] : get_ticker(ticker[0], '01-01-2010', '30-04-2020')['Adj Close'] for ticker in tickers}).dropna()
-#prices.to_excel("currency_data.xlsx") 
+#prices.to_excel("dow_nya_data.xlsx") 
 
 def create_features (fname, col_name):
 
@@ -66,3 +66,9 @@ def create_features (fname, col_name):
     del df_temp
 
     return df
+
+def get_colums_names (fname, col_name):
+    df = create_features(fname, col_name)
+    df.drop([col_name, 'return', 'return_sign'], axis=1, inplace=True)
+    colms = df.columns
+    return colms

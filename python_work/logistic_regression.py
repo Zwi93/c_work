@@ -4,72 +4,21 @@ from random import choice
 import sklearn.linear_model as skl_lm
 from sklearn.naive_bayes import GaussianNB
 import matplotlib.pyplot as plt
-import yfinance as yf
-from pandas_datareader import data, wb 
-from yahoo_data_prep import create_features
+from sklearn.model_selection import train_test_split, cross_val_score, ShuffleSplit, KFold, GridSearchCV, cross_validate 
+from yahoo_data_prep import create_features, get_colums_names 
 from sklearn.svm import l1_min_c
+from sklearn.metrics import confusion_matrix
 
-'''
-#Create fictional credit data.
-income = np.sort(np.random.uniform(100, 1000, 1000))
-balance = np.sort(np.random.uniform(1, 450, 1000))
-ones_array = np.ones(750)
-zeros_array = np.zeros(250)
-ones_and_zeros = np.concatenate((ones_array, zeros_array))
-default = np.ones(1000) 
+#Function to compute powerset of a list.
+def powerset(s):
+    x = len(s)
+    power_set = []
+    for i in range(1 << x):
+        subset = [s[j] for j in range(x) if (i & (1 << j))]
+        power_set.append(subset)
 
-for i in range(len(balance)):
-    if i < 450:
-        default[i] = choice([0, 0, 0, 0, 1])
-    elif (i >= 450 and i <= 550):
-        default[i] = choice([0, 1])
-    else:
-        default[i] = choice([0, 1, 1, 1, 1])
+    return power_set 
 
-student = choice([0, 1])
-
-#data = {'Default': default, 'Student': student, 'Balance': balance, 'Income': income}
-#df = pd.DataFrame(data)
-
-#fname = "index_data.xlsx"
-fname = "currency_data.xlsx"
-df = create_features(fname, "USDZAR")
-
-df = df[df['return_sign'] != 0.0]
-
-#X_train = df.SMA.values.reshape(-1, 1)
-cols = ['ret_1', 'ret_2']
-X_train = df[cols]
-y_classifier = df.return_sign
-#X_test = np.arange(df.Balance.min(), df.Balance.max()).reshape(-1, 1)
-#X_test = np.arange(1, 700).reshape(-1, 1)
-#X_test = np.arange(df.ret_1.min(), df.ret_1.max()).reshape(-1, 1)
-X_test = df[['ret_1', 'ret_2']]
-
-min_c = l1_min_c(X_train, y_classifier, loss='log')  # To determine the minimum C that gives a non 'null' model. 
-clf = skl_lm.LogisticRegression(solver='liblinear', penalty='l1', C=1000*min_c)  
-clf.fit(X_train, y_classifier)
-
-print(clf.classes_)
-print(clf.coef_)
-print(clf.intercept_)
-
-prob_of_upmove = clf.predict_proba(X_test)
-
-fig = plt.figure(figsize=(10, 6))
-x_data = df.ret_1.values.reshape(-1, 1)
-plt.scatter(x_data, y_classifier, color = 'r')
-plt.scatter(x_data, prob_of_upmove[:, 1], color='b')
-
-
-clf_bayes = GaussianNB()
-clf_bayes.fit(X_train, y_classifier)
-
-prob_of_upmove_nb = clf_bayes.predict_proba(X_test)
-
-plt.scatter(x_data, prob_of_upmove_nb[:, 1], color='orange')
-plt.show()
-'''
 
 class LogisticRegressionClassifier (skl_lm.LogisticRegression):
     def get_train_data (self, fname, asset_class, cols):
@@ -89,6 +38,7 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
         return min_c
 
     def fit_test_model (self, fname, asset_class, cols):
+        #Function to fit model without cross validation. 
         #determine which penalty is being applied.
         penalty = self.penalty
 
@@ -101,21 +51,47 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
                 pass
         else:
             pass
-
+        #Perform cross_validation on the model.
         X_train, y_classifier = self.get_train_data(fname, asset_class, cols)
+
         self.fit(X_train, y_classifier)
 
+    def fit_test_CV (self, fname, asset_class, cols):
+        #perform cross_validation to yield best output for any metric.
+        X, y = self.get_train_data(fname, asset_class, cols)
+        validated_model = cross_validate(self, X, y, cv=5, return_estimator=True)  # This is a dictionary object.
+    
+        return validated_model
 
     def classify_data (self, fname, asset_class, cols, test_data, ax):
-        #Predict class for given array of samples and plot the results
-        self.fit_test_model(fname, asset_class, cols)
-        classified_test_data = self.predict(test_data)
+        #Predict class for given array of samples and plot the results on a scatter plot.
         X_train, y_classifier = self.get_train_data(fname, asset_class, cols)
+        
+        self.fit_test_model(fname, asset_class, cols)
+        unvalidated_classified_data = self.predict_proba(test_data)[:, 0]
+        #matrix = confusion_matrix(y_classifier, unvalidated_classified_data)
+        #print(matrix)
+        
+        ax.scatter(test_data[cols[0]], unvalidated_classified_data , color='b', s=20)
+
+        validated_model = self.fit_test_CV(fname, asset_class, cols)
+        best_models = validated_model['estimator']
+        best_scores = validated_model['test_score']
+        max_score = max(best_scores)
+
+        for score, model in zip(best_scores, best_models):
+            if score == max_score:
+                classified_test_data = model.predict_proba(test_data)[:, 0]
+                #matrix = confusion_matrix(y_classifier, classified_test_data)
+                #print(matrix)
+            else:
+                pass
 
         x_data1 = test_data[cols[0]]
         x_data2 = X_train[cols[0]]
 
-        ax.scatter(x_data1, classified_test_data, color='r')
+        #To be able to plot test data must be 2d, higher dimensions impossible to plot.
+        ax.scatter(x_data1, classified_test_data, color='r', s=10)
         ax.scatter(x_data2, y_classifier, color='orange')
 
     def get_coefficients (self, fname, asset_class, cols):
@@ -148,19 +124,92 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
 
         return data_table
 
+    def scoring_selection_gridCV (self, fname, asset_class, cols, ax):
+        #Perform scoring and selection of best estimator from a range of parameters. Try different combinations of clomns.
+        params_grid = {'C': [100, 200, 300, 400, 500]}
+        cv_1 = KFold(n_splits=3, shuffle=False, random_state=1)
+        cv_2 = KFold(n_splits=3, shuffle=False, random_state=1)
+        #cols_subsets = [cols, cols[:3], cols[3:], cols[-3:], cols[:-3]]
+        cols_subsets = powerset(cols)[1:]
+        #Create dictionary for storing scores.
+        scores_array = {}
+        index = 0
+
+        for cols in cols_subsets:
+            #Create object of GridSearchCV to use for scoring. 
+            clf = GridSearchCV(estimator = self, param_grid=params_grid, cv = cv_1)
+            X, y = self.get_train_data(fname, asset_class, cols)
+            nested_score = cross_val_score(clf, X=X, y=y, cv=cv_2)
+            index += 1
+            scores_array[index] = nested_score.mean()
+
+        x = list(scores_array.keys()); y = scores_array.values()
+
+        ax.scatter(x, y)
+
+
+class NaiveGaussianClassifier(GaussianNB):
+    def get_train_data (self, fname, asset_class, cols):
+        df = create_features(fname, asset_class)
+        df = df[df['return_sign'] != 0.0]  # Remove any zero returns to avoiding multi-class classification.
+        X_train = df.loc[:, cols]
+        y_classifier = df.return_sign
+
+        return X_train, y_classifier
+    
+    def fit_test_model (self, fname, asset_class, cols):
+        #Get full sample data points and then split it into training and test data.
+        X, y = self.get_train_data(fname, asset_class, cols)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
+        self.fit(X_train, y_train)
+        accuracy_score = self.score(X_test, y_test)
+
+        return accuracy_score
+
+    def scoring_selection_gridCV (self, fname, asset_class, cols, ax):
+        #Perform scoring and selection of best estimator from a range of parameters. Try different combinations of clomns.
+        params_grid = {'C': [0.01, 0.02, 0.05, 0.1, 0.2]}
+        cv_1 = KFold(n_splits=3, shuffle=False, random_state=1)
+        cv_2 = KFold(n_splits=3, shuffle=False, random_state=1)
+        #cols_subsets = [cols, cols[:3], cols[3:], cols[-3:], cols[:-3]]
+        cols_subsets = powerset(cols)[1:]
+        #Create dictionary for storing scores.
+        scores_array = {}
+        index = 0
+
+        for cols in cols_subsets:
+            #Create object of GridSearchCV to use for scoring. 
+            clf = GridSearchCV(estimator = self, param_grid=params_grid, cv = cv_1)
+            X, y = self.get_train_data(fname, asset_class, cols)
+            nested_score = cross_val_score(clf, X=X, y=y, cv=cv_2)
+            index += 1
+            scores_array[index] = nested_score.mean()
+
+        x = list(scores_array.keys()); y = scores_array.values()
+
+        ax.scatter(x, y)
 
 #fname = "currency_data.xlsx"
 fname = "index_data.xlsx"
-cols = ['ret_1', 'ret_2']
+cols = ['ret_1', 'ret_2', 'ret_3']
+
 #asset_class = 'USDZAR'
-asset_class = 'SP500'
+asset_class = 'VIX'
+test_data = create_features(fname, asset_class)
+test_data = test_data[test_data['return_sign'] != 0.0]  # Remove any zero returns to avoiding multi-class classification.
+all_cols = get_colums_names(fname, asset_class)
+test_data = test_data.loc[:, all_cols]
 ax = plt.gca()
 
 #Create LogisticRegressionClassifier object.
-logit_object = LogisticRegressionClassifier(C=1, solver='liblinear', penalty='l2')
+logit_object = LogisticRegressionClassifier(C=1, solver='liblinear', penalty='l2')  # high C corresponds to no regularization.
 #test_data = logit_object.get_train_data(fname, asset_class, cols)[0]
-#logit_object.classify_data(fname, asset_class, cols, test_data, ax)
+#logit_object.classify_data(fname, asset_class, all_cols, test_data, ax)
 #coeff = logit_object.get_coefficients(fname, asset_class, cols)
-coef_table = logit_object.compare_l1_l2(fname, asset_class, cols)
-print(coef_table) 
-#plt.show()
+#coef_table = logit_object.compare_l1_l2(fname, asset_class, cols)
+#gaussian_object = NaiveGaussianClassifier()
+#accuracy_score = logit_object.fit_test_CV(fname, asset_class, all_cols)
+#accuracy_score = gaussian_object.fit_test_model(fname, asset_class, cols, test_data)
+#print(accuracy_score)
+logit_object.scoring_selection_gridCV(fname, asset_class, all_cols, ax) 
+plt.show()
