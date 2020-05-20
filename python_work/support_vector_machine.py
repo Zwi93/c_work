@@ -3,10 +3,12 @@ import numpy as np
 from random import choices
 from sklearn import svm
 import matplotlib.pyplot as plt
+from pandas.plotting import register_matplotlib_converters
 from math import sqrt, pow
-from yahoo_data_prep import create_features, get_colums_names
+from yahoo_data_prep import create_features, get_colums_names, get_dates
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, cross_val_score, ShuffleSplit, KFold, GridSearchCV
+register_matplotlib_converters()
 
 #Function to compute powerset of a list.
 def powerset(s):
@@ -100,6 +102,27 @@ class SVMClassifier (svm.SVC):
         x = list(scores_array.keys()); y = scores_array.values()
 
         ax.scatter(x, y)
+
+    def pnl_backtesting (self, fname, asset_class, cols):
+        #Perform PnL backtesting to check how accurate the path predicted by the model would have been given previous price returns.
+        X, y = self.get_train_data(fname, asset_class, cols)
+        self.fit(X, y)
+        probability_down = self.predict_proba(X)[:, 0]
+        probability_up = self.predict_proba(X)[:, 1]
+        predicted_direction = self.predict(X)
+        xdata = get_dates(fname, asset_class)
+        df0 = create_features(fname, asset_class)
+        df0 = df0[df0['return_sign'] != 0.0]  # Remove any zero returns to avoiding multi-class classification.
+        true_realised_return = df0['return']
+        kelly_optimal_fraction = probability_up - probability_down
+        realised_daily_profit = np.multiply(np.multiply(true_realised_return, predicted_direction), kelly_optimal_fraction)
+
+        df = pd.DataFrame({'Prob-Down':probability_down, 'Prob-Up':probability_up, 'Predic-Move':predicted_direction, 'Real-Move':y, 'Daily PnL':realised_daily_profit})
+        print(df.head(30))
+
+        #Plot scatter plots for probabilities.
+        #ax.scatter(xdata, probability_up, color='g')
+        #ax.scatter(xdata, probability_down, color='r')
 
 #fname = "currency_data.xlsx"
 fname = "index_data.xlsx"

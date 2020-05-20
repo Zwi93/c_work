@@ -72,3 +72,8 @@ def get_colums_names (fname, col_name):
     df.drop([col_name, 'return', 'return_sign'], axis=1, inplace=True)
     colms = df.columns
     return colms
+
+def get_dates (fname, col_name):
+    df = create_features(fname, col_name)
+    df = df[df['return_sign'] != 0.0]
+    return df.index
