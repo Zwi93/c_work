@@ -1,0 +1,32 @@
+\section*{Normal Distribution}
+The normalize form of the \textit{pdf} of the normal distribution is 
+
+$$ f(x, \mu) = \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{1}{2}\left(\frac{x - \mu}{\sigma}\right)^2}  $$
+
+The exponent can be simplified as follows,
+
+\begin{equation} 
+\begin{split}
+\left(\frac{x - \mu}{\sigma}\right)^2 & = \frac{1}{\sigma^2}(x - \mu)^2 \\
+ & = \frac{1}{\sigma^2}(x^2 -2\mu x + \mu^2) \\
+ & = -\frac{2\mu}{\sigma^2}x + \frac{\mu^2}{\sigma^2} + \frac{x^2}{\sigma^2} 
+\end{split}
+\end{equation}
+
+so $f$ then becomes 
+
+$$ f(x, \mu)  = \frac{1}{\sigma\sqrt{2\pi}}e^{\frac{\mu}{\sigma^2}x  - \frac{\mu^2}{2\sigma^2} - \frac{x^2}{2\sigma^2}} $$
+
+With 
+\begin{equation} 
+\begin{split}
+a(x) & = x \\
+b(\mu) & = \frac{\mu}{\sigma^2} \\
+c(\mu) & = -\frac{\mu^2}{2\sigma^2} \\
+d(x) & = - \frac{x^2}{2\sigma^2}
+\end{split}
+\end{equation}
+
+then we can see that 
+
+$$ f(x, \mu)  = e^{a(x)b(\mu) + c(\mu) + d(x)}   $$

@@ -3,6 +3,7 @@ import numpy as np
 from random import choice
 import sklearn.linear_model as skl_lm
 from sklearn.naive_bayes import GaussianNB
+from matplotlib.colors import ListedColormap
 import matplotlib.pyplot as plt
 from pandas.plotting import register_matplotlib_converters
 from sklearn.model_selection import train_test_split, cross_val_score, ShuffleSplit, KFold, GridSearchCV, cross_validate 
@@ -24,6 +25,10 @@ def powerset(s):
 
 class LogisticRegressionClassifier (skl_lm.LogisticRegression):
     def get_train_data (self, fname, asset_class, cols):
+        """Function to obtain training data (or training + test) from a dataframe.
+        fname : name of the file under which the data is stored in the system's path.
+        asset_class : name of the financial instrument to consider as contained in the file given by fname.
+        """
         df = create_features(fname, asset_class)
         df = df[df['return_sign'] != 0.0]  # Remove any zero returns to avoiding multi-class classification.
         X_train = df.loc[:, cols]
@@ -32,7 +37,8 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
         return X_train, y_classifier
 
     def get_minimum_c (self, fname, asset_class, cols):
-        
+        """Function to obtain the minimum c parameter. any value smaller than this yields a model with 0 coefficients.
+        """
         X_train, y_classifier = self.get_train_data(fname, asset_class, cols)
         #To determine the minimum C that gives a non 'null' model, only applicable when applying l1 penalty.
         min_c = l1_min_c(X_train, y_classifier, loss='log')
@@ -40,7 +46,8 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
         return min_c
 
     def fit_test_model (self, fname, asset_class, cols):
-        #Function to fit model without cross validation. 
+        """Function to fit model without cross validation.
+        """
         #determine which penalty is being applied.
         penalty = self.penalty
 
@@ -59,22 +66,25 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
         self.fit(X_train, y_classifier)
 
     def fit_test_CV (self, fname, asset_class, cols):
-        #perform cross_validation to yield best output for any metric.
+        """Function to perform cross_validation to yield best output for any metric.
+        """
         X, y = self.get_train_data(fname, asset_class, cols)
         validated_model = cross_validate(self, X, y, cv=5, return_estimator=True)  # This is a dictionary object.
     
         return validated_model
 
-    def classify_data (self, fname, asset_class, cols, test_data, ax):
-        #Predict class for given array of samples and plot the results on a scatter plot.
+    def cross_validation_test (self, fname, asset_class, cols, ax):
+        """Use cross validation to determine the precision on confusion matrix
+        """
         X_train, y_classifier = self.get_train_data(fname, asset_class, cols)
         
         self.fit_test_model(fname, asset_class, cols)
-        unvalidated_classified_data = self.predict_proba(test_data)[:, 0]
-        #matrix = confusion_matrix(y_classifier, unvalidated_classified_data)
-        #print(matrix)
+        unvalidated_classified_data = self.predict(X_train)
+        matrix = confusion_matrix(y_classifier, unvalidated_classified_data)
+        print('Confusion Matrix: ')
+        print(matrix)
         
-        ax.scatter(test_data[cols[0]], unvalidated_classified_data , color='b', s=20)
+        #ax.scatter(X_train[cols[0]], unvalidated_classified_data , color='b', s=20)
 
         validated_model = self.fit_test_CV(fname, asset_class, cols)
         best_models = validated_model['estimator']
@@ -83,18 +93,31 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
 
         for score, model in zip(best_scores, best_models):
             if score == max_score:
-                classified_test_data = model.predict_proba(test_data)[:, 0]
-                #matrix = confusion_matrix(y_classifier, classified_test_data)
-                #print(matrix)
+                classified_test_data = model.predict(X_train)
+                matrix = confusion_matrix(y_classifier, classified_test_data)
+                print('Confusion Matrix VC: ')
+                print(matrix)
             else:
                 pass
 
-        x_data1 = test_data[cols[0]]
+        x_data1 = X_train[cols[0]]
         x_data2 = X_train[cols[0]]
 
         #To be able to plot test data must be 2d, higher dimensions impossible to plot.
-        ax.scatter(x_data1, classified_test_data, color='r', s=10)
-        ax.scatter(x_data2, y_classifier, color='orange')
+        #ax.scatter(x_data1, classified_test_data, color='r', s=10)
+        #ax.scatter(x_data2, y_classifier, color='orange')
+
+    def get_total_up_down_moves (self, fname, asset_class, cols):
+        """Function to compute the overall realised up/down moves.
+        """
+        df = create_features(fname, asset_class)
+        df = df[df['return_sign'] != 0.0]  # Remove any zero returns to avoiding multi-class classification.
+
+        #Seperate points into up/down moves.
+        up_moves = df[df['return_sign'] == 1.0]
+        down_moves = df[df['return_sign'] == -1.0]
+        print('real down moves: ', down_moves.shape[0])
+        print('real up moves: ', up_moves.shape[0])
 
     def get_coefficients (self, fname, asset_class, cols):
         #Examine the coefficients.
@@ -103,7 +126,8 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
         return coefficients
 
     def compare_l1_l2(self, fname, asset_class, cols):
-        #Compare the coefficients of different loss functions as we vary the C parameter.
+        """Function to compare the coefficients of different loss functions (Penalty functions l1 or l2) as we vary the C parameter.
+        """
         C_parameters = np.arange(1, 3)
         collect_c_params = []
         l1_coeff = []
@@ -127,7 +151,8 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
         return data_table
 
     def scoring_selection_gridCV (self, fname, asset_class, cols, ax):
-        #Perform scoring and selection of best estimator from a range of parameters. Try different combinations of clomns.
+        """Perform scoring and selection of best estimator from a range of parameters. Try different combinations of colmns (i.e different combination of features)
+        """
         params_grid = {'C': [100, 200, 300, 400, 500]}
         cv_1 = KFold(n_splits=3, shuffle=False, random_state=1)
         cv_2 = KFold(n_splits=3, shuffle=False, random_state=1)
@@ -150,25 +175,34 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
         ax.scatter(x, y)
 
     def pnl_backtesting (self, fname, asset_class, cols):
-        #Perform PnL backtesting to check how accurate the path predicted by the model would have been given previous price returns.
+        """Perform PnL backtesting to check how accurate is the PnL predicted by the model is given previous realised price returns.
+        """
         X, y = self.get_train_data(fname, asset_class, cols)
-        self.fit(X, y)
-        probability_down = self.predict_proba(X)[:, 0]
-        probability_up = self.predict_proba(X)[:, 1]
-        predicted_direction = self.predict(X)
+
+        #Split the data into test and training data and train the model on the training data.
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, shuffle=False)
+        self.fit(X_train, y_train)
+        probability_down = self.predict_proba(X_test)[:, 0]
+        probability_up = self.predict_proba(X_test)[:, 1]
+        predicted_direction = self.predict(X_test)
         xdata = get_dates(fname, asset_class)
         df0 = create_features(fname, asset_class)
-        df0 = df0[df0['return_sign'] != 0.0]  # Remove any zero returns to avoiding multi-class classification.
+        df0 = df0[df0['return_sign'] != 0.0]  # Remove any zero returns to avoiding multi-class classification. And select the returns corresponding to the dates on the test data.
+        df0 = df0[-X_test.shape[0]:]
         true_realised_return = df0['return']
-        kelly_optimal_fraction = probability_up - probability_down
+        kelly_optimal_fraction = abs(probability_up - probability_down)
         realised_daily_profit = np.multiply(np.multiply(true_realised_return, predicted_direction), kelly_optimal_fraction)
 
-        df = pd.DataFrame({'Prob-Down':probability_down, 'Prob-Up':probability_up, 'Predic-Move':predicted_direction, 'Real-Move':y, 'Daily PnL':realised_daily_profit})
-        print(df.head(30))
+        df = pd.DataFrame({'Prob-Down':probability_down, 'Prob-Up':probability_up, 'Predic-Move':predicted_direction, 'Real-Move':y_test, 'Daily PnL':realised_daily_profit})
+        #print(df.head(30))
 
         #Plot scatter plots for probabilities.
-        #ax.scatter(xdata, probability_up, color='g')
-        #ax.scatter(xdata, probability_down, color='r')
+        #color_code = np.multiply(predicted_direction, y)   # 1 if probability UP was correct
+        #cmap = ListedColormap(['r', 'g'])  # Red means incorrect prediction.
+        #ax.scatter(xdata, probability_up, c=color_code, cmap=cmap)
+        #ax.scatter(xdata, probability_down, c=color_code, cmap=cmap)
+        
+        return df
 
 class NaiveGaussianClassifier(GaussianNB):
     def get_train_data (self, fname, asset_class, cols):
@@ -183,10 +217,16 @@ class NaiveGaussianClassifier(GaussianNB):
         #Get full sample data points and then split it into training and test data.
         X, y = self.get_train_data(fname, asset_class, cols)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2)
-        self.fit(X_train, y_train)
-        accuracy_score = self.score(X_test, y_test)
 
-        return accuracy_score
+        self.fit(X_train, y_train)
+
+    def fit_test_CV (self, fname, asset_class, cols):
+        """Function to perform cross_validation to yield best output for any metric.
+        """
+        X, y = self.get_train_data(fname, asset_class, cols)
+        validated_model = cross_validate(self, X, y, cv=5, return_estimator=True)  # This is a dictionary object.
+    
+        return validated_model
 
     def pnl_backtesting (self, fname, asset_class, cols):
         #Perform PnL backtesting to check how accurate the path predicted by the model would have been given previous price returns.
@@ -202,36 +242,85 @@ class NaiveGaussianClassifier(GaussianNB):
         kelly_optimal_fraction = probability_up - probability_down
         realised_daily_profit = np.multiply(np.multiply(true_realised_return, predicted_direction), kelly_optimal_fraction)
 
-        #df = pd.DataFrame({'Prob-Down':probability_down, 'Prob-Up':probability_up, 'Predic-Move':predicted_direction, 'Real-Move':y, 'Daily PnL':realised_daily_profit})
-        #print(df.head(30))
+        df = pd.DataFrame({'Prob-Down':probability_down, 'Prob-Up':probability_up, 'Predic-Move':predicted_direction, 'Real-Move':y, 'Daily PnL':realised_daily_profit})
 
         #Plot scatter plots for probabilities.
-        color_code = np.multiply(predicted_direction, y)   # 1 if probability UP was correct
-        ax.scatter(xdata, probability_up, c=color_code)
-        #ax.scatter(xdata, probability_down, color='r')
+        #color_code = np.multiply(predicted_direction, y)   # 1 if probability UP was correct
+        #cmap = ListedColormap(['r', 'g'])  # Red means incorrect prediction.
+        #ax.scatter(xdata, probability_up, c=color_code, cmap=cmap)
+        #ax.scatter(xdata, probability_down, c=color_code, cmap=cmap)
 
+    def cross_validation_test (self, fname, asset_class, cols, ax):
+        """Use cross validation to determine the precision on confusion matrix
+        """
+        X_train, y_classifier = self.get_train_data(fname, asset_class, cols)
+        
+        self.fit_test_model(fname, asset_class, cols)
+        unvalidated_classified_data = self.predict(X_train)
+        matrix = confusion_matrix(y_classifier, unvalidated_classified_data)
+        print('Confusion Matrix: ')
+        print(matrix)
+        
+        #ax.scatter(X_train[cols[0]], unvalidated_classified_data , color='b', s=20)
+
+        validated_model = self.fit_test_CV(fname, asset_class, cols)
+        best_models = validated_model['estimator']
+        best_scores = validated_model['test_score']
+        max_score = max(best_scores)
+
+        for score, model in zip(best_scores, best_models):
+            if score == max_score:
+                classified_test_data = model.predict(X_train)
+                matrix = confusion_matrix(y_classifier, classified_test_data)
+                print('Confusion Matrix VC: ')
+                print( matrix)
+            else:
+                pass
+
+        #x_data1 = X_train[cols[0]]
+        #x_data2 = X_train[cols[0]]
+
+        #To be able to plot test data must be 2d, higher dimensions impossible to plot.
+        #ax.scatter(x_data1, classified_test_data, color='r', s=10)
+        #ax.scatter(x_data2, y_classifier, color='orange')
+
+    def get_total_up_down_moves (self, fname, asset_class, cols):
+        """Function to compute the overall realised up/down moves.
+        """
+        df = create_features(fname, asset_class)
+        df = df[df['return_sign'] != 0.0]  # Remove any zero returns to avoiding multi-class classification.
+
+        #Seperate points into up/down moves.
+        up_moves = df[df['return_sign'] == 1.0]
+        down_moves = df[df['return_sign'] == -1.0]
+        print('real down moves: ', down_moves.shape[0])
+        print('real up moves: ', up_moves.shape[0])
+
+
+#Setup model parameters.
 #fname = "currency_data.xlsx"
 fname = "index_data.xlsx"
-cols = ['ret_1', 'ret_2', 'ret_3']
-
-#asset_class = 'USDZAR'
 asset_class = 'SP500'
-test_data = create_features(fname, asset_class)
-test_data = test_data[test_data['return_sign'] != 0.0]  # Remove any zero returns to avoiding multi-class classification.
 all_cols = get_colums_names(fname, asset_class)
-test_data = test_data.loc[:, all_cols]
-ax = plt.gca()
+
+#Determine which combination of features to investigate; select one from all the possible combinations in the powerset.
+feature_combination = powerset(all_cols)[205]
+#ax = plt.gca()
 
 #Create LogisticRegressionClassifier object.
-logit_object = LogisticRegressionClassifier(C=1, solver='liblinear', penalty='l2')  # high C corresponds to no regularization.
+logit_object = LogisticRegressionClassifier(C=500, solver='liblinear', penalty='l2')  # high C corresponds to no regularization.
 #test_data = logit_object.get_train_data(fname, asset_class, cols)[0]
-#logit_object.classify_data(fname, asset_class, all_cols, test_data, ax)
+#logit_object.cross_validation_test(fname, asset_class, feature_combination, ax)
 #coeff = logit_object.get_coefficients(fname, asset_class, cols)
-#coef_table = logit_object.compare_l1_l2(fname, asset_class, cols)
+#coef_table = logit_object.compare_l1_l2(fname, asset_class, feature_combination)
 gaussian_object = NaiveGaussianClassifier()
 #accuracy_score = logit_object.fit_test_CV(fname, asset_class, all_cols)
 #accuracy_score = gaussian_object.fit_test_model(fname, asset_class, cols, test_data)
-#print(accuracy_score)
+#print(coef_table)
 #logit_object.scoring_selection_gridCV(fname, asset_class, all_cols, ax) 
-gaussian_object.pnl_backtesting (fname, asset_class, all_cols)
+#logit_object.get_total_up_down_moves(fname, asset_class, feature_combination) 
+#print(logit_object.pnl_backtesting (fname, asset_class, feature_combination).head(20))
+#gaussian_object.pnl_backtesting (fname, asset_class, feature_combination)
+#gaussian_object.cross_validation_test(fname, asset_class, feature_combination, ax)
+#gaussian_object.get_total_up_down_moves(fname, asset_class, feature_combination)
 #plt.show()

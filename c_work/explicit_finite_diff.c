@@ -39,10 +39,11 @@ int main ()
 
 void explicit_fdm_option_estimates (double array[][ASSET_STEPS], double vol, double rate, double strike, double delta_s, double delta_t, int asset_steps, int time_steps)
 {
-    //Function to implement the explicit finite difference method for option pricing.
+    //Function to implement the explicit finite difference method for option pricing.  The array will carry option values at each point on the grid. 
 
     int time_index, asset_index;
 
+    //First assign the payoff values at 'time' 0.  
     for (asset_index = 0; asset_index < asset_steps; asset_index++)
     {
         array[0][asset_index] = vanilla_payoff_function(asset_index*delta_s, strike, 'C');
@@ -60,7 +61,8 @@ void explicit_fdm_option_estimates (double array[][ASSET_STEPS], double vol, dou
             
             array[time_index][asset_index] = array[time_index - 1][asset_index] - delta_t*theta;
         }
-    
+
+        //These are the boundary conditions on asset variable.
         array[time_index][0] = array[time_index - 1][0]*(1 - rate*delta_t);
         array[time_index][asset_steps - 1] = 2*array[time_index][asset_steps - 2] - array[time_index][asset_steps - 3]; 
     }
@@ -68,6 +70,7 @@ void explicit_fdm_option_estimates (double array[][ASSET_STEPS], double vol, dou
 
 double vanilla_payoff_function (double stock_price, double strike, char type)
 {
+    //This is the payoff function for vanilla options. type captures either Call (C) or put (P).
     double payoff;
     switch (type)
     {
