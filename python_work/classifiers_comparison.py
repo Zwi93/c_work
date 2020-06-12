@@ -45,3 +45,4 @@ df['pred_ret_svm'] = df3['Daily PnL']
 df['pred_ret_logit'] = df2['Daily PnL']
 df[['pred_ret_knn', 'pred_ret_svm', 'pred_ret_logit']].cumsum().apply(np.exp).plot(figsize=(15, 10))
 plt.show()
+
