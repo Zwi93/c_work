@@ -1,6 +1,6 @@
 /*
  * Script to experiment on the struct and union data types of C++.
-*/
+ */
 
 #include <iostream>
 using namespace std;
