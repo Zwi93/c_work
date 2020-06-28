@@ -112,7 +112,7 @@ void cds_curve_bootstrapper (double survival_probability[6], double LGD = 0.4)
  *                                                                                                                                  *
  * Author: Zwi Mudau                                                                                                                *
  *                                                                                                                                  *
- * Parameters:                                                                                                                      *                                                                            
+ * Parameters:                                                                                                                      *
  * zero_disc_factor: 1d array to store discount factors; passed as reference parameter.                                             *
  *                                                                                                                                  *
  * Return: This is a void function.                                                                                                 *                                                                                                                                  
@@ -120,13 +120,13 @@ void cds_curve_bootstrapper (double survival_probability[6], double LGD = 0.4)
  */
 void bond_curve_bootstrapper (double zero_disc_factor[6])
 {
-    // Create array to carry the information of bonds to be bootstrapped.
+    // Create array to carry the information of bonds to be bootstrapped. Data taken on 2020/06/26.
     coupon_bonds bonds_info[5];
-    bonds_info[0] = {"1Y bond", 0.00183, 0.0, 1.0};
-    bonds_info[1] = {"2Y bond", 0.00199, 0.001, 2.0};
-    bonds_info[2] = {"3Y bond", 0.00232, 0.0012, 3};
-    bonds_info[3] = {"4Y bond", 0.00236, 0.0015, 4};
-    bonds_info[4] = {"5Y bond", 0.00342, 0.0014, 5.0};
+    bonds_info[0] = {"1Y bond", 0.00162, 0.0, 1.0};
+    bonds_info[1] = {"2Y bond", 0.00168, 0.0013, 2.0};
+    bonds_info[2] = {"3Y bond", 0.00186, 0.0013, 3};
+    bonds_info[3] = {"4Y bond", 0.00236, 0.0015, 4};  //Interpolated.
+    bonds_info[4] = {"5Y bond", 0.003, 0.0025, 5.0};
 
     //Initialize useful variable.
     int index;
@@ -177,3 +177,5 @@ Function to compute the price of a bond given its yield, coupon rate, and maturi
     
     return bond_value; 
 }
+
+//void exponential_interpolation (double )
