@@ -35,9 +35,9 @@ int main ()
 
     //Get hazard rates.
     get_hazard_rates(survival_probability, hazard_rates);
-    double index = survival_time_inverse_cdf(hazard_rates, 0.5);
+    double index = survival_time_inverse_cdf(hazard_rates, 0.97561, 1000, 0.001);
 
-    cout << "Index with minimum difference " << index << endl;
+    cout << "Inverse default time cdf " << index << endl;
     
     return 0;
 }
@@ -346,7 +346,7 @@ void get_hazard_rates (double survival_probability[11], double hazard_rates[11])
  * Return: This returns the corresponding y_value of the function.                                                                  *
  ************************************************************************************************************************************
  */
-double survival_time_inverse_cdf (double hazard_rates[11], double x_input)
+double survival_time_inverse_cdf (double hazard_rates[11], double x_input, int divisions, double accuracy_level)
 {
     //Method employed is not robust but uses only the built exp function.
     int index = 0;
@@ -367,5 +367,18 @@ double survival_time_inverse_cdf (double hazard_rates[11], double x_input)
 
     }
 
-    return index;
+    //Interval of intercept.
+    double lower_bound = index*time_interval, upper_bound = lower_bound + time_interval;
+
+    //Pick many values in this interval and evaluate difference.
+    double estimated_value = lower_bound, difference_variable3 = 1, delta_time = time_interval/divisions;
+
+    while (abs(difference_variable3) > accuracy_level & estimated_value < upper_bound)
+    {
+        estimated_value += delta_time;
+        difference_variable3 = x_input - exp(exponent_sum - hazard_rates[index + 1]*(estimated_value - lower_bound));
+    }
+     
+
+    return estimated_value;
 }

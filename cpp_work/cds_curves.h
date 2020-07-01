@@ -23,4 +23,4 @@ double exponential_interpolation (double x_input, double a_param, double b_param
 struct contract_info *interpolate_par_curve (contract_info info_struct[6], int frequency);
 void interpolate_par_curve1 (contract_info info_struct[6], contract_info interpolated_info[FREQUENCY*(6 - 1)]);
 void get_hazard_rates (double survival_probability[11], double hazard_rates[11]);
-double survival_time_inverse_cdf (double hazard_rates[11], double x_input);
+double survival_time_inverse_cdf (double hazard_rates[11], double x_input, int divisions, double accuracy_level);
