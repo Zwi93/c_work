@@ -8,13 +8,14 @@
  ************************************************************************************************************************************
  */
 
-#include "cds_curves.h"
+#include "cds_curve_bootstrapper.h"
 
+/*
 int main ()
 {
     // Create array of struct type (cds_contract) to carry the information of cds contracts to be bootstrapped.
     contract_info cds_info[6];
-    cds_info[0] = {"0.5Y cds", 100, 0.0, 0.5};
+    cds_info[0] = {"0.5Y cds", 95, 0.0, 0.5};
     cds_info[1] = {"1Y cds", 100, 0.0, 1.0};
     cds_info[2] = {"2Y cds", 114.00, 0.0, 2.0};
     cds_info[3] = {"3Y cds", 121.0, 0.0, 3};
@@ -35,12 +36,16 @@ int main ()
 
     //Get hazard rates.
     get_hazard_rates(survival_probability, hazard_rates);
-    double index = survival_time_inverse_cdf(hazard_rates, 0.97561, 1000, 0.001);
+    double x_input = 0.94;
+    double index = survival_time_inverse_cdf(hazard_rates, x_input, 100000, 0.001);
+    //double index = survival_time_inverse_cdf1(hazard_rates, 0.9, 0.5);
 
-    cout << "Inverse default time cdf " << index << endl;
+    cout << "Inverse default time cdf at " << x_input<< endl;
+    cout << index << endl;
     
     return 0;
 }
+*/
 
 /************************************************************************************************************************************
  * Purpose: Function to bootstrapp the cds curve from given input data.                                                             * 
@@ -53,7 +58,7 @@ int main ()
  * Return: This is a void function.                                                                                                 *                                                                                                                                  
  ************************************************************************************************************************************
  */
-void cds_curve_bootstrapper (double survival_probability[11], contract_info cds_info[6],double LGD = 0.4)
+void cds_curve_bootstrapper (double survival_probability[11], contract_info cds_info[6],double LGD)
 {
 
     //interpolate the cds curve.
@@ -319,14 +324,7 @@ void get_hazard_rates (double survival_probability[11], double hazard_rates[11])
 
     for (outer_index = 1; outer_index < 11; outer_index++)
     {
-        double temporary_sum = 0.0;
-
-        for (inner_index = 1; inner_index < outer_index; inner_index++)
-        {
-            temporary_sum += log(survival_probability[inner_index]);
-        }
-
-        hazard_rates[outer_index] = minus_one*(log(survival_probability[outer_index]) + temporary_sum)/time_interval;
+        hazard_rates[outer_index] = (log(survival_probability[outer_index - 1]) - log(survival_probability[outer_index]))/time_interval;
     }
 
     for (outer_index = 1; outer_index < 11; outer_index++)
@@ -348,7 +346,7 @@ void get_hazard_rates (double survival_probability[11], double hazard_rates[11])
  */
 double survival_time_inverse_cdf (double hazard_rates[11], double x_input, int divisions, double accuracy_level)
 {
-    //Method employed is not robust but uses only the built exp function.
+    //Method employed is not robust but uses only the built in exp function.
     int index = 0;
     double time_interval = 0.5, exponent_sum = 0;
     double difference_variable1 = 1, difference_variable2 = 1; //Needed to determine the difference and minimize it.
@@ -362,23 +360,45 @@ double survival_time_inverse_cdf (double hazard_rates[11], double x_input, int d
 
         difference_variable2 = x_input - exp(-exponent_sum -hazard_rates[index + 1]*time_interval);
 
-        cout << "Difference variable 1 " << difference_variable1 << endl;
-        cout << "Difference variable 2 " << difference_variable2 << endl; 
-
     }
 
+    cout << "Index stopped at " << index << endl;
     //Interval of intercept.
     double lower_bound = index*time_interval, upper_bound = lower_bound + time_interval;
 
-    //Pick many values in this interval and evaluate difference.
+    cout << "Lower bound is " << lower_bound << endl;
+
+    //Pick many values in this interval and evaluate difference to input value.
     double estimated_value = lower_bound, difference_variable3 = 1, delta_time = time_interval/divisions;
 
     while (abs(difference_variable3) > accuracy_level & estimated_value < upper_bound)
     {
         estimated_value += delta_time;
-        difference_variable3 = x_input - exp(exponent_sum - hazard_rates[index + 1]*(estimated_value - lower_bound));
+        difference_variable3 = x_input - exp(-exponent_sum - hazard_rates[index + 1]*(estimated_value - lower_bound));
     }
      
 
     return estimated_value;
+}
+
+double survival_time_inverse_cdf1 (double hazard_rates[11], double x_input, double time_interval)
+{
+    double h_bar = -log(x_input)/time_interval;
+    double running_sum = h_bar;
+
+    cout << "h-bar " << h_bar << endl; 
+    
+    int index = 0;
+
+    while(running_sum > 0 & index < 11)
+    {
+        index += 1;
+        running_sum = running_sum - hazard_rates[index];
+
+        cout << "Running difference " << running_sum << endl; 
+    }
+
+    double y_value = (running_sum + hazard_rates[index])*time_interval/hazard_rates[index + 1] + time_interval*index; 
+    
+    return y_value;
 }
