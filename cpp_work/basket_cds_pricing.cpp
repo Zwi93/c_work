@@ -38,6 +38,8 @@ void one_to_many_dimension (double one_dimension_array[No_COMPANIES], double man
 void matrix_product (double array_one[][No_COMPANIES], double array_two[][No_COMPANIES], double product_array[][No_COMPANIES], double scale_factor);
 double inverse_error_function1 (double x_param);
 void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD);
+double get_minimum_value (double array[No_COMPANIES]);
+double get_nth_minimum_value (double array[No_COMPANIES], int n);
 
 int main ()
 {
@@ -146,7 +148,12 @@ int main ()
 
     double LGD = 0.4; //Loss Given Default, assumed constant and equal for each company.
 
-    basket_cds_mc_pricing(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD);
+    //basket_cds_mc_pricing(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD);
+    double array[No_COMPANIES] = {2.5, 1.4, 4.5, 1.2, 0.6};
+    double minimum_value = get_minimum_value(array);
+
+    cout << "Min " << minimum_value << endl;
+
 
     return 0;
 }
@@ -201,7 +208,7 @@ void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order,
             double correlated_uniform_rv;
             correlated_uniform_rv = normal_cdf(correlated_normals[inner_index][0]);
 
-            //cout << "Correlated univariates " << correlated_uniform_rv << endl;
+            cout << "Correlated univariates " << correlated_uniform_rv << endl;
 
             //Construct the credit curves fo each counterpart.
             contract_info cds_info[6];
@@ -222,7 +229,7 @@ void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order,
             get_hazard_rates(survival_probability, hazard_rates);
             
             //Then obtain the correlated default time.
-            correlated_default_times[inner_index] = 1 - survival_time_inverse_cdf(hazard_rates, correlated_uniform_rv, 1000, 0.001);
+            correlated_default_times[inner_index] = survival_time_inverse_cdf(hazard_rates,1 - correlated_uniform_rv, 1000, 0.001);
 
             cout << "Correlated default time for Counterpart " << inner_index << " " << correlated_default_times[inner_index] << endl;
         }
@@ -908,4 +915,52 @@ double survival_time_inverse_cdf1 (double hazard_rates[11], double x_input, doub
     double y_value = (running_sum + hazard_rates[index])*time_interval/hazard_rates[index + 1] + time_interval*index; 
     
     return y_value;
+}
+
+double get_minimum_value (double array[No_COMPANIES])
+{
+    int outer_index, inner_index, minimum_index;
+    double minimum_value;
+
+    for (outer_index = 0; outer_index < No_COMPANIES; outer_index++)
+    {    
+        double qoutient_array[No_COMPANIES - 1];
+        int i = -1, selection_index[No_COMPANIES - 1];
+
+        for (inner_index = 0; inner_index < No_COMPANIES; inner_index++)
+        {
+            if (inner_index != outer_index)
+            {
+                ++i; selection_index[i] = inner_index;
+            }
+        }
+
+        int greater_than_1 = 0;
+        for (inner_index = 0; inner_index < (No_COMPANIES - 1); inner_index++)
+        {
+            double denom, numerator; 
+            numerator = array[selection_index[inner_index]];
+            denom = array[outer_index];
+            qoutient_array[inner_index] = numerator/denom;
+
+            if (qoutient_array[inner_index] > 1)
+                greater_than_1++;
+            if (qoutient_array[inner_index] < 1)
+                continue;
+            
+        }
+
+        if (greater_than_1 == (No_COMPANIES - 1))
+            minimum_index  = outer_index;
+        else 
+            continue;
+    }
+
+    minimum_value = array[minimum_index];
+    return minimum_value;
+}
+
+double get_nth_minimum_value (double array[No_COMPANIES], int n)
+{
+    return 0.0;
 }
