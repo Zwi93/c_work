@@ -19,10 +19,10 @@ using namespace std;
 
 //Declare important macros here.
 #define No_COMPANIES 5 //number of underlyings in the basket.
-#define SIMULATIONS 3
+#define SIMULATIONS 300
 #define NATURAL_EXP exp(1)
 #define MY_PI 4*atan(1.0)  //pi to be used only in this script.
-#define size_one 3
+#define MATURITY 1.0
 
 //Functions Declaration here.
 void get_pseudo_square_root (double correlation_matrix[][No_COMPANIES], double pseudo_matrix[][No_COMPANIES]);
@@ -37,9 +37,10 @@ void get_correlation_matrix (double correlation_array[][No_COMPANIES]);
 void one_to_many_dimension (double one_dimension_array[No_COMPANIES], double many_dimension_array[][No_COMPANIES]);
 void matrix_product (double array_one[][No_COMPANIES], double array_two[][No_COMPANIES], double product_array[][No_COMPANIES], double scale_factor);
 double inverse_error_function1 (double x_param);
-void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD);
+void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD, int nth_default, double maturity);
 double get_minimum_value (double array[No_COMPANIES]);
 double get_nth_minimum_value (double array[No_COMPANIES], int n);
+double premium_protection_leg_calcs (double nth_default_time, double maturity, double LGD, double delta_t, double zero_disc_factor[11]);
 
 int main ()
 {
@@ -147,12 +148,14 @@ int main ()
     //cout << "RHS " << reg_beta_2 << endl;*/
 
     double LGD = 0.4; //Loss Given Default, assumed constant and equal for each company.
+    int n = 1;
 
-    //basket_cds_mc_pricing(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD);
-    double array[No_COMPANIES] = {2.5, 1.4, 4.5, 1.2, 0.6};
-    double minimum_value = get_minimum_value(array);
+    basket_cds_mc_pricing(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY);
+    double array[No_COMPANIES] = {1.2, 1.2, 4.5, 1.2, 0.6};
+    
+    //double nth_minimum_value = get_nth_minimum_value(array, n);
 
-    cout << "Min " << minimum_value << endl;
+    //cout << n << " Min " << nth_minimum_value << endl;
 
 
     return 0;
@@ -164,13 +167,14 @@ int main ()
  * Author: Zwi Mudau                                                                                                                *
  *                                                                                                                                  *
  * Parameters:                                                                                                                      *
- * correlation_matrix: matrix storing information about the correlations of the variables.                                          *
- * pseudo_matrix: matrix to store the computed pseudo-square root matrix.                                                           *
+ * no_of_credits is the basket's number of underlyings, no_of_simulations is how many monte carlo simulation to perform, order is   *
+ * parameter to manage the accuracy of the inverse_default_cdf, cds_curve_matrix variable contains all the data for each underlying *
+ * nth_default determines which type of CDS it is, 1st, 2nd, etc, and maturity is the contract's maturity.                          *
  *                                                                                                                                  *
  * Return: This is a void function.                                                                                                 *                                                                                                                                  
  ************************************************************************************************************************************
  */
-void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD)
+void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD, int nth_default, double maturity)
 {
     int index;
 
@@ -208,7 +212,7 @@ void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order,
             double correlated_uniform_rv;
             correlated_uniform_rv = normal_cdf(correlated_normals[inner_index][0]);
 
-            cout << "Correlated univariates " << correlated_uniform_rv << endl;
+            //cout << "Correlated univariates " << correlated_uniform_rv << endl;
 
             //Construct the credit curves fo each counterpart.
             contract_info cds_info[6];
@@ -231,13 +235,78 @@ void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order,
             //Then obtain the correlated default time.
             correlated_default_times[inner_index] = survival_time_inverse_cdf(hazard_rates,1 - correlated_uniform_rv, 1000, 0.001);
 
-            cout << "Correlated default time for Counterpart " << inner_index << " " << correlated_default_times[inner_index] << endl;
+            //cout << "Correlated default time for Counterpart " << inner_index << " " << correlated_default_times[inner_index] << endl;
         }
 
+        //Next determine the 1st, 2nd, etc default time, depending on the nth_default input value.
+        double nth_default_time; //time of default variable;depends on the input nth_default integer.
+
+        nth_default_time = get_nth_minimum_value(correlated_default_times, nth_default);
+
+        //cout << "Nth default time for Contract " << nth_default_time << endl;
+
+        //Determine the fair spread based on this nth default time.
+        double zero_disc_factors[11], delta_t = 0.5;
+        bond_curve_bootstrapper(zero_disc_factors);
+        double fair_spread;
+        fair_spread = premium_protection_leg_calcs(nth_default_time, maturity, LGD, delta_t, zero_disc_factors);
+
+        if (fair_spread > 0)
+        {
+            cout << "Fair Spread for path " << index << " is " << fair_spread << endl;
+        }
+        
     }
 }
 
+/************************************************************************************************************************************
+ * Purpose: Function to compute the net of the premiums and protection leg given the default time and maturity of contract.         * 
+ *                                                                                                                                  *
+ * Author: Zwi Mudau                                                                                                                *
+ *                                                                                                                                  *
+ * Parameters:                                                                                                                      *
+ * nth_default_time : Time of the nth default in the basket, calculated from joint ditribution.                                     *
+ * maturity : Maturity of contract.                                                                                                 *
+ * zero_disc_factor ; Bootstrapped zero discount factors from prevailing market bond prices.                                        *
+ * Return: The fair spread is returnd for the given inputs.                                                                         *                                                                                                                                  
+ ************************************************************************************************************************************
+ */
 
+double premium_protection_leg_calcs (double nth_default_time, double maturity, double LGD, double delta_t, double zero_disc_factor[11])
+{
+    double protection_leg = 0, premium_leg = 0, fair_spread;
+
+    if (nth_default_time < maturity)
+    {
+        //Determine the time interval where default occurs.
+        int index;
+        int lower_bound = floor(nth_default_time/delta_t);
+
+        for (index = 1; index < lower_bound; index++)
+        {
+            premium_leg += zero_disc_factor[index];
+        }  
+
+        protection_leg = LGD*zero_disc_factor[lower_bound];
+    }
+
+    if (nth_default_time >= maturity)
+    {
+        //Determine the time interval where default occurs.
+        int index;
+
+        for (index = 1; index < 11; index++)
+        {
+            premium_leg += zero_disc_factor[index];
+        }
+
+        protection_leg = 0;
+    }
+
+    fair_spread = protection_leg/premium_leg;
+
+    return fair_spread;
+}
 /************************************************************************************************************************************
  * Purpose: Function to compute the Cholesky decomposition for given correlation matrix.                                            * 
  *                                                                                                                                  *
@@ -546,9 +615,9 @@ void one_to_many_dimension (double one_dimension_array[No_COMPANIES], double man
 {
     int outer_index, inner_index;
 
-    for (outer_index = 0; outer_index < size_one; outer_index++)
+    for (outer_index = 0; outer_index < No_COMPANIES; outer_index++)
     {
-        for (inner_index = 0; inner_index < size_one; inner_index++)
+        for (inner_index = 0; inner_index < No_COMPANIES; inner_index++)
         {
             if (inner_index == 0)
             {
@@ -563,9 +632,18 @@ void one_to_many_dimension (double one_dimension_array[No_COMPANIES], double man
     }
 }
 
-
-
-
+/************************************************************************************************************************************
+ * Purpose: Function to bootstrapp the cds curve from given input data.                                                             * 
+ *                                                                                                                                  *
+ * Author: Zwi Mudau                                                                                                                *
+ *                                                                                                                                  *
+ * Parameters:                                                                                                                      *
+ * survival-probability: Array to store the implied survival probabilities from the bootstrapp.                                     *
+ * LGD : Loss given default value.                                                                                                  *
+ * contract_info: array holding screenshot of daily cds_curve up to 5y maturity.                                                    *
+ * Return: This is a void function.                                                                                                 *                                                                                                                                  
+ ************************************************************************************************************************************
+ */
 
 void cds_curve_bootstrapper (double survival_probability[11], contract_info cds_info[6], double LGD)
 {
@@ -617,7 +695,7 @@ void cds_curve_bootstrapper (double survival_probability[11], contract_info cds_
 }
 
 /************************************************************************************************************************************
- * Purpose: Function to bootstrapp the cds curve from given input data.                                                             * 
+ * Purpose: Function to bootstrapp the bond curve from given input data.                                                             * 
  *                                                                                                                                  *
  * Author: Zwi Mudau                                                                                                                *
  *                                                                                                                                  *
@@ -665,7 +743,6 @@ void bond_curve_bootstrapper (double zero_disc_factor[11])
 
         zero_disc_factor[index] = (current_bond_price - temp_factor)/(interpolated_bonds_info[index - 1].coupon/FREQUENCY + 1);  //Face value is one for now.
     }
-    cout << endl;
 
     /*
     for (index = 1; index < 11; index++)
@@ -945,6 +1022,8 @@ double get_minimum_value (double array[No_COMPANIES])
 
             if (qoutient_array[inner_index] > 1)
                 greater_than_1++;
+            if (qoutient_array[inner_index] == (double) 1)
+                greater_than_1++;
             if (qoutient_array[inner_index] < 1)
                 continue;
             
@@ -957,10 +1036,42 @@ double get_minimum_value (double array[No_COMPANIES])
     }
 
     minimum_value = array[minimum_index];
-    return minimum_value;
+    return minimum_index;
 }
 
 double get_nth_minimum_value (double array[No_COMPANIES], int n)
 {
-    return 0.0;
+    int outer_index, inner_index;
+    double reduced_array[No_COMPANIES];
+    double sum_of_entries = 0;
+    double global_min_value = 0;
+
+    for (outer_index = 0; outer_index < No_COMPANIES; outer_index++)
+    {
+        reduced_array[outer_index] = array[outer_index];
+        sum_of_entries += abs(array[outer_index]);  
+    }
+
+    
+    for (outer_index = 0; outer_index < n; outer_index++)
+    {
+        int min_index = (int) get_minimum_value(reduced_array);
+
+        //cout << "Min index at " << outer_index << " time " << min_index << endl;
+
+        /*for (inner_index = 0; inner_index < No_COMPANIES; inner_index++)
+        {
+            if (reduced_array[inner_index] == min_value)
+            {
+                reduced_array[inner_index] = (outer_index + 1)*sum_of_entries;
+            }
+        }*/
+        
+        global_min_value = reduced_array[min_index];
+        
+        reduced_array[min_index] = sum_of_entries;
+        
+    }
+
+    return global_min_value;
 }
