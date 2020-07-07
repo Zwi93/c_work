@@ -19,10 +19,10 @@ using namespace std;
 
 //Declare important macros here.
 #define No_COMPANIES 5 //number of underlyings in the basket.
-#define SIMULATIONS 300
+#define SIMULATIONS 3
 #define NATURAL_EXP exp(1)
 #define MY_PI 4*atan(1.0)  //pi to be used only in this script.
-#define MATURITY 1.0
+#define MATURITY 3.0
 
 //Functions Declaration here.
 void get_pseudo_square_root (double correlation_matrix[][No_COMPANIES], double pseudo_matrix[][No_COMPANIES]);
@@ -31,16 +31,21 @@ double inverse_error_function (int order, double x_param);
 double inverse_normal_cdf (int order, double x_param);
 double factorial_of_x (int x_param);
 double beta_function (double a_param, double b_param);
+double student_t_cdf (double x_value, double mu);
 long double incomplete_beta_function (double a_param, double b_param, double x_variable);
+double incomplete_beta_function1 (double a_param, double b_param, double x_variable);
 long double hypergeometric_function (int order, double a_param, double b_param, double c_param, double x_variable);
-void get_correlation_matrix (double correlation_array[][No_COMPANIES]);
+void get_correlation_matrix (double correlation_array[][No_COMPANIES], string copula_type);
 void one_to_many_dimension (double one_dimension_array[No_COMPANIES], double many_dimension_array[][No_COMPANIES]);
 void matrix_product (double array_one[][No_COMPANIES], double array_two[][No_COMPANIES], double product_array[][No_COMPANIES], double scale_factor);
 double inverse_error_function1 (double x_param);
-void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD, int nth_default, double maturity);
+void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD, int nth_default, double maturity, string copula_type);
 double get_minimum_value (double array[No_COMPANIES]);
 double get_nth_minimum_value (double array[No_COMPANIES], int n);
 double premium_protection_leg_calcs (double nth_default_time, double maturity, double LGD, double delta_t, double zero_disc_factor[11]);
+double f(double x);
+double simpson(double lower_bound, double upper_bound, double no_steps, double a, double b);
+double trapezoidal (double lower_bound, double upper_bound, double no_steps, double a, double b);
 
 int main ()
 {
@@ -91,72 +96,22 @@ int main ()
     cds_curves_matrix[4][4] = {"4Y cds", 75.0, 0.0, 4};
     cds_curves_matrix[4][5] = {"5Y cds", 85.0, 0.0, 5.0};
 
-    /*
-    //Toy model for correlation matrix.
-    double correlation_marix[No_COMPANIES][No_COMPANIES];
-    correlation_marix[0][0] = 4.0;
-    correlation_marix[0][1] = 12.0;
-    correlation_marix[0][2] = -16.0;
-    correlation_marix[1][0] = 12.0;
-    correlation_marix[1][1] = 37.0;
-    correlation_marix[1][2] = -43.0;
-    correlation_marix[2][0] = -16.0;
-    correlation_marix[2][1] = -43.0;
-    correlation_marix[2][2] = 98.0;
-    
-    double n_1d_array[No_COMPANIES] = {1, 1, 1};
-    double n_by_n_array[No_COMPANIES][No_COMPANIES];
-    double product_array[No_COMPANIES][No_COMPANIES];
-    one_to_many_dimension(n_1d_array, n_by_n_array);
-    matrix_product(correlation_marix, n_by_n_array, product_array, 1.0);
-
-
-    //Initialize the pseudo-square root matrix with 0s.
-    double pseudo_matrix[No_COMPANIES][No_COMPANIES];
-    int outer_index, inner_index;
-
-    for (outer_index = 0; outer_index < No_COMPANIES; outer_index++)
-    {
-        for (inner_index = 0; inner_index < No_COMPANIES; inner_index++)
-        {
-            cout << product_array[outer_index][inner_index] << endl;
-        }
-    }
-
-    
-    //Perform the Cholesky decomposition.
-    get_pseudo_square_root(correlation_marix, pseudo_matrix);
-
-    for (outer_index = 0; outer_index < No_COMPANIES; outer_index++)
-    {
-        for (inner_index = 0; inner_index < No_COMPANIES; inner_index++)
-        {
-            cout << pseudo_matrix[outer_index][inner_index] << endl;
-        }
-    }
-    
-    double test, x_input = erf(-2.3);
-    test = inverse_error_function1(x_input);
-    //test = inverse_error_function(100, 0.5);
-
-    cout << "Inverse error function " << test << endl;
-    /*
-    double reg_beta_1, reg_beta_2;
-    reg_beta_1 = incomplete_beta_function(0.6, 0.5, 0.8999)/beta_function(0.6, 0.5);
-    reg_beta_2 = 1 - incomplete_beta_function(0.5, 0.6, 1 - 0.8999)/beta_function(0.5, 0.6);
-    //cout << "LHS " << reg_beta_1 << endl;
-    //cout << "RHS " << reg_beta_2 << endl;*/
 
     double LGD = 0.4; //Loss Given Default, assumed constant and equal for each company.
-    int n = 1;
+    int n = 1; //Contract defaulting type, i.e 1st, 2nd, etc to default.
 
-    basket_cds_mc_pricing(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY);
+    basket_cds_mc_pricing(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "t_stat");
     double array[No_COMPANIES] = {1.2, 1.2, 4.5, 1.2, 0.6};
     
     //double nth_minimum_value = get_nth_minimum_value(array, n);
 
     //cout << n << " Min " << nth_minimum_value << endl;
+    //double t_dist = student_t_cdf(0.5, 3);
+    //double check = 0.5 + ((1/sqrt(3))*(0.5/(1 + 0.5*0.5/3)) + atan(0.5/sqrt(3)))/MY_PI;
+    //double beta_inc = incomplete_beta_function1();
 
+    //cout << "t value " << t_dist << " and tan value " << check << endl;
+    //cout << "Beta-incomplete " << beta_inc << endl;
 
     return 0;
 }
@@ -174,7 +129,7 @@ int main ()
  * Return: This is a void function.                                                                                                 *                                                                                                                                  
  ************************************************************************************************************************************
  */
-void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD, int nth_default, double maturity)
+void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD, int nth_default, double maturity, string copula_type)
 {
     int index;
 
@@ -182,35 +137,79 @@ void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order,
     {
         int inner_index; double uniform_rvs[no_of_credits];  //Array to store univariates.
 
+        //Obtain pseudo random numbers in the range (0, 1).
         for (inner_index = 0; inner_index < no_of_credits; inner_index++)
         {
             uniform_rvs[inner_index] = ( (double)(rand()) + 1. )/( (double)(RAND_MAX) + 1. );
         }
 
-        double normal_rvs[No_COMPANIES], normal_rvs_matrix[No_COMPANIES][No_COMPANIES]; // Array to store corresponding normals.
+        double normal_rvs[No_COMPANIES], normal_rvs_matrix[No_COMPANIES][No_COMPANIES]; // Array to store corresponding uncorrelated normals.
 
+        //Obtain corresponding standard normal variables from the uniforms.
         for (inner_index = 0; inner_index < no_of_credits; inner_index++)
         {
             normal_rvs[inner_index] = inverse_normal_cdf(order, uniform_rvs[inner_index]);
         }
         
-        //Convert the 1d normals array to 2d.
+        //Convert the 1d normals array to 2d;matrix product function can only handle square matrix, not vector.
         one_to_many_dimension(normal_rvs, normal_rvs_matrix);
 
+        //Arrays to store the correlation matrix, pseudo-square-root, and finally from these two obtain the correlated normals matrix (or vector).
         double correlated_normals[No_COMPANIES][No_COMPANIES], correlation_matrix[No_COMPANIES][No_COMPANIES], pseudo_matrix[No_COMPANIES][No_COMPANIES];
 
-        //Get the correlation matrix and store in variable correlation_matrix and compute the cholesky decomposition.
-        get_correlation_matrix(correlation_matrix);
-        get_pseudo_square_root(correlation_matrix, pseudo_matrix);
+        if (copula_type == "gaussian")
+        {
+            //Get the correlation matrix and store in variable correlation_matrix and compute the cholesky decomposition.
+            get_correlation_matrix(correlation_matrix, copula_type);
+            get_pseudo_square_root(correlation_matrix, pseudo_matrix);
 
-        //Get the correlated normal RVs;the values are stored in the 1st column.
-        matrix_product(pseudo_matrix, normal_rvs_matrix, correlated_normals, 1.0);
+            //Get the correlated normal RVs;the values are stored in the 1st column.
+            matrix_product(pseudo_matrix, normal_rvs_matrix, correlated_normals, 1.0);
+        }
+
+        int mu = 3; //Mu parameter for the chi squared and student t distributions.
+        if (copula_type == "t_stat")
+        {
+            //Get the correlation matrix and store in variable correlation_matrix and compute the cholesky decomposition.
+            get_correlation_matrix(correlation_matrix, copula_type);
+            get_pseudo_square_root(correlation_matrix, pseudo_matrix);
+
+            //Get the chi squared RVs from its definition as the sum of squares of normal RVs. 
+            int count_mu;
+            double chi_squared_rv = 0;
+            
+            for (count_mu = 0; count_mu < mu; count_mu++)
+            {
+                double normal_rv, uniform_rv;
+                uniform_rv = ( (double)(rand()) + 1. )/( (double)(RAND_MAX) + 1. );
+                normal_rv = inverse_normal_cdf(order, uniform_rv);
+                chi_squared_rv += normal_rv*normal_rv; 
+            }
+
+            double multiplication_factor; //Factor going in the matrix product calcs.
+            multiplication_factor = sqrt(mu/chi_squared_rv);
+
+            //Get the correlated normal RVs;the values are stored in the 1st column.
+            matrix_product(pseudo_matrix, normal_rvs_matrix, correlated_normals, multiplication_factor);
+            
+        }
 
         double correlated_default_times[No_COMPANIES]; //Variable to store the correlated default time for each credit.
         for (inner_index = 0; inner_index < No_COMPANIES; inner_index++)
         {
             double correlated_uniform_rv;
-            correlated_uniform_rv = normal_cdf(correlated_normals[inner_index][0]);
+
+            /*Uniform variates will differ depending on the type of copula method; the gaussian copula uses the relevant gaussian copula marginal cdf, and the 
+            student's t copula uses its own relevant t marginal cdf. This is handled in the if statements below.*/
+            
+            if (copula_type == "gaussian")
+            {
+                correlated_uniform_rv = normal_cdf(correlated_normals[inner_index][0]);
+            }
+            if (copula_type == "t_stat")
+            {
+                correlated_uniform_rv = student_t_cdf(correlated_normals[inner_index][0], mu);
+            }
 
             //cout << "Correlated univariates " << correlated_uniform_rv << endl;
 
@@ -245,7 +244,7 @@ void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order,
 
         //cout << "Nth default time for Contract " << nth_default_time << endl;
 
-        //Determine the fair spread based on this nth default time.
+        //Determine the fair spread based on this nth default time and the zero discount factors are also important for this purpose.
         double zero_disc_factors[11], delta_t = 0.5;
         bond_curve_bootstrapper(zero_disc_factors);
         double fair_spread;
@@ -313,7 +312,7 @@ double premium_protection_leg_calcs (double nth_default_time, double maturity, d
  * Author: Zwi Mudau                                                                                                                *
  *                                                                                                                                  *
  * Parameters:                                                                                                                      *
- * correlation_matrix: matrix storing information about the correlations of the variables.                                          *
+ * correlation_matrix: matrix storing information about the correlations of the variables;assumed to be positive definite.          *
  * pseudo_matrix: matrix to store the computed pseudo-square root matrix.                                                           *
  *                                                                                                                                  *
  * Return: This is a void function.                                                                                                 *                                                                                                                                  
@@ -361,7 +360,7 @@ void get_pseudo_square_root (double correlation_matrix[][No_COMPANIES], double p
 }
 
 /************************************************************************************************************************************
- * Purpose: Function to compute the cummulative density function for normal RVs.                                                    * 
+ * Purpose: Function to compute the cummulative density function for normal RVs;coverts normal RVs to uniform RVs.                  * 
  *                                                                                                                                  *
  * Author: Zwi Mudau                                                                                                                *
  *                                                                                                                                  *
@@ -400,7 +399,7 @@ double inverse_normal_cdf (int order, double x_param)
 
     if (order == 0)
         inverse_normal_cdf = sqrt(2)*inverse_error_function1(2*x_param - 1);
-    if (order == 0)
+    if (order != 0)
         inverse_normal_cdf = sqrt(2)*inverse_error_function(order, 2*x_param - 1);
 
     return inverse_normal_cdf;
@@ -480,6 +479,18 @@ double inverse_error_function1 (double x_param)
         return 0.0;
 }
 
+/************************************************************************************************************************************
+ * Purpose: Function to compute an approximation to the hypergeometric function using series; used to obtain the incomple beta F    * 
+ *                                                                                                                                  *
+ * Author: Zwi Mudau                                                                                                                *
+ *                                                                                                                                  *
+ * Parameters:                                                                                                                      *
+ *                                                                                                                                  *
+ * Order refers to the highest power of the polynomial in the series, x_variable is the independent variable we wish to compute the *
+ * approximation at, and the other are just parameters of the function as can be obtained from literature.                          *
+ * Return: This returns a number approximating the series.                                                                          *                                                                                                                                  
+ ************************************************************************************************************************************
+ */
 long double hypergeometric_function (int order, double a_param, double b_param, double c_param, double x_variable)
 {
     int index;
@@ -506,6 +517,18 @@ long double hypergeometric_function (int order, double a_param, double b_param, 
     return hypergeometric_value;
 }
 
+/************************************************************************************************************************************
+ * Purpose: Functions to compute the incomplete beta function from the (0)hypergeometrix function and (1)numerical integration.     * 
+ *                                                                                                                                  *
+ * Author: Zwi Mudau                                                                                                                *
+ *                                                                                                                                  *
+ * Parameters:                                                                                                                      *
+ *                                                                                                                                  *
+ * x_param: x_variable is the independent x value we wish to compute the function at, and the others are just parameters of the fun *
+ * ction as found in the literature.                                                                                                *
+ * Return: The return value is the incomplete beta function at this x point.                                                        *                                                                                                                                  
+ ************************************************************************************************************************************
+ */
 long double incomplete_beta_function (double a_param, double b_param, double x_variable)
 {
     long double beta_value;
@@ -515,12 +538,122 @@ long double incomplete_beta_function (double a_param, double b_param, double x_v
     return beta_value;
 }
 
+double incomplete_beta_function1 (double a_param, double b_param, double x_variable)
+{
+    double intergration_approximation;
+    intergration_approximation = simpson(0, x_variable, 10000, a_param, b_param);
+
+    return intergration_approximation;
+}
+
+/************************************************************************************************************************************
+ * Purpose: Function to compute the beta function from the gamma function, which is built in the language.                          * 
+ *                                                                                                                                  *
+ * Author: Zwi Mudau                                                                                                                *
+ *                                                                                                                                  *
+ * Parameters:                                                                                                                      *
+ *                                                                                                                                  *
+ * x_param: a_param and b_param are the independent values we wish to compute the function at.                                      *
+ *                                                                                                                                  *
+ * Return: The return value is the beta function at this x point.                                                                   *                                                                                                                                  
+ ************************************************************************************************************************************
+ */
 double beta_function (double a_param, double b_param)
 {
     double beta_value;
     beta_value = tgamma(a_param)*tgamma(b_param)/tgamma(a_param + b_param);
 
     return beta_value;
+}
+
+/************************************************************************************************************************************
+ * Purpose: Function to compute the student's t cdf function from the two beta functions.                                           * 
+ *                                                                                                                                  *
+ * Author: Zwi Mudau                                                                                                                *
+ *                                                                                                                                  *
+ * Parameters:                                                                                                                      *
+ *                                                                                                                                  *
+ * x_param is the independent value we wish to compute the function at, mu is the degree of freedom of the chi squared function.    *
+ *                                                                                                                                  *
+ * Return: The return value is the beta function at this x point.                                                                   *                                                                                                                                  
+ ************************************************************************************************************************************
+ */
+double student_t_cdf (double x_value, double mu)
+{
+    double cdf_t, incomplete_beta_param;
+
+    incomplete_beta_param = mu/(mu + x_value*x_value);
+
+    if (x_value < 0)
+        cdf_t = incomplete_beta_function1(mu/2, 0.5, incomplete_beta_param)/(2*beta_function(mu/2, 0.5));
+    if (x_value > 0)
+        cdf_t = 1 - incomplete_beta_function1(mu/2, 0.5, incomplete_beta_param)/(2*beta_function(mu/2, 0.5));
+    if (x_value == 0)
+        cdf_t = 1;
+
+    return cdf_t;
+}
+
+double f(double x, double a, double b) 
+// integrand definition
+{ 
+    /* 3 different functions to try - remove the comment command
+    when using the function of interest */
+    //double function=x*x; // this is the only line to change.
+    // double function= 1.0/(sqrt(2*pi))*exp(-x*x/2.0);
+
+    double function= pow(x, a - 1)*pow(1 - x, b - 1);
+    
+    return function;
+}
+
+double simpson(double lower_bound, double upper_bound, double no_steps, double a, double b)
+{
+    double sum_even = 0.0;
+    double sum_odd = 0.0;
+    double step_size = (upper_bound - lower_bound)/no_steps;
+    int index;
+    
+    for (int index = 1; index <= (no_steps - 1); index++)
+    {
+        double x = lower_bound + index*step_size;
+        
+        if (index %2 == 0)
+        {
+            sum_even += f(x, a, b);
+        }
+        else
+        {
+            sum_odd += f(x, a, b);
+        }
+    }
+
+    //cout << "sum even " << sum_even << endl;
+    //cout << "sum odd " << sum_odd << endl;
+
+    double inner_pts = 4*(sum_odd) + 2*(sum_even);
+    double f_x = step_size*(f(lower_bound, a, b) + inner_pts + f(upper_bound, a, b))/3.0;
+
+    //cout << "SImmpsom integral " << f_x << endl;
+
+    return f_x;
+}
+
+double trapezoidal (double lower_bound, double upper_bound, double no_steps, double a, double b)
+{
+    double sum = 0.0; int index;
+    double step_size = (upper_bound - lower_bound)/no_steps;
+
+    for (int index = 1; index <= (no_steps - 1); index++)
+    {
+        double x = lower_bound + index*step_size;
+        sum += f(x, a, b);
+    }
+
+    double inner_pts = 2*sum;
+    double f_x = 0.5*step_size*(f(lower_bound, a, b) + inner_pts + f(upper_bound, a, b));
+    
+    return f_x;
 }
 
 double factorial_of_x (int x_param)
@@ -555,13 +688,19 @@ double factorial_of_x (int x_param)
  * This is a void function.                                                                                                         *                                                                                                                                  
  ************************************************************************************************************************************
  */
-void get_correlation_matrix (double correlation_array[][No_COMPANIES])
+void get_correlation_matrix (double correlation_array[][No_COMPANIES], string copula_type)
 {
     string command = "python3 correlation_calcs.py";  //Command to run on the shell.
     const char *c_command = command.c_str();
     system(c_command);
+    string correlation_file;
 
-    char correlation_file[50] = "correlation_matrix.txt";
+    if (copula_type == "gaussian") 
+        correlation_file = "correlation_matrix_gaussian.txt";
+    if (copula_type == "t_stat")
+        correlation_file = "correlation_matrix_t.txt";
+    
+    //Create stream to the file.
     ifstream stream_to_file(correlation_file);
     int index1, index2, outer_index = 0; string line;
 
@@ -569,8 +708,12 @@ void get_correlation_matrix (double correlation_array[][No_COMPANIES])
     while (getline(stream_to_file, line)) 
     {
         string word;
+
+        //Create stream to the string variable 'word'.
         istringstream string_stream (line);
         int inner_index = 0;
+
+        //read string word by word, and convert the string to a float value.
         while (getline(string_stream, word, ' '))
         {
             correlation_array[outer_index][inner_index] = stod(word);
@@ -593,6 +736,9 @@ void get_correlation_matrix (double correlation_array[][No_COMPANIES])
 
 void matrix_product (double array_one[][No_COMPANIES], double array_two[][No_COMPANIES], double product_array[][No_COMPANIES], double scale_factor)
 {
+    /*Function computes the product of 2 matrices array_one and array_two then stores the product in a new array product_array. The two matrices are 
+    assumed to be 2d. Also at the same time, scalar multiplication is implemented.*/
+
     int i_index, j_index;
 
     for (i_index = 0; i_index < No_COMPANIES; i_index++)
@@ -1075,3 +1221,4 @@ double get_nth_minimum_value (double array[No_COMPANIES], int n)
 
     return global_min_value;
 }
+
