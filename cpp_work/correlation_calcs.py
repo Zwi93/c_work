@@ -107,21 +107,30 @@ def log_lokelihood_mu (dataframe):
     #Then the weekly data in uniform type, i.e in (0, 1).
     cds_historical_data_weekly = daily_to_weekly(dataframe)
     columns = cds_historical_data_weekly.columns.values.tolist()
-    
-    log_likelihood = 0
-    for i in range(cds_historical_data_weekly.shape[0]):
 
-        implied_cdf_data = []  #this will contain data point for a single day in the historical data.
+    #Find the mu which maximizes the log-likelihood. 
+    log_likelihood_dict = {}
 
-        #Select just one vector from this dictionary.
-        for colmn in columns:
-            implied_cdf = get_implied_cdf(cds_historical_data_weekly[colmn])[i]
-            implied_cdf_data.append(implied_cdf)
+    for mu in range(1, 25):
+        
+        log_likelihood = 0
 
-        tcopula = multivariate_tcopula(implied_cdf_data, 1, inverse_correlation_matrix, determinant)
-        log_likelihood += np.log10(tcopula)
-    
-    print(log_likelihood)
+        for i in range(cds_historical_data_weekly.shape[0]):
+
+            implied_cdf_data = []  #this will contain data point for a single day in the historical data.
+
+           #Select just one vector from this dictionary.
+            for colmn in columns:
+                implied_cdf = get_implied_cdf(cds_historical_data_weekly[colmn])[i]
+                implied_cdf_data.append(implied_cdf)
+
+            tcopula = multivariate_tcopula(implied_cdf_data, mu, inverse_correlation_matrix, determinant)
+            log_likelihood += np.log10(tcopula)
+
+        log_likelihood_dict[mu] = log_likelihood
+
+    return log_likelihood_dict
+
     
     
 #Below is a definition for the density function of the multivariate t copula.
@@ -161,5 +170,10 @@ def multivariate_tcopula (uniform_rvs, mu, inv_correlation_matrix, det_correlati
 #plt.scatter(np.arange(pfizer_cds_data.size), pfizer_cds_data)
 #plt.plot(kde.support, kde.cdf, label="KDE")
 
-#plt.show()
-log_lokelihood_mu(cds_historical_data_daily)
+
+log_likelihood_dict = log_lokelihood_mu(cds_historical_data_daily)
+x_values = list(log_likelihood_dict.keys())
+y_values = list(log_likelihood_dict.values())
+plt.scatter(x_values, y_values)
+
+plt.show()

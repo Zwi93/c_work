@@ -1,5 +1,5 @@
 /************************************************************************************************************************************
- * Purpose: Given the correlation matrix one can price the fair spread of a basket CDS using functions defined here.                * 
+ * Purpose: Given the correlation matrix one can price the fair spread of a nth-to-default basket CDS using functions defined here. * 
  *                                                                                                                                  *
  * Author: Zwi Mudau                                                                                                                *
  *                                                                                                                                  *
@@ -9,10 +9,6 @@
  */
 
 //Include all relevant header files here.
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <cmath>
 #include "cds_curve_bootstrapper.h"
 
 using namespace std;

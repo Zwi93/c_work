@@ -1,5 +1,7 @@
 //Include all relevant header files here.
 #include <iostream>
+#include <fstream>
+#include <sstream>
 #include <cmath>
 
 using namespace std;
