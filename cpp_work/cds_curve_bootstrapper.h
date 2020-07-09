@@ -9,7 +9,7 @@ using namespace std;
 //Declare important macros here.
 #define FREQUENCY 2
 #define No_COMPANIES 5 //number of underlyings in the basket.
-#define SIMULATIONS 30
+#define SIMULATIONS 300
 #define NATURAL_EXP exp(1)
 #define MY_PI 4*atan(1.0)  //pi to be used only in this script.
 #define MATURITY 3.0
@@ -51,6 +51,6 @@ void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order,
 double get_minimum_value (double array[No_COMPANIES]);
 double get_nth_minimum_value (double array[No_COMPANIES], int n);
 double premium_protection_leg_calcs (double nth_default_time, double maturity, double LGD, double delta_t, double zero_disc_factor[11]);
-double f(double x);
+double f(double x, double a, double b);
 double simpson(double lower_bound, double upper_bound, double no_steps, double a, double b);
 double trapezoidal (double lower_bound, double upper_bound, double no_steps, double a, double b);

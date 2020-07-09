@@ -152,12 +152,12 @@ def multivariate_tcopula (uniform_rvs, mu, inv_correlation_matrix, det_correlati
     return tcopula
 
 #Calculate the correlation matrix.
-#correlation_matrix_gaussian = get_correlation(cds_historical_data_daily, "gaussian")
-#correlation_matrix_t = get_correlation(cds_historical_data_daily, "t_stat")
+correlation_matrix_gaussian = get_correlation(cds_historical_data_daily, "gaussian")
+correlation_matrix_t = get_correlation(cds_historical_data_daily, "t_stat")
 
 #Write correlation matrix to .txt file.
-#correlation_matrix_gaussian.to_csv("correlation_matrix_gaussian.txt", header=None, index=None, sep=" ", mode="w")
-#correlation_matrix_t.to_csv("correlation_matrix_t.txt", header=None, index=None, sep=" ", mode="w")
+correlation_matrix_gaussian.to_csv("correlation_matrix_gaussian.txt", header=None, index=None, sep=" ", mode="w")
+correlation_matrix_t.to_csv("correlation_matrix_t.txt", header=None, index=None, sep=" ", mode="w")
 
 #pfizer_cds_data = cds_historical_data_weekly['PFIZER']
 
@@ -171,9 +171,9 @@ def multivariate_tcopula (uniform_rvs, mu, inv_correlation_matrix, det_correlati
 #plt.plot(kde.support, kde.cdf, label="KDE")
 
 
-log_likelihood_dict = log_lokelihood_mu(cds_historical_data_daily)
-x_values = list(log_likelihood_dict.keys())
-y_values = list(log_likelihood_dict.values())
-plt.scatter(x_values, y_values)
+#log_likelihood_dict = log_lokelihood_mu(cds_historical_data_daily)
+#x_values = list(log_likelihood_dict.keys())
+#y_values = list(log_likelihood_dict.values())
+#plt.scatter(x_values, y_values)
 
-plt.show()
+#plt.show()

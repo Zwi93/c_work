@@ -10,9 +10,10 @@
 
 //Include all relevant header files here.
 #include "cds_curve_bootstrapper.h"
+#include "matplotlibcpp.h"
 
 using namespace std;
-
+namespace plt = matplotlibcpp;
 
 int main ()
 {   
@@ -20,44 +21,44 @@ int main ()
     contract_info cds_curves_matrix[No_COMPANIES][6];
 
     // Create array of struct type (cds_contract) to carry the information of cds contracts to be bootstrapped.
-    cds_curves_matrix[0][0] = {"0.5Y cds", 95, 0.0, 0.5};
-    cds_curves_matrix[0][1] = {"1Y cds", 100, 0.0, 1.0};
-    cds_curves_matrix[0][2] = {"2Y cds", 114.00, 0.0, 2.0};
-    cds_curves_matrix[0][3] = {"3Y cds", 121.0, 0.0, 3};
-    cds_curves_matrix[0][4] = {"4Y cds", 135.0, 0.0, 4};
-    cds_curves_matrix[0][5] = {"5Y cds", 145.0, 0.0, 5.0};
+    cds_curves_matrix[0][0] = {"0.5Y cds", 9.5, 0.0, 0.5};
+    cds_curves_matrix[0][1] = {"1Y cds", 10.00, 0.0, 1.0};
+    cds_curves_matrix[0][2] = {"2Y cds", 14.700, 0.0, 2.0};
+    cds_curves_matrix[0][3] = {"3Y cds", 21.890, 0.0, 3};
+    cds_curves_matrix[0][4] = {"4Y cds", 25.500, 0.0, 4};
+    cds_curves_matrix[0][5] = {"5Y cds", 29.406, 0.0, 5.0};
 
     // Create array of struct type (cds_contract) to carry the information of cds contracts to be bootstrapped.
-    cds_curves_matrix[1][0] = {"0.5Y cds", 85, 0.0, 0.5};
-    cds_curves_matrix[1][1] = {"1Y cds", 105, 0.0, 1.0};
-    cds_curves_matrix[1][2] = {"2Y cds", 110.00, 0.0, 2.0};
-    cds_curves_matrix[1][3] = {"3Y cds", 126.0, 0.0, 3};
-    cds_curves_matrix[1][4] = {"4Y cds", 135.0, 0.0, 4};
-    cds_curves_matrix[1][5] = {"5Y cds", 140.0, 0.0, 5.0};
+    cds_curves_matrix[1][0] = {"0.5Y cds", 11.132, 0.0, 0.5};
+    cds_curves_matrix[1][1] = {"1Y cds", 17.560, 0.0, 1.0};
+    cds_curves_matrix[1][2] = {"2Y cds", 24.410, 0.0, 2.0};
+    cds_curves_matrix[1][3] = {"3Y cds", 29.980, 0.0, 3};
+    cds_curves_matrix[1][4] = {"4Y cds", 36.780, 0.0, 4};
+    cds_curves_matrix[1][5] = {"5Y cds", 41.431, 0.0, 5.0};
 
     // Create array of struct type (cds_contract) to carry the information of cds contracts to be bootstrapped.
-    cds_curves_matrix[2][0] = {"0.5Y cds", 75, 0.0, 0.5};
-    cds_curves_matrix[2][1] = {"1Y cds", 89, 0.0, 1.0};
-    cds_curves_matrix[2][2] = {"2Y cds", 104.00, 0.0, 2.0};
-    cds_curves_matrix[2][3] = {"3Y cds", 117.0, 0.0, 3};
-    cds_curves_matrix[2][4] = {"4Y cds", 130.0, 0.0, 4};
-    cds_curves_matrix[2][5] = {"5Y cds", 141.0, 0.0, 5.0};
+    cds_curves_matrix[2][0] = {"0.5Y cds", 25.452, 0.0, 0.5};
+    cds_curves_matrix[2][1] = {"1Y cds", 30.741, 0.0, 1.0};
+    cds_curves_matrix[2][2] = {"2Y cds", 34.000, 0.0, 2.0};
+    cds_curves_matrix[2][3] = {"3Y cds", 35.651, 0.0, 3};
+    cds_curves_matrix[2][4] = {"4Y cds", 45.347, 0.0, 4};
+    cds_curves_matrix[2][5] = {"5Y cds", 52.495, 0.0, 5.0};
 
     // Create array of struct type (cds_contract) to carry the information of cds contracts to be bootstrapped.
-    cds_curves_matrix[3][0] = {"0.5Y cds", 85, 0.0, 0.5};
-    cds_curves_matrix[3][1] = {"1Y cds", 101, 0.0, 1.0};
-    cds_curves_matrix[3][2] = {"2Y cds", 104.00, 0.0, 2.0};
-    cds_curves_matrix[3][3] = {"3Y cds", 111.0, 0.0, 3};
-    cds_curves_matrix[3][4] = {"4Y cds", 125.0, 0.0, 4};
-    cds_curves_matrix[3][5] = {"5Y cds", 125.0, 0.0, 5.0};
+    cds_curves_matrix[3][0] = {"0.5Y cds", 314.451, 0.0, 0.5};
+    cds_curves_matrix[3][1] = {"1Y cds", 374.145, 0.0, 1.0};
+    cds_curves_matrix[3][2] = {"2Y cds", 405.521, 0.0, 2.0};
+    cds_curves_matrix[3][3] = {"3Y cds", 450.874, 0.0, 3};
+    cds_curves_matrix[3][4] = {"4Y cds", 489.417, 0.0, 4};
+    cds_curves_matrix[3][5] = {"5Y cds", 519.097, 0.0, 5.0};
 
     // Create array of struct type (cds_contract) to carry the information of cds contracts to be bootstrapped.
-    cds_curves_matrix[4][0] = {"0.5Y cds", 45, 0.0, 0.5};
-    cds_curves_matrix[4][1] = {"1Y cds", 50, 0.0, 1.0};
-    cds_curves_matrix[4][2] = {"2Y cds", 61.00, 0.0, 2.0};
-    cds_curves_matrix[4][3] = {"3Y cds", 71.0, 0.0, 3};
-    cds_curves_matrix[4][4] = {"4Y cds", 75.0, 0.0, 4};
-    cds_curves_matrix[4][5] = {"5Y cds", 85.0, 0.0, 5.0};
+    cds_curves_matrix[4][0] = {"0.5Y cds", 17.63, 0.0, 0.5};
+    cds_curves_matrix[4][1] = {"1Y cds", 21.21, 0.0, 1.0};
+    cds_curves_matrix[4][2] = {"2Y cds", 28.41, 0.0, 2.0};
+    cds_curves_matrix[4][3] = {"3Y cds", 31.85, 0.0, 3};
+    cds_curves_matrix[4][4] = {"4Y cds", 26.78, 0.0, 4};
+    cds_curves_matrix[4][5] = {"5Y cds", 30.97, 0.0, 5.0};
 
 
     double LGD = 0.4; //Loss Given Default, assumed constant and equal for each company.
@@ -79,6 +80,112 @@ int main ()
 }
 
 /************************************************************************************************************************************
+ * Purpose: Function to compute the spread for the basket cds using a faster monte carlo technique.                                 *
+ *                                                                                                                                  *
+ * Author: Zwi Mudau                                                                                                                *
+ *                                                                                                                                  *
+ * Parameters:                                                                                                                      *
+ * no_of_credits is the basket's number of underlyings, no_of_simulations is how many monte carlo simulation to perform, order is   *
+ * parameter to manage the accuracy of the inverse_default_cdf, cds_curve_matrix variable contains all the data for each underlying *
+ * nth_default determines which type of CDS it is, 1st, 2nd, etc, and maturity is the contract's maturity.                          *
+ *                                                                                                                                  *
+ * Return: This is a void function.                                                                                                 *
+ ************************************************************************************************************************************
+ */
+void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD, int nth_default, double maturity, string copula_type)
+{
+    int index;
+
+    for (index = 0; index < no_of_simulations; index++)
+    {
+        int inner_index; double independent_normal_rvs[no_of_credits];  //Array to store independent normal variates.
+        double count_defaults = 0, payoff_adjustment = 1; //Keep track of number of defaults and adjustment to payoff.
+        double correlation_matrix[No_COMPANIES][No_COMPANIES], pseudo_matrix[No_COMPANIES][No_COMPANIES]; //Matrix to store correlation matrix and its Cholesky Decomposition. 
+
+        //Populate independent_normal_rvs by zeros.
+        int temp_i;
+        for (temp_i = 0; temp_i < no_of_credits; temp_i++)
+        {
+            independent_normal_rvs[temp_i] = 0.0;
+        }
+        
+        //Get the correlation matrix and store in variable correlation_matrix and compute the cholesky decomposition.
+        get_correlation_matrix(correlation_matrix, copula_type);
+        get_pseudo_square_root(correlation_matrix, pseudo_matrix); 
+        
+        //Obtain pseudo random numbers in the range (0, 1).
+        for (inner_index = 0; inner_index < no_of_credits; inner_index++)
+        {
+            double correlated_normal_bound; //Normals below this value will guaranttee a default.
+            double survival_probability[11];
+            
+            //Construct the credit curves fo each counterpart.
+            contract_info cds_info[6];
+
+            int tenor_index; //The tenor of the curve point.
+            for (tenor_index = 0; tenor_index < 6; tenor_index++)
+            {
+                cds_info[tenor_index] = cds_curves_matrix[inner_index][tenor_index];
+            }
+        
+            //Obtain the survival probabilities for counterpart corresponding to index inner_index.
+            cds_curve_bootstrapper(survival_probability, cds_info, LGD);
+
+            double delta_t = 0.5; int index_maturity = (int) maturity/delta_t;
+
+            //Obtain the limiting value to guarantee default in the simulation path.
+            correlated_normal_bound = inverse_normal_cdf(order, survival_probability[index_maturity]);
+            
+            //Decide whether enough defaults have occured.
+
+            if (count_defaults < nth_default)
+            {
+                double adjusted_default_prob = 1/(no_of_credits + 1 - (inner_index + 1)); //With this prob, default is guaruanteed to occur in each simulation path.
+                double temp_sum = 0; //Needed for the calculation of new updated uniform.
+                double updated_uniform, uncorrelated_normal_bound;
+
+                int inner_inner_i;
+
+                for (inner_inner_i = 0; inner_inner_i < inner_index; inner_inner_i++)
+                {
+                    temp_sum += pseudo_matrix[inner_inner_i][inner_index]*independent_normal_rvs[inner_inner_i];
+                }
+
+                uncorrelated_normal_bound = (correlated_normal_bound - temp_sum)/pseudo_matrix[inner_index][inner_index];
+
+                //Now draw a pseudo uniform RV.
+                double pseudo_uniform_rv = ( (double)(rand()) + 1. )/( (double)(RAND_MAX) + 1. );
+
+                //Examine condition of guarauntteed default and adjust quantities accordingly.
+                if (pseudo_uniform_rv < adjusted_default_prob)
+                {
+                    updated_uniform = uncorrelated_normal_bound*pseudo_uniform_rv/adjusted_default_prob;
+                    independent_normal_rvs[inner_index] = inverse_normal_cdf(order, updated_uniform);
+                    count_defaults += 1;
+                    payoff_adjustment *= uncorrelated_normal_bound/adjusted_default_prob;
+                }
+
+                if (pseudo_uniform_rv > adjusted_default_prob)
+                {
+                    updated_uniform = uncorrelated_normal_bound + (1 - uncorrelated_normal_bound)*(pseudo_uniform_rv - adjusted_default_prob)/(1 - adjusted_default_prob);
+                    independent_normal_rvs[inner_index] = inverse_normal_cdf(order, updated_uniform);
+                    count_defaults += 0;
+                    payoff_adjustment *= (1 - uncorrelated_normal_bound)/(1 - adjusted_default_prob);
+                }
+            }
+
+            if (count_defaults >= nth_default)
+            {
+                //Now draw a pseudo uniform RV.
+                double pseudo_uniform_rv = ( (double)(rand()) + 1. )/( (double)(RAND_MAX) + 1. );
+                independent_normal_rvs[inner_index] = inverse_normal_cdf(order, pseudo_uniform_rv);
+            }
+
+        }        
+    }
+} 
+
+/************************************************************************************************************************************
  * Purpose: Function to compute the spread for the basket cds using monte carlo techniques.                                         * 
  *                                                                                                                                  *
  * Author: Zwi Mudau                                                                                                                *
@@ -94,6 +201,8 @@ int main ()
 void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD, int nth_default, double maturity, string copula_type)
 {
     int index;
+    double fair_spread = 0; //Rolling average spread to be saved here.
+    vector<double> fair_spread_path(no_of_simulations);
 
     for (index = 0; index < no_of_simulations; index++)
     {
@@ -209,15 +318,20 @@ void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order,
         //Determine the fair spread based on this nth default time and the zero discount factors are also important for this purpose.
         double zero_disc_factors[11], delta_t = 0.5;
         bond_curve_bootstrapper(zero_disc_factors);
-        double fair_spread;
-        fair_spread = premium_protection_leg_calcs(nth_default_time, maturity, LGD, delta_t, zero_disc_factors);
-
-        if (fair_spread > 0)
-        {
-            cout << "Fair Spread for path " << index << " is " << fair_spread << endl;
-        }
         
+        //cout << "Loop no. " << index << endl;
+        int lower_bound = floor(nth_default_time/delta_t);
+        //cout << "Lower bound " << lower_bound << endl;
+        fair_spread += premium_protection_leg_calcs(nth_default_time, maturity, LGD, delta_t, zero_disc_factors);
+        fair_spread_path.at(index) = fair_spread;
     }
+
+    double average_fair_spread = fair_spread/no_of_simulations;
+
+    cout << "Average Spread " << average_fair_spread << endl;
+
+    plt::plot(fair_spread_path);
+    plt::show();
 }
 
 /************************************************************************************************************************************
@@ -243,17 +357,25 @@ double premium_protection_leg_calcs (double nth_default_time, double maturity, d
         int index;
         int lower_bound = floor(nth_default_time/delta_t);
 
-        for (index = 1; index < lower_bound; index++)
+        if (lower_bound > 1)
         {
-            premium_leg += zero_disc_factor[index];
-        }  
+            for (index = 1; index < lower_bound; index++)
+            {
+                premium_leg += zero_disc_factor[index];
+            }
 
-        protection_leg = LGD*zero_disc_factor[lower_bound];
+            protection_leg = LGD*zero_disc_factor[lower_bound];
+        }
+
+        if (lower_bound <= 1)
+        {
+            premium_leg = (zero_disc_factor[0] + zero_disc_factor[1])/2;
+            protection_leg = LGD*(zero_disc_factor[0] + zero_disc_factor[1])/2;
+        }  
     }
 
     if (nth_default_time >= maturity)
     {
-        //Determine the time interval where default occurs.
         int index;
 
         for (index = 1; index < 11; index++)
@@ -556,6 +678,18 @@ double student_t_cdf (double x_value, double mu)
     return cdf_t;
 }
 
+/************************************************************************************************************************************
+ * Purpose: Function to be provided as the integrand in the simpson/trapeziodal function.                                           * 
+ *                                                                                                                                  *
+ * Author: This is code stripped from code in notes from Dr Riaz Ahmad.                                                                                                               *
+ *                                                                                                                                  *
+ * Parameters:                                                                                                                      *
+ *                                                                                                                                  *
+ * x is the independent value of the function, parameters a and b are exponents in the function of interest in this project; this is*
+ * the integrand in the incomplete bet function.                                                                                    *
+ * Return: The return value is the integrand's value at x.                                                                   *                                                                                                                                  
+ ************************************************************************************************************************************
+ */
 double f(double x, double a, double b) 
 // integrand definition
 { 
@@ -569,6 +703,18 @@ double f(double x, double a, double b)
     return function;
 }
 
+/************************************************************************************************************************************
+ * Purpose: Function to compute the simpson's approximation to the definite integral.                                               * 
+ *                                                                                                                                  *
+ * Author: This is code stripped from code in notes from Dr Riaz Ahmad.                                                             *
+ *                                                                                                                                  *
+ * Parameters:                                                                                                                      *
+ *                                                                                                                                  *
+ * lower_bound is the integral's lower_limit, same applies for upper_bound, and no_steps determines how the interval of integration *
+ * is divided, and parameters a and b will go into the integrand.                                                                   *
+ * Return: The returned value is an approximation to the incomplete beta function.                                                  *                                                                                                                                  
+ ************************************************************************************************************************************
+ */
 double simpson(double lower_bound, double upper_bound, double no_steps, double a, double b)
 {
     double sum_even = 0.0;
@@ -601,6 +747,18 @@ double simpson(double lower_bound, double upper_bound, double no_steps, double a
     return f_x;
 }
 
+/************************************************************************************************************************************
+ * Purpose: Function to compute the trapezoidal approximation to the definite integral.                                             *  
+ *                                                                                                                                  *
+ * Author: This is code stripped from code in notes from Dr Riaz Ahmad.                                                             *
+ *                                                                                                                                  *
+ * Parameters:                                                                                                                      *
+ *                                                                                                                                  *
+ * lower_bound is the integral's lower_limit, same applies for upper_bound, and no_steps determines how the interval of integration *
+ * is divided, and parameters a and b will go into the integrand.                                                                   *
+ * Return: The returned value is an approximation to the incomplete beta function.                                                  *                                                                                                                                                                                                                                                                    
+ ************************************************************************************************************************************
+ */
 double trapezoidal (double lower_bound, double upper_bound, double no_steps, double a, double b)
 {
     double sum = 0.0; int index;
