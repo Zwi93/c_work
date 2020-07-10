@@ -10,7 +10,7 @@
 
 #include "cds_curve_bootstrapper.h"
 
-/*
+
 int main ()
 {
     // Create array of struct type (cds_contract) to carry the information of cds contracts to be bootstrapped.
@@ -45,7 +45,7 @@ int main ()
     
     return 0;
 }
-*/
+
 
 /************************************************************************************************************************************
  * Purpose: Function to bootstrapp the cds curve from given input data.                                                             * 
