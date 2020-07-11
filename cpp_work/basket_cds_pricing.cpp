@@ -64,9 +64,9 @@ int main ()
     double LGD = 0.4; //Loss Given Default, assumed constant and equal for each company.
     int n = 1; //Contract defaulting type, i.e 1st, 2nd, etc to default.
 
-    //basket_cds_mc_pricing(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "t_stat");
-    basket_cds_mc_pricing_adjusted(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "t_stat");
-    
+    //basket_cds_mc_pricing_adjusted(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "gaussian");
+    basket_cds_mc_pricing(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "gaussian");
+
     //double nth_minimum_value = get_nth_minimum_value(array, n);
 
     //cout << n << " Min " << nth_minimum_value << endl;
@@ -113,7 +113,7 @@ void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, i
         
         //Get the correlation matrix and store in variable correlation_matrix and compute the cholesky decomposition.
         get_correlation_matrix(correlation_matrix0, copula_type);
-        get_pseudo_square_root(correlation_matrix0, pseudo_matrix0);
+        get_pseudo_square_root(correlation_matrix0, pseudo_matrix0); 
 
         //Case of inner_index = 0 has to be handled separately. 
         double first_rv = ((double)(rand()) + 1. )/( (double)(RAND_MAX) + 1. );
@@ -127,21 +127,24 @@ void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, i
         
         cds_curve_bootstrapper(first_survival_probability, first_cds_info, LGD);int index_maturity = floor(maturity/delta_t);
         
-        double first_bound = inverse_normal_cdf(order, first_survival_probability[index_maturity]);
+        double first_bound = inverse_normal_cdf(order, 1 - first_survival_probability[index_maturity]);
         double first_uncorrelated_bound = normal_cdf(first_bound);
-        if (first_rv < 1.0/No_COMPANIES)
+        double numerator0 = nth_default; double adjusted_prob0 = numerator0/No_COMPANIES; 
+
+        
+        if (first_rv < adjusted_prob0)
         {
-            double first_uncorrelated_normal = inverse_normal_cdf(order ,No_COMPANIES*first_uncorrelated_bound*first_rv);
+            double first_uncorrelated_normal = inverse_normal_cdf(order ,first_uncorrelated_bound*first_rv/adjusted_prob0);
             independent_normal_rvs[0] = first_uncorrelated_normal;
             count_defaults += 1;
-            payoff_adjustment *= No_COMPANIES*first_uncorrelated_bound;
+            payoff_adjustment *= first_uncorrelated_bound/adjusted_prob0;
         }
-        if (first_rv > 1.0/No_COMPANIES)
+        if (first_rv > adjusted_prob0)
         {
-            double v_1 = first_uncorrelated_bound + (1 - first_uncorrelated_bound)*(first_rv - 1.0/No_COMPANIES)/(1 - 1.0/No_COMPANIES);
+            double v_1 = first_uncorrelated_bound + (1 - first_uncorrelated_bound)*(first_rv - adjusted_prob0)/(1 - adjusted_prob0);
             independent_normal_rvs[0] = inverse_normal_cdf(order, v_1);
             count_defaults += 0;
-            payoff_adjustment *= (1 - first_uncorrelated_bound)/(1 - 1.0/No_COMPANIES);
+            payoff_adjustment *= (1 - first_uncorrelated_bound)/(1 - adjusted_prob0);
         }
         
         //Obtain pseudo random numbers in the range (0, 1) and corresponding adjusted normal variates.
@@ -150,7 +153,25 @@ void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, i
         {
             double correlated_normal_bound; //Normals below this value will guaranttee a default.
             double survival_probability0[11];
-            double adjusted_default_prob = 1.0/(No_COMPANIES - inner_index); //With this prob, default is guaruanteed to occur in each simulation path.
+            double adjusted_default_prob; //With this prob, default is guaruanteed to occur in each simulation path.
+            
+            if (nth_default == 1)
+            {
+                adjusted_default_prob = 1.0/(No_COMPANIES - inner_index);
+            }
+            else
+            {
+                double numerator = nth_default - count_defaults;
+                if (inner_index == No_COMPANIES - 2)
+                {
+                    adjusted_default_prob = numerator/1.0;
+                }
+                else
+                {
+                    adjusted_default_prob = numerator/(No_COMPANIES -(inner_index + 1 + 1));
+                }
+            }
+
             
             //Now draw a pseudo uniform RV.
             double pseudo_uniform_rv = ( (double)(rand()) + 1. )/( (double)(RAND_MAX) + 1. );
@@ -170,11 +191,11 @@ void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, i
             double delta_t = 0.5; int index_maturity = floor(maturity/delta_t);
 
             //Obtain the limiting value to guarantee default in the simulation path.
-            correlated_normal_bound = inverse_normal_cdf(order, survival_probability0[index_maturity]);
+            correlated_normal_bound = inverse_normal_cdf(order, 1 - survival_probability0[index_maturity]);
             
             //Decide whether enough defaults have occured.
 
-            if (count_defaults < nth_default)
+            if (adjusted_default_prob > 0)
             {
                 double temp_sum = 0; //Needed for the calculation of new updated uniform.
                 double updated_uniform, uncorrelated_normal_bound;
@@ -183,7 +204,7 @@ void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, i
 
                 for (inner_inner_i = 0; inner_inner_i < inner_index; inner_inner_i++)
                 {
-                    //cout << "factors in the sum " << pseudo_matrix[inner_index][inner_inner_i] << endl;
+                    //cout << "factors in the sum " << pseudo_matrix0[inner_index][inner_inner_i] << endl;
                     //cout << "factors in the sum " << independent_normal_rvs[inner_inner_i] << endl;
                     temp_sum += pseudo_matrix0[inner_index][inner_inner_i]*independent_normal_rvs[inner_inner_i];
                 }
@@ -285,6 +306,7 @@ void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, i
             
             if (copula_type == "gaussian")
             {
+                //cout << "Correlated normal for credit " << inner_index << endl; cout << correlated_normals[inner_index][0] << endl;
                 correlated_uniform_rv = normal_cdf(correlated_normals[inner_index][0]);
             }
             if (copula_type == "t_stat")
@@ -292,7 +314,7 @@ void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, i
                 correlated_uniform_rv = student_t_cdf(correlated_normals[inner_index][0], mu);
             }
 
-            //cout << "Correlated uniform RVs " << correlated_uniform_rv << endl;
+            //cout << "Correlated uniform RVs for credit " << inner_index << endl;cout << correlated_uniform_rv << endl;
 
             //Construct the credit curves fo each counterpart.
             contract_info cds_info[6];
@@ -316,7 +338,7 @@ void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, i
             get_hazard_rates(survival_probability, hazard_rates);
             
             //Then obtain the correlated default time.
-            correlated_default_times[inner_index] = survival_time_inverse_cdf(hazard_rates,1 - correlated_uniform_rv, 1000, 0.001);
+            correlated_default_times[inner_index] = survival_time_inverse_cdf(hazard_rates, 1 - correlated_uniform_rv, 1000, 0.001);
 
             //cout << "Correlated default time for Counterpart " << inner_index << " " << correlated_default_times[inner_index] << endl;
         }
@@ -337,15 +359,14 @@ void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, i
         double payoff_legs[2];
         //cout << "Lower bound " << lower_bound << endl;
         fair_spread += premium_protection_leg_calcs(nth_default_time, maturity, LGD, delta_t, zero_disc_factors, payoff_legs);
-        premium_leg += payoff_legs[1]; protection_leg += payoff_legs[0];
+        premium_leg += payoff_adjustment*payoff_legs[1]; protection_leg += payoff_adjustment*payoff_legs[0];
 
         cout << "Default time " << nth_default_time << endl;
     }
 
     double average_fair_spread1 = fair_spread/no_of_simulations, average_fair_spread2 = protection_leg/premium_leg;
 
-    cout << "Average Spread 1 " << average_fair_spread1 << endl;
-    cout << "Average Spread 2 " << average_fair_spread2 << endl; 
+    cout << "Real Average Spread (adjusted MC)" << average_fair_spread2 << endl; 
     
 } 
 
@@ -467,7 +488,7 @@ void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order,
             get_hazard_rates(survival_probability, hazard_rates);
             
             //Then obtain the correlated default time.
-            correlated_default_times[inner_index] = survival_time_inverse_cdf(hazard_rates,1 - correlated_uniform_rv, 1000, 0.001);
+            correlated_default_times[inner_index] = survival_time_inverse_cdf(hazard_rates, 1 - correlated_uniform_rv, 1000, 0.001);
 
             //cout << "Correlated default time for Counterpart " << inner_index << " " << correlated_default_times[inner_index] << endl;
         }
@@ -477,7 +498,7 @@ void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order,
 
         nth_default_time = get_nth_minimum_value(correlated_default_times, nth_default);
 
-        //cout << "Nth default time for Contract " << nth_default_time << endl;
+        cout << "Nth default time for Contract " << nth_default_time << endl;
 
         //Determine the fair spread based on this nth default time and the zero discount factors are also important for this purpose.
         double zero_disc_factors[11], delta_t = 0.5;
@@ -488,14 +509,14 @@ void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order,
         //cout << "Lower bound " << lower_bound << endl;
         double payoff_legs[2];
         fair_spread += premium_protection_leg_calcs(nth_default_time, maturity, LGD, delta_t, zero_disc_factors, payoff_legs);
-        fair_spread_path.at(index) = fair_spread;
         premium_leg += payoff_legs[1]; protection_leg += payoff_legs[0]; 
+        fair_spread_path.at(index) = protection_leg/premium_leg;
     }
 
     double average_fair_spread1 = fair_spread/no_of_simulations, average_fair_spread2 = protection_leg/premium_leg;
 
-    cout << "Average Spread 1 " << average_fair_spread1 << endl;
-    cout << "Average Spread 2 " << average_fair_spread2 << endl;
+    //cout << "Average Spread 1 " << average_fair_spread1 << endl;
+    cout << "Real Average Spread " << average_fair_spread2 << endl;
 
     plt::plot(fair_spread_path);
     plt::show();
@@ -1377,8 +1398,9 @@ double survival_time_inverse_cdf (double hazard_rates[11], double x_input, int d
     int index = 0;
     double time_interval = 0.5, exponent_sum = 0;
     double difference_variable1 = 1, difference_variable2 = 1; //Needed to determine the difference and minimize it.
+    double estimated_value;
 
-    while (difference_variable1*difference_variable2 > 0 & index < 11)
+    while (difference_variable1*difference_variable2 > 0 & index < 10)
     {
         index += 1;
         exponent_sum += hazard_rates[index]*time_interval;
@@ -1389,19 +1411,37 @@ double survival_time_inverse_cdf (double hazard_rates[11], double x_input, int d
 
     }
 
-    cout << "Index stopped at " << index << endl;
+    //cout << "Difference2 " << difference_variable2 << endl; 
+
+    //cout << "Index stopped at " << index << endl;
     //Interval of intercept.
-    double lower_bound = index*time_interval, upper_bound = lower_bound + time_interval;
-
-    //cout << "Lower bound is " << lower_bound << endl;
-
-    //Pick many values in this interval and evaluate difference to input value.
-    double estimated_value = lower_bound, difference_variable3 = 1, delta_time = time_interval/divisions;
-
-    while (abs(difference_variable3) > accuracy_level & estimated_value < upper_bound)
+    if (index < 10)
     {
-        estimated_value += delta_time;
-        difference_variable3 = x_input - exp(-exponent_sum - hazard_rates[index + 1]*(estimated_value - lower_bound));
+        double lower_bound = index*time_interval, upper_bound = lower_bound + time_interval;
+
+        //cout << "Lower bound is " << lower_bound << endl;
+
+        //Pick many values in this interval and evaluate difference to input value.
+        estimated_value = lower_bound;double difference_variable3 = 1, delta_time = time_interval/divisions;
+
+        while (abs(difference_variable3) > accuracy_level & estimated_value < upper_bound)
+        {
+            estimated_value += delta_time;
+            difference_variable3 = x_input - exp(-exponent_sum - hazard_rates[index + 1]*(estimated_value - lower_bound));
+        }
+    }
+
+    if (index == 10)
+    {
+        if (x_input >= exp(-hazard_rates[1]*time_interval))
+        {
+            //cout << "This is where the x_input is close to 1 " << endl;
+            estimated_value = time_interval*(1 - x_input)/(1 - exp(-hazard_rates[1]*time_interval));
+        }
+        else
+        {
+            estimated_value = 5.05;
+        }        
     }
      
 

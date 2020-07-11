@@ -9,10 +9,10 @@ using namespace std;
 //Declare important macros here.
 #define FREQUENCY 2
 #define No_COMPANIES 5 //number of underlyings in the basket.
-#define SIMULATIONS 5
+#define SIMULATIONS 50
 #define NATURAL_EXP exp(1)
 #define MY_PI 4*atan(1.0)  //pi to be used only in this script.
-#define MATURITY 1.0
+#define MATURITY 4.0
 
 //Define a new type to hold data for a certain CDS/Bond contracts.
 struct contract_info 
