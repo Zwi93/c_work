@@ -9,7 +9,7 @@ using namespace std;
 //Declare important macros here.
 #define FREQUENCY 2
 #define No_COMPANIES 5 //number of underlyings in the basket.
-#define SIMULATIONS 50
+#define SIMULATIONS 100
 #define NATURAL_EXP exp(1)
 #define MY_PI 4*atan(1.0)  //pi to be used only in this script.
 #define MATURITY 4.0
@@ -55,3 +55,4 @@ double premium_protection_leg_calcs (double nth_default_time, double maturity, d
 double f(double x, double a, double b);
 double simpson(double lower_bound, double upper_bound, double no_steps, double a, double b);
 double trapezoidal (double lower_bound, double upper_bound, double no_steps, double a, double b);
+void plot_hazard_rate_function (contract_info cds_curves_matrix[][6]);

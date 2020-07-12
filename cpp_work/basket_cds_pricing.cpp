@@ -65,7 +65,7 @@ int main ()
     int n = 1; //Contract defaulting type, i.e 1st, 2nd, etc to default.
 
     //basket_cds_mc_pricing_adjusted(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "gaussian");
-    basket_cds_mc_pricing(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "gaussian");
+    basket_cds_mc_pricing(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "t_stat");
 
     //double nth_minimum_value = get_nth_minimum_value(array, n);
 
@@ -81,7 +81,7 @@ int main ()
 }
 
 /************************************************************************************************************************************
- * Purpose: Function to compute the spread for the basket cds using a faster monte carlo technique.                                 *
+ * Purpose: Function to compute the spread for the basket cds using a variance reduction  monte carlo technique.                    *
  *                                                                                                                                  *
  * Author: Zwi Mudau                                                                                                                *
  *                                                                                                                                  *
@@ -111,11 +111,16 @@ void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, i
             independent_normal_rvs[temp_i] = 0.0;
         }
         
-        //Get the correlation matrix and store in variable correlation_matrix and compute the cholesky decomposition.
+        /************************************************************************************************************************************
+         *                                                                                                                                  *
+         *                                  HANDLING THE CASE INNER_INDEX = 0..                                                             *
+         *                                                                                                                                  *
+         ************************************************************************************************************************************/ 
+        
         get_correlation_matrix(correlation_matrix0, copula_type);
         get_pseudo_square_root(correlation_matrix0, pseudo_matrix0); 
 
-        //Case of inner_index = 0 has to be handled separately. 
+         
         double first_rv = ((double)(rand()) + 1. )/( (double)(RAND_MAX) + 1. );
         contract_info first_cds_info[6];
         int i;
@@ -146,6 +151,12 @@ void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, i
             count_defaults += 0;
             payoff_adjustment *= (1 - first_uncorrelated_bound)/(1 - adjusted_prob0);
         }
+
+        /************************************************************************************************************************************
+         *                                                                                                                                  *
+         *                                     HANDLING THE CASE INNER_INDEX > 0.                                                           *
+         *                                                                                                                                  *
+         ************************************************************************************************************************************/
         
         //Obtain pseudo random numbers in the range (0, 1) and corresponding adjusted normal variates.
         //Loop is going over each credit in the basket.
@@ -249,6 +260,11 @@ void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, i
 
         }
 
+        /************************************************************************************************************************************
+         *                                                                                                                                  *
+         *                       USE THE INDEPENDENT NORMAL RV TO OBTAIN CORRELATED NORMALS.                                                *
+         *                                                                                                                                  *
+         ************************************************************************************************************************************/
         
         //Convert the 1d normals array to 2d;matrix product function can only handle square matrix, not vector.
         double independent_normal_rvs_matrix[No_COMPANIES][No_COMPANIES];
@@ -1089,6 +1105,15 @@ void one_to_many_dimension (double one_dimension_array[No_COMPANIES], double man
     }
 }
 
+/*
+ *************************************************************************************************************************************************************************************************************************
+ *                                                                                                                                                                                                                       *
+ *                                  SECTION DEALING WITH CURVE BOOTSTRAPPING, INVERSE FUNCTION CONSTRUCTION, HAZARD RATES.                                                                                               *
+ *                                                                                                                                                                                                                       *
+ * ***********************************************************************************************************************************************************************************************************************
+ */
+
+
 /************************************************************************************************************************************
  * Purpose: Function to bootstrapp the cds curve from given input data.                                                             * 
  *                                                                                                                                  *
@@ -1470,6 +1495,14 @@ double survival_time_inverse_cdf1 (double hazard_rates[11], double x_input, doub
     return y_value;
 }
 
+/*
+ *************************************************************************************************************************************************************************************************************************
+ *                                                                                                                                                                                                                       *
+ *                                                                                 SECTION INCLUDES HELPER AND PLOTTING FUNCTIONS                                                                                        *
+ *                                                                                                                                                                                                                       *
+ * ***********************************************************************************************************************************************************************************************************************
+ */
+
 double get_minimum_value (double array[No_COMPANIES])
 {
     int outer_index, inner_index, minimum_index;
@@ -1552,3 +1585,39 @@ double get_nth_minimum_value (double array[No_COMPANIES], int n)
     return global_min_value;
 }
 
+void plot_hazard_rate_function (contract_info cds_curves_matrix[][6])
+{
+    //get hazard rates.
+    //Initiate input variables.
+    double survival_probability[11];
+    double hazard_rates[11];
+    double LGD = 0.4; //Loss Given Default, assumed constant and equal for each company.
+    contract_info cds_info[6];
+
+    int n;
+
+    for (n = 0; n < 6; n++)
+    {
+        cds_info[n] = cds_curves_matrix[0][n];
+    }
+    
+    //Bootstrapp cds curve.
+    cds_curve_bootstrapper(survival_probability, cds_info, LGD);
+
+    //Get hazard rates.
+    get_hazard_rates(survival_probability, hazard_rates);
+
+    int i;
+    for (i = 1; i < 11; i++)
+    {
+        double x_1, x_2;
+        x_1 = ((double)(i - 1))/2, x_2 = ((double) i)/2;
+        vector<double> x(2), y(2); x = {x_1, x_2}, y = {hazard_rates[i], hazard_rates[i]};
+        plt::plot(x, y);
+    }
+    
+    plt::title("Hazard Rate Function for Company");
+    plt::xlabel("Time");
+    plt::ylabel("Rate");
+    plt::save("hazard_rate_function.png");
+}
