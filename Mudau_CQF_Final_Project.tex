@@ -1,0 +1,226 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\DeclareMathOperator*{\E}{\mathbb{E}}
+
+\begin{document}
+
+\title{Pricing A Credit Spread}
+\author{Zwimangadzo Mudau}
+\date{\today}
+\maketitle
+
+\section{Introduction}
+One of the assumptions in pricing financial instruments is that the there is no default by any counterparty in the transaction. The results obtained from this assumption will only work in an unrealistic world where defaults rates are zero. In the real world, default risk plays an important role and must included in any financial instrument pricing. Default in many instruments is reflected as a \textit{spread} added on top of base price. Investors will demand a higher spread for the assumed risk of default inherent in most derivatives contracts. The default risk is a subset of a larger category known as Credit risk. It is investors' challenge to find ways to manage and reduce this inherent Credit risk. Credit derivatives provide a way to manage this risk, and also to assume it. Various credit derivatives exist in practice with applications in different areas of the financial markets. One popular group of such derivatives is the Credit Default Swap on a single name and its extenstion Basket Credit Swap on a collection of names. The project will focus mainly on pricing the spread on the basket instrument with five underlyings. Key parameters play varying roles in obtaining the spread; namely, \(i\) the number of underlyings, \(ii\) the recovery rate, and \(iii\) the default correlation. The default correlation is perhaps the most important of these and the project will spend some time on unpacking its influence on the spread. Also specified on the contract's term sheet is the type of contract, i.e 1st-to-default, 2nd-to-default, etc. These also have a bearing on the behaviour of the spread as other paraments change. All these will be examined in the various subsections of the project. The pricing is to be implemented through a Monte Carlo simulation approach. This approach has its own advantages and disadvantes but it is proven to outperform the other methods in higher dimensions similar to the case of multiple underlyings. 
+
+\section{Theoretical Background}
+\subsection{Default Free Bond}
+As can be found in numerous publications, the price of a coupon bearing, default free, bond can be written as follows, 
+
+\begin{equation}
+V(t, T_n) = \sum_{i = 1}^nZ(t, T_i)C_i + Z(t, T_n)F
+\end{equation}
+
+where $C$ is the coupon payment, $Z(t, T_i)$ is the zero coupon discount factor, and $F$ is the face value (this can be set to one with no loss of generality). 
+
+This equation can be flipped around to obtain the zero coupon bond discount factors while given the coupon bonds' pricces. This is the so-called bootstrapping method and was employed in the project to obtain the risk free discount curve. The resulting equation for the zero coupon discount factors is, 
+
+\begin{equation}
+Z(t, T_n) = \frac{V(t, T_n) - \sum_{i = 1}^{n - 1}Z(t, T_i)C_i}{C_n + 1}
+\end{equation}
+
+There are $n$ unknowns $Z$ for each known bond price $V$. If there are few bonds' prices, interpolation methods can be employed to obtain the other missing prices. The US Treasure Bills give a close approximation to default free coupon bonds, and these were used to obtain the zero-coupon default free discount factors.
+
+\subsection{Defaultable Bond and Extensions to CDS}
+The next logical step would be to incorporate default risk in the discussion of bonds, or any contingent claim instrument. This has been done extensively in the literature, and the price of a risky contingent claim promising to pay unit payoff at maturity $T$, is given by,
+
+\begin{equation}
+B(t, T) = \E[e^{-\int_t^{T}r(s)ds}\left(\mathsf{1}_{(\tau > T)} + \mathsf{LGD}(\tau)\mathsf{1}_{(\tau < T)}\right)]
+\end{equation}
+
+The expectation is taken against the risk-neutral survival probabilities. $\tau$ is the random time where default occurs and $\mathsf{1}_{(\tau < T)}$ is the indicator function of the default event. This equation can be simply put in words as, the price of a defaultable bond is the expecation value of the discounted future expected cash flows. The exponential is the discounting term, the sum in the brackets is the expected payoff at maturity. 
+\newline
+This can be extended to the caseof a single name CDS contract, with swap premiums paid on dates $T_i$, $0 \leq i \leq n$. Further, if a constant recovery rate is assumed and no correlation between default and interests rates, the protection and premium legs of the CDS can be shown to become, 
+
+\begin{equation}
+A_{def, t} = \mathsf{LGD}\int_{T_0}^{T_n}Z(T_0, u)F(du)
+\end{equation}
+
+\begin{equation}
+A_{prem, t} = \sum_{i = 1}^{n}s\delta_{i}Z(T_0, T_i)S(T_i)
+\end{equation}
+
+where $S(t) = 1 - F(t)$ is the survival probability, and $F(t)$ is the default probability. These have been defined rigourously in literature and their relationship to hazard rates. $s$ is the premium spread for the contract paid by the protection buyer at the dates $T_i$ provided default has not occured as shown by the presence of $S(T_i)$ in the premium leg. $F(du)$  signifies the probability of default in the short time interval $du$ and the integral is taken against all possible $du$ in the life of the contract. Further simplifications can be made on the integral to yield a summation and the equation of the spread can be found by requiring the premium and protection legs have a difference of zero at initiation of the CDS. The equation of the spread then becomes, 
+
+\begin{equation}
+s_n = \frac{\mathsf{LGD}\sum_{i = 1}^{n}Z(T_0, T_i)[S(T_i) - S(T_{i - 1})]}{\sum_{i = 1}^{n}\delta_{i}Z(T_0, T_i)S(T_i)}
+\end{equation}
+
+This is the equation of the CDS spread when given survival probabilities $S(T_i)$, however, this can also be flipped around to obtain the survival probabilities from the quoted spreads in the market in a bootstapping scheme similarly as in the case of bonds. The formula for the survival probabilities can be found through iterative procedures, and one gets the following result
+
+\begin{equation}
+S(T_n) = \frac{\sum_{i = 1}^{n - 1}Z(T_0, T_i)[\mathsf{LGD}S(T_{i - 1}) - \left(\mathsf{LGD} + s_n\right)S(T_i)]}{Z(T_0, T_n)\left(\mathsf{LGD} + s_n\right)} + \frac{S(T_{n - 1})\mathsf{LGD}}{\mathsf{LGD} + s_n}
+\end{equation}
+
+The system of linear equation consists of $n$ unknowns in $n$ equations and can thus be solved for the unknowns; if there are few spread prices, these can be interpolated using an exponential function for instance.
+
+\subsection{Hazard Rates} 
+
+Survival and default probabilities, $S(T)$ and $F(T)$, have to be modelled properly in order to obtain a consistent theory of credit risk. There have been numerous attempts in this regards; Merton's structural approach comes up more often in the literatures. This involves modeling the counterparty's assets and applying option's theory to derive a method of obtaining the default probabilities. The other approach is to model default as an exogenous process, driven by forces external to the company's business and modeled as a poisson process. This is the approach adopted in this project. 
+
+Let $\tau$ denote the first arrival time, i.e default time, and $T$ the maturity of the CDS contract. The probability that $\tau$ is before $T$ is given by, 
+
+\begin{equation}
+F(T) = P[\tau \leq T] = 1 - P[\tau > T] = 1 - S(T)
+\end{equation}
+
+$S(T)$ can be shown to originate from the hazard function $h(t)$, which itselt is closely related to the poisson process of default, as follows, 
+
+ \begin{equation}
+S(T) = e^{-\int_0^Th(s)ds}
+\end{equation}
+
+$\tau$ follows the process with pdf given by 
+
+$$f(t) = \lambda e^{-\lambda t}$$ 
+
+Where $\lambda$ is the intensity of the process. $\lambda$ and the hazard function ($h(t)$) can be shown to be equal under certain conditions. From the spread's quotes, it is possible to determine the implied survival probabilities (risk-neutral probabilities that is) and from these, under certain simplifying assumptions, it is possible to obtain the term structure of hazard rates. The integral equation for hazard rates poses a problem when it comes to calculating the rates; often there has to be made, simplifying assumption to reduce the complexity of the problem. There are several assumptions that can be made as found in the literature, however the assumption made in this project is that the hazard function $h(t)$ is deterministic and piece-wise constant. The text by \cite{credit} gives another assumption that can be made about the structure of the hazard rates and provides an explanation on how to proceed to obtain solutions, however that can be involved, requiring use of numerical solvers tools to obtain the parametrs. The piece-wise constant assumption is simpler to implement as decribed here. 
+Suppose the survival probabilities $S(T_n)$ have been computed, then to obtain the first hazard rate, the integral equation simply becomes, 
+
+$$h_1 = -\frac{lnS(T_1)}{\delta t} $$
+ 
+The second hazard rate becomes, 
+
+$$h_2 = \frac{lnS(T_1) - lnS(T_2)}{\delta t} $$
+
+And finally, for any $n$ 
+
+\begin{equation}
+h_n = \frac{lnS(T_{n - 1}) - lnS(T_n)}{\delta t}
+\end{equation}
+
+This is the equation for piece-wise contant hazard rates when given survival probabilities. The hazard rates are like forward rates; i.e only applying in a forward interval of time as seen today. To validate the results, a simple check is to confirm that the calculated hazard rates return the implied probabilities that were used to obtain them. 
+
+\subsubsection{Inverse Cummulative Distributive Function for default time}
+Having obtained the hazard rates, it becomes straightforward to get the survival probabilities for any time going into the future. This is obtained through the cdf function for $\tau$, which can be obtained by interpolation techniques on the survival probabilities. However, of rather more important role when it comes to basket cds pricing, is the inverse function of the cdf. There are numerous ways to go about computing inverse cdf for non-normal distributions as mentioned in \cite{peter_jackel}. The approach adopted in this project was to find the collection of hazard rates parameters $h_1, h_2, \dots , h_n$ which give a number close to the given input. Stated more mathematically, suppose $u_i = S(T_i)$ is given, and suppose a constant $\delta t$ where each hazard rate applies, then the goal of the inverse cdf is to find $T_i$ such that 
+
+$$u_i = S(T_i) = e^{-h_1\delta t - h_2 \delta t - \dots - h_n(T_i - t_{n - 1})} $$
+
+The search for $T_i$ is not resource expensive as the functions involved here are the exponential functions only. This at first makes the assumption that $S(T_i)$ is in the range $S(T_1) \leq S(T_i) \leq S(T_n)$, however that can be extended to regions outside this using extrapolation techniques. The procedure above only gives an interval $t_i \leq T_i \leq t_i + \delta t$ where $T_i$ belongs but does not give exact location. To get the exact location, find $T_i$ by gradually incrementing the $t_i$ until the difference , 
+
+$$S(T_i) - e^{-h_1\delta t - h_2 \delta t - \dots - h_{i + 1}(T_i - t_{i})} $$
+
+is close to prescribed accuracy level. 
+
+This gives us the function $S^{-1}(x)$, the inverse cdf for survival, and not $F^{-1}(x)$ the inverse cdf for default. To obtain the latter, the relationship $S(T) = 1 - F(T)$ comes in to lead to the result 
+
+\begin{equation}
+F^{-1}(x) = S^{-1}(1 - x)
+\end{equation}
+
+\subsection{Basket CDS}
+The previous section focused only on single name derivative products. The problem becomes more complex when more than one name are considered. This is coming from the default correlation piece of the puzzle that is introduced when multiple names are involved. Default correlation plays an important role in determining the joint probabilities for default for the basket. In this project the number of underlyings considered was just 5 names, but this can be extended easily to more than that and the problem just takes a while to compute, however the underlying principles are similar. Still adopting notations from the previous sections, one or two more can be added in the case of basket CDS. Let $\tau_i$ denote the default time (random variable) of company $i$ and let $\gamma_n$ denote the default time of the $nth$ name in the basket. $\gamma$ clearly depends on the $\tau_i$'s and the order at which they occur; for a 1st-to-default product, $\gamma_n = min\{\tau_i\}$. The challenge in determining the spread in this case is that the $\tau_i$'s are codependent, meaning that the full joint distribution $P[\tau_1 \leq T, \tau_2 \leq T, \dots, \tau_n \leq T]$ has to be determined. After successful obtaining of the joint cdf the payoff of the basket CDS is then obtained as follows,
+
+\begin{equation}
+\E[V_{prem} - V_{pro}] = \int\left(V_{prem} - V_{pro}\right)\psi (\tau_1, \tau_2, \dots, \tau_n)d\tau_1d\tau_2\dots\tau_n
+\end{equation}
+
+where $\psi (\tau_1, \tau_2, \dots, \tau_n)$ is the joint default times density, and $V_{prem}$ is given by 
+
+\begin{equation}
+V_{prem} = 
+\begin{cases} 
+\sum\limits_{i = 1}^{j}s\delta t Z(T_i) & \text{if } T_j \leq \gamma_n < T_{j + 1} \leq T \\
+\sum\limits_{i = 1}^{m}s\delta t Z(T_i) &  \text{if } \gamma_n > T
+\end{cases}
+\end{equation}
+
+and $V_{pro}$  is given by, 
+
+\begin{equation}
+V_{pro} = \mathsf{LGD}Z(\gamma_n)H(T - \gamma_n)
+\end{equation}
+
+where, 
+
+$$ H(T - \gamma_n) = \begin{cases} 1 & \text{if } \gamma_n \leq T \\ 0 & \text{otherwise} \end{cases} $$
+
+Having put the problem in this manner, it immediately becomes clear why Monte Carlo methods are suitable for computation of the spread. This is an expectation problem under multiple factors and this is where Monte Carlo schemes outperform the other numerical techniques. The idea is to simulate $\tau_i$ which follow the distribution (as yet unknown) $\psi(\tau_1, \tau_2, \dots, \tau_n)$ and then take averages of the payoff $V_{prem} - V_{pro}$ at each generated path.
+\newline 
+The remaining big question is around the functional form of the default density $\psi(\tau_1, \tau_2, \dots, \tau_n)$ and how to obtain it. Luckily, there has been significant development in this area of statistics and with the aid of Sklar's theorem, it is possible to write the cummulative distribution function $\Psi(\tau_1, \tau_2, \dots, \tau_n)$ as a copula on the $\tau_i$'s. Suppose the univariate cdf for each $i$'s name is $F_i(\tau_i)$, then the joint cdf $\Psi(\tau_1, \tau_2, \dots, \tau_n)$ can be written as a copula function of these marginals as follows, 
+
+\begin{equation}
+\Psi(\tau_1, \tau_2, \dots, \tau_n) = C(F_1(t), F_2(t), \dots, F_n(t))
+\end{equation}
+
+If the $F_i$ are continous and monotonic, then the $F_i^{-1}$ exists, and from known joint distribution (i.e multivariate gaussian or student's t) it is possible to construct copulas as follows, 
+
+\begin{equation}
+C(u_1, u_2, \dots, u_n) = F(F_1^{-1}(u_1), F_2^{-1}(u_2), \dots, F_n^{-1}(u_n); \mathbf{\Sigma})
+\end{equation}
+
+The project will only look into two copula functions as possible dependent structures for the correlated default times $\tau_i$'s. In both of these the parameter $\mathbf{\Sigma}$ controls the strength of dependence and is calibrated differently for each. 
+\newline
+Now from the point of view of a protection seller providing protection on a basket of five names, say, the probability of any one of them defaulting is higher than the probability of any two of them defaulting, both events occuring before expiry $T$ and similar default correlation. From this it is not difficult to see why the spread for 1st-to-default basket CDS is higher than that of a 2nd-to-default one. The same argument can be applied to see why the spread for the 2nd-to-default product is greater  than that of the 3rd-to-default, and so on. This will serve as quick check for the Monte Carlo calculations later on.
+
+\subsection{Numerical Methods}
+The Monte Carlo is itself a numerical method which can include other numerical methods in its process. In this project, these smaller numerical methods came in various forms as outlined in this section. The main skeleton to the Monte Carlo algorithm can be summarized as follows (for the gaussian case, similar algorithm for student's t with just a minute adjustment), as found in the numerous articles referenced here, 
+
+\begin{itemize}
+\item Setup a loop $1 \leq j \leq N$
+\item Draw $n$ $u_i$ from $U(0, 1)$.
+\item Do transformation $z_i = N^{-1}(u_i)$ for all $1 \leq i \leq n$ to obtain $\mathbf{Z}$.
+\item With $\mathbf{A}$ $s.t $ $\mathbf{\Sigma} = \mathbf{A}\mathbf{A}^T$, transform $z_i$ to $w_i$ through $\mathbf{W} = \mathbf{A}\mathbf{Z}$.
+\item Convert back to $v_i$ through $v_i = N(\mathbf{W_i})$ for each $i$.
+\item Obtain simulated $\tau_i$ for each $i$ through $\tau_i = F_i^{-1}(v_i)$. 
+\item Calculate $\gamma_n$ depending on type of contract;1st-to-default, 2nd-to-default, etc. and compute the implied $V_{prem}$ and $V_{pro}$ based on $\gamma_n$
+\item After all $j$ the spread is $s= \frac{V_{pro}}{V_{prem}}$
+\end{itemize}
+
+
+
+
+\medskip
+
+\begin{thebibliography}{20}
+\bibitem{paul_wilmott}
+Paul Wilmott.
+\textit{Paul Wilmott on Quantitative Finance},
+John Wiley \& Sons, Ltd, Chapter 41.
+
+\bibitem{peter_jackel}
+Peter Jackel.
+\textit{Monte Carlo Methods in Finance},
+John Wiley \& Sons, Ltd, Chapters 2 \& 9.
+
+\bibitem{credit}
+Christian Bluhm, Ludger Overbeck, \& Christoph Wagner.
+\textit{An Introduction to Credit Risk Modeling}
+Chapman \& Hall, Chapters 6 \& 7.
+
+\bibitem{Antulio}
+Antulio N. Bomfim.
+\textit{Understanding Credit Derivatives and Related Instruments}
+Elsevier Academic Press, Chapters 9 \& 15 \& 20. 
+
+\bibitem{joshi_kainth}
+Mark S. Joshi and Dherminder Kainth.
+\textit{Rapid and Accurate Development of Prices and Greeks for nth to Default Swaps in the Li Model}, \(2004\).
+
+\bibitem{milicia}
+Giuseppe Milicia.
+\textit{A Monte Carlo Pricing Engine for nth to Default Credit Swaps in the Li Model},
+
+\bibitem{li_2000}
+David X. Li.
+\textit{On Default Correlation: A Copula Function Approach}, \(2000\), RiskMetric. 
+
+\bibitem{sergei}
+Sergie Winitski.
+\textit{A Handy Approximation for the Error/Inverse Function}
+\texttt{https://www.academia.edu/9730974/A\_handy\_approximation\_for\_the\_error\_function\_and\_its\_inverse}
+
+\end{thebibliography}
+
+\end{document}
