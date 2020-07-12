@@ -64,8 +64,8 @@ int main ()
     double LGD = 0.4; //Loss Given Default, assumed constant and equal for each company.
     int n = 1; //Contract defaulting type, i.e 1st, 2nd, etc to default.
 
-    //basket_cds_mc_pricing_adjusted(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "gaussian");
-    basket_cds_mc_pricing(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "t_stat");
+    basket_cds_mc_pricing_adjusted(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "gaussian");
+    basket_cds_mc_pricing(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "gaussian");
 
     //double nth_minimum_value = get_nth_minimum_value(array, n);
 
@@ -97,6 +97,7 @@ void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, i
 {
     int index;
     double fair_spread = 0, premium_leg = 0, protection_leg = 0; //Rolling average spread to be saved here.
+    vector<double> fair_spread_path(no_of_simulations);
 
     for (index = 0; index < no_of_simulations; index++)
     {
@@ -283,7 +284,7 @@ void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, i
             matrix_product(pseudo_matrix, independent_normal_rvs_matrix, correlated_normals, 1.0);
         }
 
-        int mu = 3; //Mu parameter for the chi squared and student t distributions.
+        int mu = 9; //Mu parameter for the chi squared and student t distributions.
         if (copula_type == "t_stat")
         {
             //Get the correlation matrix and store in variable correlation_matrix and compute the cholesky decomposition.
@@ -374,16 +375,22 @@ void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, i
         int lower_bound = floor(nth_default_time/delta_t);
         double payoff_legs[2];
         //cout << "Lower bound " << lower_bound << endl;
-        fair_spread += premium_protection_leg_calcs(nth_default_time, maturity, LGD, delta_t, zero_disc_factors, payoff_legs);
+        fair_spread = premium_protection_leg_calcs(nth_default_time, maturity, LGD, delta_t, zero_disc_factors, payoff_legs);
         premium_leg += payoff_adjustment*payoff_legs[1]; protection_leg += payoff_adjustment*payoff_legs[0];
+        fair_spread_path.at(index) = pow(10, 4)*protection_leg/premium_leg;
 
-        cout << "Default time " << nth_default_time << endl;
+        //cout << "Default time " << nth_default_time << endl;
     }
 
-    double average_fair_spread1 = fair_spread/no_of_simulations, average_fair_spread2 = protection_leg/premium_leg;
+    double average_fair_spread2 = pow(10, 4)*protection_leg/premium_leg;
 
-    cout << "Real Average Spread (adjusted MC)" << average_fair_spread2 << endl; 
-    
+    cout << "Real Average Spread (adjusted MC)" << average_fair_spread2 << endl;
+
+    plt::plot(fair_spread_path);
+    plt::title("Rolling Spread Value");
+    plt::xlabel("Simulation Index");
+    plt::ylabel("BPs");
+    plt::save("rolling_spread_mc_adjusted.png"); 
 } 
 
 /************************************************************************************************************************************
@@ -439,7 +446,7 @@ void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order,
             matrix_product(pseudo_matrix, normal_rvs_matrix, correlated_normals, 1.0);
         }
 
-        int mu = 3; //Mu parameter for the chi squared and student t distributions.
+        int mu = 9; //Mu parameter for the chi squared and student t distributions.
         if (copula_type == "t_stat")
         {
             //Get the correlation matrix and store in variable correlation_matrix and compute the cholesky decomposition.
@@ -514,7 +521,7 @@ void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order,
 
         nth_default_time = get_nth_minimum_value(correlated_default_times, nth_default);
 
-        cout << "Nth default time for Contract " << nth_default_time << endl;
+        //cout << "Nth default time for Contract " << nth_default_time << endl;
 
         //Determine the fair spread based on this nth default time and the zero discount factors are also important for this purpose.
         double zero_disc_factors[11], delta_t = 0.5;
@@ -524,18 +531,21 @@ void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order,
         int lower_bound = floor(nth_default_time/delta_t);
         //cout << "Lower bound " << lower_bound << endl;
         double payoff_legs[2];
-        fair_spread += premium_protection_leg_calcs(nth_default_time, maturity, LGD, delta_t, zero_disc_factors, payoff_legs);
+        fair_spread = premium_protection_leg_calcs(nth_default_time, maturity, LGD, delta_t, zero_disc_factors, payoff_legs);
         premium_leg += payoff_legs[1]; protection_leg += payoff_legs[0]; 
-        fair_spread_path.at(index) = protection_leg/premium_leg;
+        fair_spread_path.at(index) = pow(10, 4)*protection_leg/premium_leg;
     }
 
-    double average_fair_spread1 = fair_spread/no_of_simulations, average_fair_spread2 = protection_leg/premium_leg;
+    double average_fair_spread2 = pow(10, 4)*protection_leg/premium_leg;
 
     //cout << "Average Spread 1 " << average_fair_spread1 << endl;
     cout << "Real Average Spread " << average_fair_spread2 << endl;
 
     plt::plot(fair_spread_path);
-    plt::show();
+    plt::title("Rolling Spread Value");
+    plt::xlabel("Simulation Index");
+    plt::ylabel("BPs");
+    plt::save("rolling_spread_mc.png");
 }
 
 /************************************************************************************************************************************
@@ -1141,7 +1151,7 @@ void cds_curve_bootstrapper (double survival_probability[11], contract_info cds_
     //cout << endl;
 
     //Initialize useful variable.
-    int index;
+    int index; double delta_t = 0.5;
 
     //Initialize array with 1s.
     for (index = 0; index < 11; index++)
@@ -1151,7 +1161,7 @@ void cds_curve_bootstrapper (double survival_probability[11], contract_info cds_
 
     //Begin bootstrapping here.
     //First calculate the 1st implied survival probability.
-    survival_probability[1] = LGD/(LGD + interpolated_cds_info[0].price/pow(10, 4));
+    survival_probability[1] = LGD/(LGD + 0.5*interpolated_cds_info[0].price/pow(10, 4));
 
     //Then calculate the 2nd, 3rd etc...
     for (index = 2; index < 11; index++)

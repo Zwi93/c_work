@@ -27,6 +27,8 @@ def daily_to_weekly (dataframe):
 
 #Define the CDF for the data.
 def get_implied_cdf (the_array):
+
+    #The array is a column vector of just one name. cobcerted to weekely data.
     
     #Perform KDE to estimate cdf. 
     kde = sm.nonparametric.KDEUnivariate(the_array)
@@ -45,6 +47,22 @@ def get_implied_cdf (the_array):
         running_index += 1 
 
     return implied_cdf
+
+def plot_histograms_implied_cdf (dataframe):
+
+    #First get the weekly data from the raw dataframe.
+    cds_historical_data_weekly = daily_to_weekly(dataframe)
+    columns = cds_historical_data_weekly.columns.values.tolist()
+
+    #Obtain just one name data
+    the_array = cds_historical_data_weekly[columns[0]]
+    
+    uniform_vectors = get_implied_cdf(the_array)
+
+    plt.hist(uniform_vectors)
+    plt.show()
+
+
 
 
 #Define function to compute the correlation depending on the copula type.
@@ -97,7 +115,7 @@ def get_correlation (dataframe, copula_type):
 
 
 #Below is a function to fit a t copula by finding that mu that maximizes log-likelihood.
-def log_lokelihood_mu (dataframe):
+def log_likelihood_mu (dataframe):
 
     #1st obtain the linearized, positive definite correlation matrix and its inverse and determinant.
     correlation_matrix = get_correlation(dataframe, "t_stat")
@@ -111,7 +129,7 @@ def log_lokelihood_mu (dataframe):
     #Find the mu which maximizes the log-likelihood. 
     log_likelihood_dict = {}
 
-    for mu in range(1, 25):
+    for mu in range(1, 3):
         
         log_likelihood = 0
 
@@ -171,7 +189,7 @@ correlation_matrix_t.to_csv("correlation_matrix_t.txt", header=None, index=None,
 #plt.plot(kde.support, kde.cdf, label="KDE")
 
 
-#log_likelihood_dict = log_lokelihood_mu(cds_historical_data_daily)
+#log_likelihood_dict = log_likelihood_mu(cds_historical_data_daily)
 #x_values = list(log_likelihood_dict.keys())
 #y_values = list(log_likelihood_dict.values())
 #plt.scatter(x_values, y_values)
