@@ -9,7 +9,7 @@ using namespace std;
 //Declare important macros here.
 #define FREQUENCY 2
 #define No_COMPANIES 5 //number of underlyings in the basket.
-#define SIMULATIONS 300
+#define SIMULATIONS 500
 #define NATURAL_EXP exp(1)
 #define MY_PI 4*atan(1.0)  //pi to be used only in this script.
 #define MATURITY 4.0
@@ -47,8 +47,8 @@ void get_correlation_matrix (double correlation_array[][No_COMPANIES], string co
 void one_to_many_dimension (double one_dimension_array[No_COMPANIES], double many_dimension_array[][No_COMPANIES]);
 void matrix_product (double array_one[][No_COMPANIES], double array_two[][No_COMPANIES], double product_array[][No_COMPANIES], double scale_factor);
 double inverse_error_function1 (double x_param);
-void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD, int nth_default, double maturity, string copula_type);
-void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD, int nth_default, double maturity, string copula_type);
+double basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD, int nth_default, double maturity, string copula_type);
+double basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD, int nth_default, double maturity, string copula_type, double rho);
 double get_minimum_value (double array[No_COMPANIES]);
 double get_nth_minimum_value (double array[No_COMPANIES], int n);
 double premium_protection_leg_calcs (double nth_default_time, double maturity, double LGD, double delta_t, double zero_disc_factor[11], double payoff_legs[2]);
@@ -56,3 +56,6 @@ double f(double x, double a, double b);
 double simpson(double lower_bound, double upper_bound, double no_steps, double a, double b);
 double trapezoidal (double lower_bound, double upper_bound, double no_steps, double a, double b);
 void plot_hazard_rate_function (contract_info cds_curves_matrix[][6]);
+void compare_kth_to_default_spreads (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD);
+void sensitivity_to_lgd (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double maturity, string copula_type);
+void sensitivity_to_correlation (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double maturity, string copula_type, double LGD);

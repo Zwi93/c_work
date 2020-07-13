@@ -64,9 +64,10 @@ int main ()
     double LGD = 0.4; //Loss Given Default, assumed constant and equal for each company.
     int n = 1; //Contract defaulting type, i.e 1st, 2nd, etc to default.
 
-    basket_cds_mc_pricing_adjusted(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "gaussian");
-    basket_cds_mc_pricing(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "gaussian");
+    //basket_cds_mc_pricing_adjusted(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "gaussian");
+    //basket_cds_mc_pricing(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "gaussian");
 
+    compare_kth_to_default_spreads(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD);
     //double nth_minimum_value = get_nth_minimum_value(array, n);
 
     //cout << n << " Min " << nth_minimum_value << endl;
@@ -93,7 +94,7 @@ int main ()
  * Return: This is a void function.                                                                                                 *
  ************************************************************************************************************************************
  */
-void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD, int nth_default, double maturity, string copula_type)
+double basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD, int nth_default, double maturity, string copula_type)
 {
     int index;
     double fair_spread = 0, premium_leg = 0, protection_leg = 0; //Rolling average spread to be saved here.
@@ -384,13 +385,15 @@ void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, i
 
     double average_fair_spread2 = pow(10, 4)*protection_leg/premium_leg;
 
-    cout << "Real Average Spread (adjusted MC)" << average_fair_spread2 << endl;
+    //cout << "Real Average Spread (adjusted MC)" << average_fair_spread2 << endl;
 
-    plt::plot(fair_spread_path);
-    plt::title("Rolling Spread Value");
-    plt::xlabel("Simulation Index");
-    plt::ylabel("BPs");
-    plt::save("rolling_spread_mc_adjusted.png"); 
+    //plt::plot(fair_spread_path);
+    //plt::title("Rolling Spread Value");
+    //plt::xlabel("Simulation Index");
+    //plt::ylabel("BPs");
+    //plt::save("rolling_spread_mc_adjusted.png");
+
+    return average_fair_spread2; 
 } 
 
 /************************************************************************************************************************************
@@ -406,7 +409,7 @@ void basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations, i
  * Return: This is a void function.                                                                                                 *                                                                                                                                  
  ************************************************************************************************************************************
  */
-void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD, int nth_default, double maturity, string copula_type)
+double basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD, int nth_default, double maturity, string copula_type, double rho)
 {
     int index;
     double fair_spread = 0, premium_leg = 0, protection_leg = 0; //Rolling average spread to be saved here.
@@ -473,6 +476,29 @@ void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order,
             
         }
 
+        if (copula_type == "various")
+        {
+            //Synthesize correlation matrix.
+            int i, j;
+            for (i = 0; i < No_COMPANIES; i++)
+            {
+                for (j = 0; j < No_COMPANIES; j++)
+                {
+                    if (j == i)
+                    {
+                        correlation_matrix[i][j] = 1.0;
+                    }
+                    else
+                    {
+                        correlation_matrix[i][j] = rho;
+                    }
+                }
+            }
+
+            get_pseudo_square_root(correlation_matrix, pseudo_matrix);
+            matrix_product(pseudo_matrix, normal_rvs_matrix, correlated_normals, 1.0);
+        }
+
         double correlated_default_times[No_COMPANIES]; //Variable to store the correlated default time for each credit.
         for (inner_index = 0; inner_index < No_COMPANIES; inner_index++)
         {
@@ -488,6 +514,10 @@ void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order,
             if (copula_type == "t_stat")
             {
                 correlated_uniform_rv = student_t_cdf(correlated_normals[inner_index][0], mu);
+            }
+            if (copula_type == "various")
+            {
+                correlated_uniform_rv = normal_cdf(correlated_normals[inner_index][0]);
             }
 
             //cout << "Correlated univariates " << correlated_uniform_rv << endl;
@@ -539,13 +569,15 @@ void basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int order,
     double average_fair_spread2 = pow(10, 4)*protection_leg/premium_leg;
 
     //cout << "Average Spread 1 " << average_fair_spread1 << endl;
-    cout << "Real Average Spread " << average_fair_spread2 << endl;
+    //cout << "Real Average Spread " << average_fair_spread2 << endl;
 
-    plt::plot(fair_spread_path);
-    plt::title("Rolling Spread Value");
-    plt::xlabel("Simulation Index");
-    plt::ylabel("BPs");
-    plt::save("rolling_spread_mc.png");
+    //plt::plot(fair_spread_path);
+    //plt::title("Rolling Spread Value");
+    //plt::xlabel("Simulation Index");
+    //plt::ylabel("BPs");
+    //plt::save("rolling_spread_mc.png");
+
+    return average_fair_spread2;
 }
 
 /************************************************************************************************************************************
@@ -1508,7 +1540,7 @@ double survival_time_inverse_cdf1 (double hazard_rates[11], double x_input, doub
 /*
  *************************************************************************************************************************************************************************************************************************
  *                                                                                                                                                                                                                       *
- *                                                                                 SECTION INCLUDES HELPER AND PLOTTING FUNCTIONS                                                                                        *
+ *                                                                                 SECTION INCLUDES HELPER AND MODEL VALIDATION FUNCTIONS                                                                                *
  *                                                                                                                                                                                                                       *
  * ***********************************************************************************************************************************************************************************************************************
  */
@@ -1630,4 +1662,92 @@ void plot_hazard_rate_function (contract_info cds_curves_matrix[][6])
     plt::xlabel("Time");
     plt::ylabel("Rate");
     plt::save("hazard_rate_function.png");
+}
+
+void compare_kth_to_default_spreads (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD)
+{
+    //Function to compare spreads of the different kth-to-default contracts;1st, 2nd, etc.
+    int kth[5] = {1, 2, 3, 4, 5};
+    vector<double> maturities(5); maturities = {1.0, 2.0, 3.0, 4.0, 5.0};
+    string copula_type = "gaussian";
+
+    int index; 
+
+    for (index = 0; index < 5; index++)
+    {
+        int inner_index;
+
+        vector<double> kth_to_default_spreads(5);
+
+        for (inner_index = 0; inner_index < 5; inner_index++)
+        {
+            kth_to_default_spreads.at(inner_index) = basket_cds_mc_pricing_adjusted(no_of_credits, no_of_simulations, 0, cds_curves_matrix, LGD, kth[index], maturities[inner_index], copula_type);
+        }
+        
+        plt::plot(maturities, kth_to_default_spreads);
+    }
+    
+    plt::title("Comparison of kth to default Spreads");
+    plt::xlabel("Maturity");
+    plt::ylabel("Spread (bps)");
+    plt::save("comparison_kth_to_default_spreads.png");
+    plt::show();
+}
+
+void sensitivity_to_lgd (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double maturity, string copula_type)
+{
+    //Function to compute sensitivity with respect to lgd.
+    int kth[5] = {1, 2, 3, 4, 5};
+    vector<double> loss_given_defaults(5); loss_given_defaults = {0.2, 0.4, 0.6, 0.8, 0.9};
+
+    int index; 
+
+    for (index = 0; index < 5; index++)
+    {
+        int inner_index;
+
+        vector<double> kth_to_default_spreads(5);
+
+        for (inner_index = 0; inner_index < 5; inner_index++)
+        {
+            kth_to_default_spreads.at(inner_index) = basket_cds_mc_pricing_adjusted(no_of_credits, no_of_simulations, 0, cds_curves_matrix, loss_given_defaults[inner_index], kth[index], maturity, copula_type);
+        }
+
+        plt::plot(loss_given_defaults, kth_to_default_spreads);
+    }
+
+    plt::title("Sensitivity to LGD");
+    plt::xlabel("LGD");
+    plt::ylabel("Spread (bps)");
+    plt::save("sensitivity_to_lgd.png");
+    plt::show();      
+}
+
+void sensitivity_to_correlation (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double maturity, string copula_type, double LGD)
+{
+    //Function to compute sensitivity w.r.t default correlation; it is assumed equal for all pair of names.
+    int kth[5] = {1, 2, 3, 4, 5};
+    vector<double> rho_vector(10); rho_vector = {0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 0.9, 0.95};
+
+    int index; 
+
+    for (index = 0; index < 5; index++)
+    {
+        int inner_index;
+
+        vector<double> kth_to_default_spreads(10);
+
+        for (inner_index = 0; inner_index < 10; inner_index++)
+        {
+            kth_to_default_spreads.at(inner_index) = basket_cds_mc_pricing(no_of_credits, no_of_simulations, 0, cds_curves_matrix, LGD, kth[index], maturity, copula_type, rho_vector[inner_index]);
+        }
+
+        plt::plot(rho_vector, kth_to_default_spreads);
+    }
+
+    plt::title("Sensitivity Correlation Matrix");
+    plt::xlabel("rho");
+    plt::ylabel("Spread (bps)");
+    plt::save("sensitivity_to_correlation.png");
+    plt::show();
 }
