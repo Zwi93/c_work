@@ -90,7 +90,8 @@ def get_correlation (dataframe, copula_type):
 
         transformed_dataframe = pd.DataFrame(implied_dict)
         correlation_matrix = transformed_dataframe.corr()
-        return correlation_matrix
+        inverse_correlation_matrix = pd.DataFrame(np.linalg.inv(correlation_matrix))
+        return correlation_matrix, inverse_correlation_matrix
 
     elif copula_type is "t_stat":
 
@@ -100,6 +101,7 @@ def get_correlation (dataframe, copula_type):
 
         transformed_dataframe = pd.DataFrame(implied_dict)
         correlation_matrix = transformed_dataframe.corr()
+        inverse_correlation_matrix = pd.DataFrame(np.linalg.inv(correlation_matrix))
 
         #Linearise the rank matrix obtained.
         linearized_correlation_matrix = correlation_matrix.applymap(linearize_correlation_matrix)
@@ -111,7 +113,7 @@ def get_correlation (dataframe, copula_type):
         #Compute eigenvalue decomposition.
         eigen_values, right_eigenvectors  = np.linalg.eig(linearized_correlation_matrix)
 
-        return linearized_correlation_matrix
+        return linearized_correlation_matrix, inverse_correlation_matrix
 
 
 #Below is a function to fit a t copula by finding that mu that maximizes log-likelihood.
@@ -169,13 +171,111 @@ def multivariate_tcopula (uniform_rvs, mu, inv_correlation_matrix, det_correlati
 
     return tcopula
 
+def plot_sensitivity_wrt_rho ():
+    file1 = open("sensitivity_wrt_correlation.txt", "r")
+
+    my_lines = file1.readlines()
+
+    x_data = [0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 0.9, 0.95]
+
+    names = ["1st-to-default", "2nd-to-default", "3rd-to-default", "4th-to-default", "5th-to-default"]
+    ii = 0
+
+    for line in my_lines:
+
+        sensitivities = []
+        for word in line.split():
+            number = float(word)
+            sensitivities.append(number)
+        plt.plot(x_data, sensitivities, label = names[ii])
+        ii += 1 
+
+    plt.legend(loc="upper right")
+    plt.show()
+
+def plot_sensitivity_wrt_lgd ():
+    file1 = open("sensitivity_wrt_lgd.txt", "r")
+
+    my_lines = file1.readlines()
+
+    x_data = [0.2, 0.4, 0.6, 0.8, 0.9]
+
+    names = ["1st-to-default", "2nd-to-default", "3rd-to-default", "4th-to-default", "5th-to-default"]
+    ii = 0
+
+    for line in my_lines:
+
+        sensitivities = []
+        for word in line.split():
+            number = float(word)
+            sensitivities.append(number)
+        plt.plot(x_data, sensitivities, label = names[ii])
+        ii += 1 
+
+    plt.legend(loc="upper left")
+    plt.show()
+
+def plot_compared_kth_to_default ():
+    file1 = open("comparison_kth_to_default.txt", "r")
+
+    my_lines = file1.readlines()
+
+    x_data = [1.0, 2.0, 3.0, 4.0, 5.0]
+
+    names = ["1st-to-default", "2nd-to-default", "3rd-to-default", "4th-to-default", "5th-to-default"]
+    ii = 0
+
+    for line in my_lines:
+
+        sensitivities = []
+        for word in line.split():
+            number = float(word)
+            sensitivities.append(number)
+        plt.plot(x_data, sensitivities, label = names[ii])
+        ii += 1 
+
+    plt.legend(loc="upper left")
+    plt.show()
+
+def plot_tstat_vs_gaussian ():
+    file1 = open("tstat_vs_gaussian.txt", "r")
+
+    my_lines = file1.readlines()
+
+    x_data = [1.0, 2.0, 3.0, 4.0, 5.0]
+    x_tick_label = ["1st-to-default", "2nd-to-default", "3rd-to-default", "4th-to-default", "5th-to-default"]
+
+    names = ["gaussian", "t_distribution"]
+    ii = 0
+
+    for line in my_lines:
+
+        sensitivities = []
+        for word in line.split():
+            number = float(word)
+            sensitivities.append(number)
+        plt.plot(x_data, sensitivities, label = names[ii])
+        ii += 1 
+
+    plt.legend(loc="best")
+    plt.xticks(x_data, labels = x_tick_label)
+    plt.show()
+
+
 #Calculate the correlation matrix.
-correlation_matrix_gaussian = get_correlation(cds_historical_data_daily, "gaussian")
-correlation_matrix_t = get_correlation(cds_historical_data_daily, "t_stat")
+#correlation_matrix_gaussian, inverse_correlation_matrix_gaussian = get_correlation(cds_historical_data_daily, "gaussian")
+#correlation_matrix_t, inverse_correlation_matrix_t = get_correlation(cds_historical_data_daily, "t_stat")
 
 #Write correlation matrix to .txt file.
-correlation_matrix_gaussian.to_csv("correlation_matrix_gaussian.txt", header=None, index=None, sep=" ", mode="w")
-correlation_matrix_t.to_csv("correlation_matrix_t.txt", header=None, index=None, sep=" ", mode="w")
+#correlation_matrix_gaussian.to_csv("correlation_matrix_gaussian.txt", header=None, index=None, sep=" ", mode="w")
+#inverse_correlation_matrix_gaussian.to_csv("inverse_correlation_matrix_gaussian.txt", header=None, index=None, sep=" ", mode="w")
+#correlation_matrix_t.to_csv("correlation_matrix_t.txt", header=None, index=None, sep=" ", mode="w")
+#inverse_correlation_matrix_t.to_csv("inverse_correlation_matrix_t.txt", header=None, index=None, sep=" ", mode="w")
+#plot_sensitivity_wrt_rho()
+#plot_sensitivity_wrt_lgd()
+plot_tstat_vs_gaussian()
+
+#plot_compared_kth_to_default()
 
 #pfizer_cds_data = cds_historical_data_weekly['PFIZER']
 

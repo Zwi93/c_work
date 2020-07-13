@@ -3,17 +3,21 @@
  *                                                                                                                                  *
  * Author: Zwi Mudau                                                                                                                *
  *                                                                                                                                  *
- * Usage: Provide the correlation matrix and the script will compute the fair basket spread.                                        *
- *                                                                                                                                  *
+ * Usage: Provide the cds curve matrix and the script will compute the fair basket spread using the function basket_cds_mc_pricing  *
+ * The function makes multiple calls to other functions defined in this script. Many of the functions have a description of the task*
+ * they perform. An important note is that one of the functions, get_correlation_matrix, makes a call to the system function, which *
+ * in turn makes a call to a python script that computes the correlation matrix. So it is crucial that users of this script have pyt*
+ * thon installed and are familiar with linking libraries. There is also a wrapper for matplotlib used which also depends on python *
+ * The other main function is the basket_cds_mc_pricing_adjusted which is the variance reduced monte carlo pricing engine.          *
  ************************************************************************************************************************************
  */
 
 //Include all relevant header files here.
 #include "cds_curve_bootstrapper.h"
-#include "matplotlibcpp.h"
+//#include "matplotlibcpp.h"
 
 using namespace std;
-namespace plt = matplotlibcpp;
+//namespace plt = matplotlibcpp;
 
 int main ()
 {   
@@ -62,13 +66,16 @@ int main ()
 
 
     double LGD = 0.4; //Loss Given Default, assumed constant and equal for each company.
-    int n = 1; //Contract defaulting type, i.e 1st, 2nd, etc to default.
+    int n = 5; //Contract defaulting type, i.e 1st, 2nd, etc to default.
 
     //basket_cds_mc_pricing_adjusted(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "gaussian");
     //basket_cds_mc_pricing(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD, n, MATURITY, "gaussian");
 
-    compare_kth_to_default_spreads(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD);
+    //compare_kth_to_default_spreads(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD);
+    //sensitivity_to_lgd(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, MATURITY, "gaussian");
+    //compare_kth_to_default_spreads(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, LGD);
     //double nth_minimum_value = get_nth_minimum_value(array, n);
+    comparison_tstat_gaussian(No_COMPANIES, SIMULATIONS, 0, cds_curves_matrix, MATURITY, LGD);
 
     //cout << n << " Min " << nth_minimum_value << endl;
     //double t_dist = student_t_cdf(0.5, 3);
@@ -98,7 +105,8 @@ double basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations,
 {
     int index;
     double fair_spread = 0, premium_leg = 0, protection_leg = 0; //Rolling average spread to be saved here.
-    vector<double> fair_spread_path(no_of_simulations);
+    //vector<double> fair_spread_path(no_of_simulations);
+    double sensitivity_wrt_hazard_rate[No_COMPANIES];
 
     for (index = 0; index < no_of_simulations; index++)
     {
@@ -315,6 +323,7 @@ double basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations,
 
 
         double correlated_default_times[No_COMPANIES]; //Variable to store the correlated default time for each credit.
+        double correlated_uniform_matrix[No_COMPANIES]; double mean_hazard_rates_matrix[No_COMPANIES];
         for (inner_index = 0; inner_index < No_COMPANIES; inner_index++)
         {
             double correlated_uniform_rv;
@@ -326,10 +335,12 @@ double basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations,
             {
                 //cout << "Correlated normal for credit " << inner_index << endl; cout << correlated_normals[inner_index][0] << endl;
                 correlated_uniform_rv = normal_cdf(correlated_normals[inner_index][0]);
+                correlated_uniform_matrix[inner_index] = correlated_uniform_rv;
             }
             if (copula_type == "t_stat")
             {
                 correlated_uniform_rv = student_t_cdf(correlated_normals[inner_index][0], mu);
+                correlated_uniform_matrix[inner_index] = correlated_uniform_rv;
             }
 
             //cout << "Correlated uniform RVs for credit " << inner_index << endl;cout << correlated_uniform_rv << endl;
@@ -354,6 +365,7 @@ double basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations,
             //Next from the survival probabilities, get the hazard rates.
             double hazard_rates[11];
             get_hazard_rates(survival_probability, hazard_rates);
+            mean_hazard_rates_matrix[inner_index] = (hazard_rates[0] + hazard_rates[1] + hazard_rates[2] + hazard_rates[3] + hazard_rates[4])/5;
             
             //Then obtain the correlated default time.
             correlated_default_times[inner_index] = survival_time_inverse_cdf(hazard_rates, 1 - correlated_uniform_rv, 1000, 0.001);
@@ -378,12 +390,52 @@ double basket_cds_mc_pricing_adjusted (int no_of_credits, int no_of_simulations,
         //cout << "Lower bound " << lower_bound << endl;
         fair_spread = premium_protection_leg_calcs(nth_default_time, maturity, LGD, delta_t, zero_disc_factors, payoff_legs);
         premium_leg += payoff_adjustment*payoff_legs[1]; protection_leg += payoff_adjustment*payoff_legs[0];
-        fair_spread_path.at(index) = pow(10, 4)*protection_leg/premium_leg;
+        //fair_spread_path.at(index) = pow(10, 4)*protection_leg/premium_leg;
 
         //cout << "Default time " << nth_default_time << endl;
+
+        //Calculate the sensitivity w.r.t hazard rates here.
+        double inverse_correlation_matrix[No_COMPANIES][No_COMPANIES], unity_matrix[No_COMPANIES][No_COMPANIES];
+        get_inverse_correlation_matrix (inverse_correlation_matrix);
+
+        int ii, jj;
+
+        for (ii = 0; ii < No_COMPANIES; ii++)
+        {
+            for (jj = 0; jj < No_COMPANIES; jj++)
+            {
+                if (jj == ii)
+                    unity_matrix[ii][jj] = 1.0;
+                else 
+                    unity_matrix[ii][jj] = 0.0;
+            }
+        }
+
+        for (inner_index = 0; inner_index < No_COMPANIES; inner_index++)
+        {
+            int ii;
+            double temp_sum = 0;
+            for (ii = 0; ii < No_COMPANIES; ii++)
+            {
+                temp_sum += (inverse_correlation_matrix[inner_index][ii] - unity_matrix[inner_index][ii]);
+            }
+
+            double log_sensitivity = (temp_sum*inverse_normal_cdf(0, correlated_uniform_matrix[inner_index])*sqrt(2*MY_PI)*exp(0.5*inverse_normal_cdf(0, correlated_uniform_matrix[inner_index]*correlated_uniform_matrix[inner_index]))*correlated_default_times[inner_index]*exp(-mean_hazard_rates_matrix[inner_index]*correlated_default_times[inner_index]) + 
+            1.0/mean_hazard_rates_matrix[inner_index] - correlated_default_times[inner_index]);
+
+            sensitivity_wrt_hazard_rate[inner_index] += (premium_leg - protection_leg)*log_sensitivity;
+            //cout << "Sensitivity to Hazard rates " << sensitivity_to_hazard_rates << endl;
+        }
+        
     }
 
     double average_fair_spread2 = pow(10, 4)*protection_leg/premium_leg;
+
+    /*for (index = 0; index < No_COMPANIES; index++)
+    {
+        cout << "X-Sens " << sensitivity_wrt_hazard_rate[index]/no_of_simulations << endl;
+    }*/
+    
 
     //cout << "Real Average Spread (adjusted MC)" << average_fair_spread2 << endl;
 
@@ -413,7 +465,7 @@ double basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int orde
 {
     int index;
     double fair_spread = 0, premium_leg = 0, protection_leg = 0; //Rolling average spread to be saved here.
-    vector<double> fair_spread_path(no_of_simulations);
+    //vector<double> fair_spread_path(no_of_simulations);
 
     for (index = 0; index < no_of_simulations; index++)
     {
@@ -563,7 +615,7 @@ double basket_cds_mc_pricing (int no_of_credits, int no_of_simulations, int orde
         double payoff_legs[2];
         fair_spread = premium_protection_leg_calcs(nth_default_time, maturity, LGD, delta_t, zero_disc_factors, payoff_legs);
         premium_leg += payoff_legs[1]; protection_leg += payoff_legs[0]; 
-        fair_spread_path.at(index) = pow(10, 4)*protection_leg/premium_leg;
+        //fair_spread_path.at(index) = pow(10, 4)*protection_leg/premium_leg;
     }
 
     double average_fair_spread2 = pow(10, 4)*protection_leg/premium_leg;
@@ -1059,9 +1111,9 @@ double factorial_of_x (int x_param)
  */
 void get_correlation_matrix (double correlation_array[][No_COMPANIES], string copula_type)
 {
-    string command = "python3 correlation_calcs.py";  //Command to run on the shell.
-    const char *c_command = command.c_str();
-    system(c_command);
+    //string command = "python3 correlation_calcs.py";  //Command to run on the shell.
+    //const char *c_command = command.c_str();
+    //system(c_command);
     string correlation_file;
 
     if (copula_type == "gaussian") 
@@ -1101,6 +1153,45 @@ void get_correlation_matrix (double correlation_array[][No_COMPANIES], string co
             cout <<index1 << index2 << " " << correlation_array[index1][index2] << endl;
         }    
     }*/   
+}
+
+void get_inverse_correlation_matrix (double inverse_correlation_array[][No_COMPANIES])
+{
+    //string command = "python3 correlation_calcs.py";  //Command to run on the shell.
+    //const char *c_command = command.c_str();
+    //system(c_command);
+    string correlation_file;
+
+    /*if (copula_type == "gaussian") 
+        correlation_file = "correlation_matrix_gaussian.txt";
+    if (copula_type == "t_stat")
+        correlation_file = "correlation_matrix_t.txt";
+    */
+    correlation_file = "inverse_correlation_matrix_gaussian.txt";
+    //Create stream to the file.
+    ifstream stream_to_file(correlation_file);
+    int index1, index2, outer_index = 0; string line;
+
+    //Read from the text file saved from the python script execution.
+    while (getline(stream_to_file, line)) 
+    {
+        string word;
+
+        //Create stream to the string variable 'word'.
+        istringstream string_stream (line);
+        int inner_index = 0;
+
+        //read string word by word, and convert the string to a float value.
+        while (getline(string_stream, word, ' '))
+        {
+            inverse_correlation_array[outer_index][inner_index] = stod(word);
+            inner_index++;
+        }
+        outer_index++;
+            
+    }
+
+    stream_to_file.close();
 }
 
 void matrix_product (double array_one[][No_COMPANIES], double array_two[][No_COMPANIES], double product_array[][No_COMPANIES], double scale_factor)
@@ -1654,100 +1745,169 @@ void plot_hazard_rate_function (contract_info cds_curves_matrix[][6])
     {
         double x_1, x_2;
         x_1 = ((double)(i - 1))/2, x_2 = ((double) i)/2;
-        vector<double> x(2), y(2); x = {x_1, x_2}, y = {hazard_rates[i], hazard_rates[i]};
-        plt::plot(x, y);
+        //vector<double> x(2), y(2); x = {x_1, x_2}, y = {hazard_rates[i], hazard_rates[i]};
+        //plt::plot(x, y);
     }
-    
+    /*
     plt::title("Hazard Rate Function for Company");
     plt::xlabel("Time");
     plt::ylabel("Rate");
-    plt::save("hazard_rate_function.png");
+    plt::save("hazard_rate_function.png");*/
 }
 
 void compare_kth_to_default_spreads (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD)
 {
     //Function to compare spreads of the different kth-to-default contracts;1st, 2nd, etc.
     int kth[5] = {1, 2, 3, 4, 5};
-    vector<double> maturities(5); maturities = {1.0, 2.0, 3.0, 4.0, 5.0};
+    double maturities[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
     string copula_type = "gaussian";
 
+    string filename;filename = "comparison_kth_to_default.txt";
+
+    ofstream stream_to_file(filename);
+    
     int index; 
 
     for (index = 0; index < 5; index++)
     {
         int inner_index;
 
-        vector<double> kth_to_default_spreads(5);
+        //vector<double> kth_to_default_spreads(5);
 
         for (inner_index = 0; inner_index < 5; inner_index++)
         {
-            kth_to_default_spreads.at(inner_index) = basket_cds_mc_pricing_adjusted(no_of_credits, no_of_simulations, 0, cds_curves_matrix, LGD, kth[index], maturities[inner_index], copula_type);
+            double comparison_kth_to_default;
+            comparison_kth_to_default = basket_cds_mc_pricing(no_of_credits, no_of_simulations, 0, cds_curves_matrix, LGD, kth[index], maturities[inner_index], copula_type, 1.0);
+
+            stream_to_file << comparison_kth_to_default << " "; 
         }
-        
-        plt::plot(maturities, kth_to_default_spreads);
+
+        stream_to_file << endl;
+        //plt::plot(maturities, kth_to_default_spreads);
     }
-    
+
+    stream_to_file.close();
+    /*
     plt::title("Comparison of kth to default Spreads");
     plt::xlabel("Maturity");
     plt::ylabel("Spread (bps)");
     plt::save("comparison_kth_to_default_spreads.png");
-    plt::show();
+    plt::show();*/
 }
 
 void sensitivity_to_lgd (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double maturity, string copula_type)
 {
     //Function to compute sensitivity with respect to lgd.
     int kth[5] = {1, 2, 3, 4, 5};
-    vector<double> loss_given_defaults(5); loss_given_defaults = {0.2, 0.4, 0.6, 0.8, 0.9};
+    double loss_given_defaults[5] = {0.2, 0.4, 0.6, 0.8, 0.9};
 
     int index; 
+
+    string filename;filename = "sensitivity_wrt_lgd.txt";
+
+    ofstream stream_to_file(filename);
 
     for (index = 0; index < 5; index++)
     {
         int inner_index;
 
-        vector<double> kth_to_default_spreads(5);
+        //vector<double> kth_to_default_spreads(5);
 
         for (inner_index = 0; inner_index < 5; inner_index++)
         {
-            kth_to_default_spreads.at(inner_index) = basket_cds_mc_pricing_adjusted(no_of_credits, no_of_simulations, 0, cds_curves_matrix, loss_given_defaults[inner_index], kth[index], maturity, copula_type);
+            double sensitivity_to_lgd;
+            sensitivity_to_lgd = basket_cds_mc_pricing(no_of_credits, no_of_simulations, 0, cds_curves_matrix, loss_given_defaults[inner_index], kth[index], maturity, copula_type, 1.0);
+
+            stream_to_file << sensitivity_to_lgd << " ";
         }
 
-        plt::plot(loss_given_defaults, kth_to_default_spreads);
+        stream_to_file << endl;
+        //plt::plot(loss_given_defaults, kth_to_default_spreads);
     }
 
+    stream_to_file.close();
+
+    /*
     plt::title("Sensitivity to LGD");
     plt::xlabel("LGD");
     plt::ylabel("Spread (bps)");
     plt::save("sensitivity_to_lgd.png");
-    plt::show();      
+    plt::show();*/      
 }
 
 void sensitivity_to_correlation (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double maturity, string copula_type, double LGD)
 {
     //Function to compute sensitivity w.r.t default correlation; it is assumed equal for all pair of names.
     int kth[5] = {1, 2, 3, 4, 5};
-    vector<double> rho_vector(10); rho_vector = {0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 0.9, 0.95};
+    double rho_vector[10] = {0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.8, 0.9, 0.95};
 
-    int index; 
+    int index;
+
+    string filename;filename = "sensitivity_wrt_correlation.txt";
+
+    ofstream stream_to_file(filename); 
 
     for (index = 0; index < 5; index++)
     {
         int inner_index;
 
-        vector<double> kth_to_default_spreads(10);
+        //vector<double> kth_to_default_spreads(10);
 
         for (inner_index = 0; inner_index < 10; inner_index++)
         {
-            kth_to_default_spreads.at(inner_index) = basket_cds_mc_pricing(no_of_credits, no_of_simulations, 0, cds_curves_matrix, LGD, kth[index], maturity, copula_type, rho_vector[inner_index]);
+            double sensitivity_to_rho;
+            sensitivity_to_rho = basket_cds_mc_pricing(no_of_credits, no_of_simulations, 0, cds_curves_matrix, LGD, kth[index], maturity, copula_type, rho_vector[inner_index]);
+
+            stream_to_file << sensitivity_to_rho << " ";
         }
 
-        plt::plot(rho_vector, kth_to_default_spreads);
+        stream_to_file << endl;
+        //plt::plot(rho_vector, kth_to_default_spreads);
     }
 
+    stream_to_file.close();
+
+    /*
     plt::title("Sensitivity Correlation Matrix");
     plt::xlabel("rho");
     plt::ylabel("Spread (bps)");
     plt::save("sensitivity_to_correlation.png");
-    plt::show();
+    plt::show();*/
 }
+
+void comparison_tstat_gaussian (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double maturity, double LGD)
+{
+    //Fucntion to compare prices from gaussian and t stat distributions.
+    int kth[5] = {1, 2, 3, 4, 5};
+
+    string filename; filename = "tstat_vs_gaussian.txt";
+
+    ofstream stream_to_file(filename);   
+    
+    int index; int ii;
+
+    for (ii = 0; ii < 2; ii++)    
+    {
+        double gaussian_copula_price, tstat_copula_price;
+
+        for (index = 0; index < No_COMPANIES; index++)    
+        {
+            if (ii == 0)
+            {
+                gaussian_copula_price = basket_cds_mc_pricing(no_of_credits, no_of_simulations, 0, cds_curves_matrix, LGD, kth[index], maturity, "gaussian", 1);
+                stream_to_file << gaussian_copula_price << " ";
+            }
+            else
+            {
+                if (index == 0)
+                    stream_to_file << endl;
+                
+                tstat_copula_price = basket_cds_mc_pricing(no_of_credits, no_of_simulations, 0, cds_curves_matrix, LGD, kth[index], maturity, "t_stat", 1);
+                stream_to_file << tstat_copula_price << " ";
+            }
+        }
+    }
+
+    stream_to_file.close();   
+}
+

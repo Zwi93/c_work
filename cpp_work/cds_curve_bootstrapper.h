@@ -9,7 +9,7 @@ using namespace std;
 //Declare important macros here.
 #define FREQUENCY 2
 #define No_COMPANIES 5 //number of underlyings in the basket.
-#define SIMULATIONS 500
+#define SIMULATIONS 1000
 #define NATURAL_EXP exp(1)
 #define MY_PI 4*atan(1.0)  //pi to be used only in this script.
 #define MATURITY 4.0
@@ -59,3 +59,5 @@ void plot_hazard_rate_function (contract_info cds_curves_matrix[][6]);
 void compare_kth_to_default_spreads (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double LGD);
 void sensitivity_to_lgd (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double maturity, string copula_type);
 void sensitivity_to_correlation (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double maturity, string copula_type, double LGD);
+void get_inverse_correlation_matrix (double inverse_correlation_array[][No_COMPANIES]);
+void comparison_tstat_gaussian (int no_of_credits, int no_of_simulations, int order, contract_info cds_curves_matrix[No_COMPANIES][6], double maturity, double LGD);
