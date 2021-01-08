@@ -273,7 +273,7 @@ def plot_tstat_vs_gaussian ():
 #inverse_correlation_matrix_t.to_csv("inverse_correlation_matrix_t.txt", header=None, index=None, sep=" ", mode="w")
 #plot_sensitivity_wrt_rho()
 #plot_sensitivity_wrt_lgd()
-plot_tstat_vs_gaussian()
+#plot_tstat_vs_gaussian()
 
 #plot_compared_kth_to_default()
 
