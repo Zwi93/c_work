@@ -296,31 +296,3 @@ class NaiveGaussianClassifier(GaussianNB):
         print('real down moves: ', down_moves.shape[0])
         print('real up moves: ', up_moves.shape[0])
 
-
-#Setup model parameters.
-#fname = "currency_data.xlsx"
-fname = "index_data.xlsx"
-asset_class = 'SP500'
-all_cols = get_colums_names(fname, asset_class)
-
-#Determine which combination of features to investigate; select one from all the possible combinations in the powerset.
-feature_combination = powerset(all_cols)[205]
-#ax = plt.gca()
-
-#Create LogisticRegressionClassifier object.
-logit_object = LogisticRegressionClassifier(C=500, solver='liblinear', penalty='l2')  # high C corresponds to no regularization.
-#test_data = logit_object.get_train_data(fname, asset_class, cols)[0]
-#logit_object.cross_validation_test(fname, asset_class, feature_combination, ax)
-#coeff = logit_object.get_coefficients(fname, asset_class, cols)
-#coef_table = logit_object.compare_l1_l2(fname, asset_class, feature_combination)
-gaussian_object = NaiveGaussianClassifier()
-#accuracy_score = logit_object.fit_test_CV(fname, asset_class, all_cols)
-#accuracy_score = gaussian_object.fit_test_model(fname, asset_class, cols, test_data)
-#print(coef_table)
-#logit_object.scoring_selection_gridCV(fname, asset_class, all_cols, ax) 
-#logit_object.get_total_up_down_moves(fname, asset_class, feature_combination) 
-#print(logit_object.pnl_backtesting (fname, asset_class, feature_combination).head(20))
-#gaussian_object.pnl_backtesting (fname, asset_class, feature_combination)
-#gaussian_object.cross_validation_test(fname, asset_class, feature_combination, ax)
-#gaussian_object.get_total_up_down_moves(fname, asset_class, feature_combination)
-#plt.show()

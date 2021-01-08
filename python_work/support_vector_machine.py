@@ -222,25 +222,3 @@ class SVMClassifier (svm.SVC):
         
         return df
 
-
-#Setup model parameters.
-#fname = "currency_data.xlsx"
-fname = "index_data.xlsx"
-asset_class = 'SP500'
-all_cols = get_colums_names(fname, asset_class)
-
-#Determine which combination of features to investigate; select one from all the possible combinations in the powerset.
-feature_combination = powerset(all_cols)[205]
-#ax = plt.gca()
-
-#Create SVM object.
-svm_object = SVMClassifier(C=0.01, kernel='linear', cache_size = 1000)
-#svm_predict = svm_object.fit_test_model(fname, asset_class, cols)
-#print(svm_predict)
-#svm_object.svm_decision_boundary_plot(fname, asset_class, two_features, ax)
-#svm_object.get_feature_scatter_plt(fname, asset_class, two_features, ax)
-#svm_object.scoring_selection_gridCV(fname, asset_class, all_cols, ax)
-#svm_object.hard_vs_soft_margin(fname, asset_class, two_features)
-#svm_object.cross_validation_test(fname, asset_class, feature_combination, ax)
-#print(svm_object.pnl_backtesting(fname, asset_class, feature_combination).head(20))
-#plt.show()

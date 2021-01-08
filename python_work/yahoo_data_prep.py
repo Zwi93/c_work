@@ -9,9 +9,9 @@ def get_ticker(ticker, start, end):
     
     return ticker
 
-tickers = [['BTC-USD', 'BitCoin']]#, ['SOL.JO', 'SOL'], ['SBK.JO', 'SBK']]
-prices = pd.DataFrame({ ticker[1] : get_ticker(ticker[0], '01-01-2001', '30-12-2020')['Adj Close'] for ticker in tickers}).dropna()
-prices.to_excel("bitcoin_data.xlsx") 
+#tickers = [['BTC-USD', 'BitCoin']]#, ['SOL.JO', 'SOL'], ['SBK.JO', 'SBK']]
+#prices = pd.DataFrame({ ticker[1] : get_ticker(ticker[0], '01-01-2001', '30-12-2020')['Adj Close'] for ticker in tickers}).dropna()
+#prices.to_excel("bitcoin_data.xlsx") 
 
 def create_features (fname, col_name):
     """Function to compute the essential features for the Machine Learning algos to be able to construct feature vectors.

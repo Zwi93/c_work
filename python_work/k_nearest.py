@@ -308,27 +308,3 @@ class KNNClassifier(KNeighborsClassifier):
 #
 ####################################################################################################################################################################################
 
-
-#Setup model parameters.
-#fname = "currency_data.xlsx"
-fname = "index_data.xlsx"
-asset_class = 'SP500'
-all_cols = get_colums_names(fname, asset_class)
-metric = ['manhattan', 'euclidean', 'mahalanobis']
-
-#Determine which combination of features to investigate; select one from all the possible combinations in the powerset.
-feature_combination = powerset(all_cols)[205]
-#ax = plt.gca()
-
-#Create KNNClassifier object, best parameters to use depends on the output of the GridSearchCV class methods.
-knn_object = KNNClassifier(n_neighbors=100, weights='uniform', metric=metric[1], algorithm='brute')
-
-#knn_object.plot_decision_boundary(fname, asset_class, feature_combination, ax)
-#knn_object.get_feature_scatter_plt(fname, asset_class, feature_combination, ax)
-#accuracy_df =  knn_object.get_optimal_k(fname, asset_class, feature_combination)
-#accuracy_df = knn_object.metric_comparison(fname, asset_class, feature_combination, metric)
-#print(accuracy_df)
-#knn_object.scoring_selection_gridCV(fname, asset_class, cols, ax, False)
-#knn_object.cross_validation_test(fname, asset_class, feature_combination, ax)
-#print(knn_object.pnl_backtesting(fname, asset_class, feature_combination).head(20))
-#plt.show()
