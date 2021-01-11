@@ -16,7 +16,7 @@ def get_prev_fixtures_ids (url):
     html_source = urlopen(url)
     soup_object = BeautifulSoup(html_source, 'lxml')
 
-    season_fixture_ids = soup_object.body.main.contents[9].get('data-fixturesids').split(',')
+    season_fixture_ids = soup_object.body.main.find('div', 'wrapper col-12 tabLoader u-hide').get('data-fixturesids').split(',')
     max_ids = sorted(season_fixture_ids)[-1] # This is the last fixture of the given season. 
 
     return int(max_ids)
@@ -44,4 +44,4 @@ def get_prev_fixtures_scores (url):
         print(home_team.string)
         print(away_team.string)
 
-get_prev_fixtures_scores(url_2018_19_season)
+get_prev_fixtures_scores(url_2019_20_season)
