@@ -20,10 +20,10 @@ async def my_team (id):
     fpl = FPL(session)
 
     #Connect to my fpl account.
-    await fpl.Login(fpl_username, fpl_psswrd)
+    await fpl.login(fpl_username, fpl_psswrd)
     this_user = await fpl.get_user(id)
     my_team = await this_user.get_team()
 
-    print(my_team)
+    print(len(my_team))
 
-asyncio.run(my_team(my_user_id))
+asyncio.get_event_loop().run_until_complete(my_team(my_user_id))
