@@ -1,5 +1,7 @@
 """
 Script info to go here......
+
+Created on 2021/01/04 or close.
 """
 
 import requests as rq
@@ -15,7 +17,7 @@ fpl_username = "zwima93@gmail.com"
 fpl_psswrd = "HXez.tzMcW?44,i"
 my_user_id = 4463037
 
-async def my_team (id):
+async def my_teams_performance (id):
     session = aiohttp.ClientSession()
     fpl = FPL(session)
 
@@ -24,6 +26,11 @@ async def my_team (id):
     this_user = await fpl.get_user(id)
     my_team = await this_user.get_team()
 
-    print(len(my_team))
+    for player in my_team:
+        player_id = player['element']
+        player_dict = await fpl.get_player(player_id, return_json=True)
+        print('points_per_game: ',player_dict['points_per_game'])
+        print('form: ', player_dict['form'])
+    await session.close()
 
-asyncio.get_event_loop().run_until_complete(my_team(my_user_id))
+asyncio.get_event_loop().run_until_complete(my_teams_performance(my_user_id))

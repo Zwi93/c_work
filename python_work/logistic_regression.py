@@ -204,6 +204,21 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
         
         return df
 
+    def predict_nxtday_price_move (self, fname, asset_class, cols):
+        """Function to predict the next day's price movement of the given asset class using the ML technique.
+        """
+        X, y = self.get_train_data(fname, asset_class, cols) # Store all previous data on these variables.
+
+        self.fit(X[:-1], y)  # Fit data of the previous days, expcept for the current days'.
+
+        #Now let's predict the direction for the next days' move. 
+        probability_down = self.predict_proba(X[-1])[:, 0]
+        probability_up = self.predict_proba(X[-1])[:, 1]
+        next_day_predicted_direction = self.predict(X[-1])
+
+        print('Predicted direction: ')
+        print(next_day_predicted_direction)
+
 class NaiveGaussianClassifier(GaussianNB):
     def get_train_data (self, fname, asset_class, cols):
         df = create_features(fname, asset_class)
@@ -250,6 +265,7 @@ class NaiveGaussianClassifier(GaussianNB):
         #ax.scatter(xdata, probability_up, c=color_code, cmap=cmap)
         #ax.scatter(xdata, probability_down, c=color_code, cmap=cmap)
 
+        
     def cross_validation_test (self, fname, asset_class, cols, ax):
         """Use cross validation to determine the precision on confusion matrix
         """
