@@ -9,6 +9,7 @@ from fpl import FPL
 import aiohttp
 import asyncio
 import csv
+import pandas as pd
 
 url = "https://fantasy.premierleague.com/api/element-summary/1/"
 url_1 = "https://fantasy.premierleague.com/api/bootstrap-static/"
@@ -58,4 +59,26 @@ async def my_teams_performance (id):
 
         await session.close()
 
-asyncio.get_event_loop().run_until_complete(my_teams_performance(my_user_id))
+
+async def find_fpl_captain ():
+    "Function to try and predict the optimal choice of fpl captain."
+    session = aiohttp.ClientSession()
+    fpl = FPL(session)
+    
+    #First get the top 5 players from all 20 teams in the epl.
+    all_pl_teams = await fpl.get_teams()
+
+    for team in all_pl_teams:
+        players = await team.get_players(return_json=True)
+        name_of_team = team.name
+
+        print(name_of_team + '\n')
+
+        #Create dataframe of the players.
+        players_df = pd.DataFrame(players).sort_values(by=['form', 'points_per_game', 'threat'], ascending=False)
+        print(players_df[['form', 'points_per_game', 'threat']].head(3))
+
+    await session.close()
+
+#asyncio.get_event_loop().run_until_complete(my_teams_performance(my_user_id))
+asyncio.get_event_loop().run_until_complete(find_fpl_captain())

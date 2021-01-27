@@ -10,20 +10,13 @@ import bs4 as bs4
 import numpy as np
 import pandas as pd
 import csv
+import asyncio 
 
 url_championship = "https://www.skysports.com/championship-results"
 url_championship_2019_20 = "https://www.skysports.com/championship-results/2019-20"
 url_pl_2020_21 = "https://www.skysports.com/premier-league-results"
 url_pl_2019_20 = "https://www.skysports.com/premier-league-results/2019-20"
-
-html = urlopen(url_pl_2019_20)
-soup_object = BeautifulSoup(html, 'lxml')
-
-fixture_score = soup_object.find_all('div', 'fixres__item')
-#fixture_score = soup_object.find_all('a', 'matches__item matches__link')
-hidden_scores = soup_object.find_all('script', type='text/show-more')[0].string
-hidden_scores_soup_object = BeautifulSoup(hidden_scores, 'lxml')
-hidden_scores = hidden_scores_soup_object.find_all('div', 'fixres__item') 
+ 
 
 #Add the two scores arrays; 1st convert them numpy arrays.
 #fixture_score = np.array(fixture_score)
@@ -46,46 +39,64 @@ for elem in all_fixtures_scores[:2]:#, all_fixtures_scores[201]):
     print('score: ', match_score_away)
 
 """
-with open('score_results_2019-20_pl.csv', 'w') as file1:
-    stream_to_file = csv.writer(file1, delimiter=',')
-    for elem in fixture_score[:2]:
-        match_link = elem.find_all('a', 'matches__item matches__link')[0].get('href')
-        html_match_stats = urlopen(match_link, timeout=20)
-        soup_obj = BeautifulSoup(html_match_stats, 'lxml')
-        match_date = soup_obj.find_all('time')[0].string.split(',')[1]
-        home_team = elem.find_all('span', 'swap-text__target')[0].string
-        away_team = elem.find_all('span', 'swap-text__target')[1].string
-        match_score_home = elem.find_all('span', 'matches__teamscores-side')[0].string.strip()
-        match_score_away = elem.find_all('span', 'matches__teamscores-side')[1].string.strip()
 
-        stream_to_file.writerow([home_team, match_score_home, away_team, match_score_away, match_date])
-        #stream_to_file.writerow(home_team + ' ' + match_score_home + ' ' + away_team + ' ' + match_score_away + ' ' + match_date + '\n')
+async def write_scores_to_file (url):
+    html = urlopen(url)
+    soup_object = BeautifulSoup(html, 'lxml')
 
-        #print('home: ', home_team)
-        #print('away: ', away_team)
-        #print('score: ', match_score_home)
-        #print('score: ', match_score_away)
-        #print(match_date)
+    fixture_score = soup_object.find_all('div', 'fixres__item')
+    #fixture_score = soup_object.find_all('a', 'matches__item matches__link')
+    hidden_scores = soup_object.find_all('script', type='text/show-more')[0].string
+    hidden_scores_soup_object = BeautifulSoup(hidden_scores, 'lxml')
+    hidden_scores = hidden_scores_soup_object.find_all('div', 'fixres__item')
+    
+    with open('score_results_2019-20_efl.csv', 'w') as file1:
+        stream_to_file = csv.writer(file1, delimiter=',')
+        stream_to_file.writerow(['Home Team', 'Home Score', 'Away Team', 'Away Score', 'Match Date'])
+        for elem in fixture_score:
+            match_link = elem.find_all('a', 'matches__item matches__link')[0].get('href')
+            html_match_stats = urlopen(match_link, timeout=5000)
+            soup_obj = BeautifulSoup(html_match_stats, 'lxml')
+            match_date = soup_obj.find_all('time')[0].string.split(',')[1]
+            home_team = elem.find_all('span', 'swap-text__target')[0].string
+            away_team = elem.find_all('span', 'swap-text__target')[1].string
+            match_score_home = elem.find_all('span', 'matches__teamscores-side')[0].string.strip()
+            match_score_away = elem.find_all('span', 'matches__teamscores-side')[1].string.strip()
 
-    for elem in hidden_scores[:2]:
-        match_link = elem.find_all('a', 'matches__item matches__link')[0].get('href')
-        html_match_stats = urlopen(match_link, timeout=20)
-        soup_obj = BeautifulSoup(html_match_stats, 'lxml')
-        match_date = soup_obj.find_all('time')[0].string.split(',')[1]
-        home_team = elem.find_all('span', 'swap-text__target')[0].string
-        away_team = elem.find_all('span', 'swap-text__target')[1].string
-        match_score_home = elem.find_all('span', 'matches__teamscores-side')[0].string.strip()
-        match_score_away = elem.find_all('span', 'matches__teamscores-side')[1].string.strip()
+            stream_to_file.writerow([home_team, match_score_home, away_team, match_score_away, match_date])
+            #stream_to_file.writerow(home_team + ' ' + match_score_home + ' ' + away_team + ' ' + match_score_away + ' ' + match_date + '\n')
 
-        stream_to_file.writerow([home_team, match_score_home, away_team, match_score_away, match_date])
+            #print('home: ', home_team)
+            #print('away: ', away_team)
+            #print('score: ', match_score_home)
+            #print('score: ', match_score_away)
+            #print(match_date)
+            await asyncio.sleep(10)
 
-        #stream_to_file.writerow(home_team + ' ' + match_score_home + ' ' + away_team + ' ' + match_score_away + ' ' + match_date + '\n')
+        for elem in hidden_scores:
+            match_link = elem.find_all('a', 'matches__item matches__link')[0].get('href')
+            html_match_stats = urlopen(match_link, timeout=5000)
+            soup_obj = BeautifulSoup(html_match_stats, 'lxml')
+            match_date = soup_obj.find_all('time')[0].string.split(',')[1]
+            home_team = elem.find_all('span', 'swap-text__target')[0].string
+            away_team = elem.find_all('span', 'swap-text__target')[1].string
+            match_score_home = elem.find_all('span', 'matches__teamscores-side')[0].string.strip()
+            match_score_away = elem.find_all('span', 'matches__teamscores-side')[1].string.strip()
 
-        #print('home: ', home_team)
-        #print('away: ', away_team)
-        #print('score: ', match_score_home)
-        #print('score: ', match_score_away)
-        #print(match_date)
+            stream_to_file.writerow([home_team, match_score_home, away_team, match_score_away, match_date])
+
+            #stream_to_file.writerow(home_team + ' ' + match_score_home + ' ' + away_team + ' ' + match_score_away + ' ' + match_date + '\n')
+
+            #print('home: ', home_team)
+            #print('away: ', away_team)
+            #print('score: ', match_score_home)
+            #print('score: ', match_score_away)
+            #print(match_date)
+            await asyncio.sleep(10)
+
+asyncio.get_event_loop().run_until_complete(write_scores_to_file(url_championship_2019_20))
+
+#match_results = pd.read_csv('score_results_2019-20_pl.csv')
 
 #stream_to_file.close()
 
