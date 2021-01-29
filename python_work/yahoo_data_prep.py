@@ -10,8 +10,9 @@ def get_ticker(ticker, start, end):
     return ticker
 
 #tickers = [['BTC-USD', 'BitCoin']]#, ['ETH-USD', 'Etherium'], ['USDT-USD', 'tETHER'], ['XRP-USD', 'XRP'], ['LTC-USD', 'Litecoin']]
-#prices = pd.DataFrame({ ticker[1] : get_ticker(ticker[0], '01-01-2001', '11-01-2021')['Adj Close'] for ticker in tickers}).dropna()
-#prices.to_excel("cryptos_data.xlsx") 
+tickers = [['ZAR=X', 'USDZAR'], ['GBPUSD=X', 'GBPUSD']]
+prices = pd.DataFrame({ ticker[1] : get_ticker(ticker[0], '01-01-2001', '28-01-2021')['Adj Close'] for ticker in tickers}).dropna()
+prices.to_excel("currency_data.xlsx") 
 
 def create_features (fname, col_name):
     """Function to compute the essential features for the Machine Learning algos to be able to construct feature vectors.
@@ -60,8 +61,8 @@ def create_features (fname, col_name):
         col = 'ret_%d' % lag
         df[col] = df['return'].shift(lag)
         cols.append(col)
-
-    print(df.tail(10))
+    #print(df.head(21))
+    
     df.dropna(inplace=True)
     df['return_sign'] = np.sign(df['return'].values)
 
@@ -79,3 +80,6 @@ def get_dates (fname, col_name):
     df = create_features(fname, col_name)
     df = df[df['return_sign'] != 0.0]
     return df.index
+#fname = "currency_data.xlsx"
+#asset_class = 'USDZAR'
+#create_features (fname, asset_class)
