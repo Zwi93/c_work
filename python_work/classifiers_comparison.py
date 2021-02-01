@@ -22,8 +22,8 @@ metric = ['manhattan', 'euclidean', 'mahalanobis']
 feature_combination = powerset(all_cols)[205]
 
 #Create KNNClassifier object, best parameters to use depends on the output of the GridSearchCV class methods.
-knn_object = KNNClassifier(n_neighbors=10, weights='uniform', metric=metric[1], algorithm='brute')
-df1 = knn_object.pnl_backtesting(fname, asset_class, feature_combination)
+#knn_object = KNNClassifier(n_neighbors=10, weights='uniform', metric=metric[1], algorithm='brute')
+#df1 = knn_object.pnl_backtesting(fname, asset_class, feature_combination)
 
 #Create LogisticRegressionClassifier object.  # high C corresponds to no regularization.
 logit_object = LogisticRegressionClassifier(C=50, solver='liblinear', penalty='l2')  
@@ -35,12 +35,12 @@ df3 = svm_object.pnl_backtesting(fname, asset_class, feature_combination)
 
 #Dataframe carrying all info about features, especially the actual realised return, that will be compared with the predicted return.
 df = create_features(fname, asset_class)
-df = df[-df1.shape[0]:]
+df = df[-df2.shape[0]:]
 
 #Put all predicted PnL for each classifier in the one dataframe df, and then plot all to comapre.
-df['pred_ret_knn'] = df1['Daily PnL']
+#df['pred_ret_knn'] = df1['Daily PnL']
 df['pred_ret_svm'] = df3['Daily PnL']
 df['pred_ret_logit'] = df2['Daily PnL']
-df[['pred_ret_knn', 'pred_ret_svm', 'pred_ret_logit']].cumsum().apply(np.exp).plot(figsize=(15, 10))
+df[['pred_ret_svm', 'pred_ret_logit']].cumsum().apply(np.exp).plot(figsize=(15, 10))
 plt.savefig('USDZAR.png')
 

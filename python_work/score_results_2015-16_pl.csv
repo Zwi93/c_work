@@ -1,3 +1,381 @@
 Home Team,Home Score,Away Team,Away Score,Match Date
 Manchester United,3,Bournemouth,1, Tuesday 17th May 2016.
+Arsenal,4,Aston Villa,0, Sunday 15th May 2016.
+Chelsea,1,Leicester City,1, Sunday 15th May 2016.
+Everton,3,Norwich City,0, Sunday 15th May 2016.
+Newcastle United,5,Tottenham Hotspur,1, Sunday 15th May 2016.
+Southampton,4,Crystal Palace,1, Sunday 15th May 2016.
+Stoke City,2,West Ham United,1, Sunday 15th May 2016.
+Swansea City,1,Manchester City,1, Sunday 15th May 2016.
+Watford,2,Sunderland,2, Sunday 15th May 2016.
+West Bromwich Albion,1,Liverpool,1, Sunday 15th May 2016.
+Norwich City,4,Watford,2, Wednesday 11th May 2016.
+Sunderland,3,Everton,0, Wednesday 11th May 2016.
+Liverpool,1,Chelsea,1, Wednesday 11th May 2016.
+West Ham United,3,Manchester United,2, Tuesday 10th May 2016.
+Tottenham Hotspur,1,Southampton,2, Sunday 8th May 2016.
+Liverpool,2,Watford,0, Sunday 8th May 2016.
+Manchester City,2,Arsenal,2, Sunday 8th May 2016.
+Norwich City,0,Manchester United,1, Saturday 7th May 2016.
+Aston Villa,0,Newcastle United,0, Saturday 7th May 2016.
+Bournemouth,1,West Bromwich Albion,1, Saturday 7th May 2016.
+Crystal Palace,2,Stoke City,1, Saturday 7th May 2016.
+Sunderland,3,Chelsea,2, Saturday 7th May 2016.
+West Ham United,1,Swansea City,4, Saturday 7th May 2016.
+Leicester City,3,Everton,1, Saturday 7th May 2016.
+Chelsea,2,Tottenham Hotspur,2, Monday 2nd May 2016.
+Swansea City,3,Liverpool,1, Sunday 1st May 2016.
+Manchester United,1,Leicester City,1, Sunday 1st May 2016.
+Southampton,4,Manchester City,2, Sunday 1st May 2016.
+Everton,2,Bournemouth,1, Saturday 30th April 2016.
+Newcastle United,1,Crystal Palace,0, Saturday 30th April 2016.
+Stoke City,1,Sunderland,1, Saturday 30th April 2016.
+Watford,3,Aston Villa,2, Saturday 30th April 2016.
+West Bromwich Albion,0,West Ham United,3, Saturday 30th April 2016.
+Arsenal,1,Norwich City,0, Saturday 30th April 2016.
+Tottenham Hotspur,1,West Bromwich Albion,1, Monday 25th April 2016.
+Sunderland,0,Arsenal,0, Sunday 24th April 2016.
+Leicester City,4,Swansea City,0, Sunday 24th April 2016.
+Manchester City,4,Stoke City,0, Saturday 23rd April 2016.
+Aston Villa,2,Southampton,4, Saturday 23rd April 2016.
+Bournemouth,1,Chelsea,4, Saturday 23rd April 2016.
+Liverpool,2,Newcastle United,2, Saturday 23rd April 2016.
+Arsenal,2,West Bromwich Albion,0, Thursday 21st April 2016.
+West Ham United,3,Watford,1, Wednesday 20th April 2016.
+Liverpool,4,Everton,0, Wednesday 20th April 2016.
+Manchester United,2,Crystal Palace,0, Wednesday 20th April 2016.
+Newcastle United,1,Manchester City,1, Tuesday 19th April 2016.
+Stoke City,0,Tottenham Hotspur,4, Monday 18th April 2016.
+Bournemouth,1,Liverpool,2, Sunday 17th April 2016.
+Leicester City,2,West Ham United,2, Sunday 17th April 2016.
+Arsenal,1,Crystal Palace,1, Sunday 17th April 2016.
+Norwich City,0,Sunderland,3, Saturday 16th April 2016.
+Everton,1,Southampton,1, Saturday 16th April 2016.
+Manchester United,1,Aston Villa,0, Saturday 16th April 2016.
+Newcastle United,3,Swansea City,0, Saturday 16th April 2016.
+West Bromwich Albion,0,Watford,1, Saturday 16th April 2016.
+Chelsea,0,Manchester City,3, Saturday 16th April 2016.
+Crystal Palace,0,Everton,0, Wednesday 13th April 2016.
+Sunderland,0,Leicester City,2, Sunday 10th April 2016.
+Liverpool,4,Stoke City,1, Sunday 10th April 2016.
+Tottenham Hotspur,3,Manchester United,0, Sunday 10th April 2016.
+West Ham United,3,Arsenal,3, Saturday 9th April 2016.
+Aston Villa,1,Bournemouth,2, Saturday 9th April 2016.
+Crystal Palace,1,Norwich City,0, Saturday 9th April 2016.
+Southampton,3,Newcastle United,1, Saturday 9th April 2016.
+Swansea City,1,Chelsea,0, Saturday 9th April 2016.
+Watford,1,Everton,1, Saturday 9th April 2016.
+Manchester City,2,West Bromwich Albion,1, Saturday 9th April 2016.
+Leicester City,1,Southampton,0, Sunday 3rd April 2016.
+Manchester United,1,Everton,0, Sunday 3rd April 2016.
+Aston Villa,0,Chelsea,4, Saturday 2nd April 2016.
+Arsenal,4,Watford,0, Saturday 2nd April 2016.
+Bournemouth,0,Manchester City,4, Saturday 2nd April 2016.
+Norwich City,3,Newcastle United,2, Saturday 2nd April 2016.
+Stoke City,2,Swansea City,2, Saturday 2nd April 2016.
+Sunderland,0,West Bromwich Albion,0, Saturday 2nd April 2016.
+West Ham United,2,Crystal Palace,2, Saturday 2nd April 2016.
+Liverpool,1,Tottenham Hotspur,1, Saturday 2nd April 2016.
+Newcastle United,1,Sunderland,1, Sunday 20th March 2016.
+Southampton,3,Liverpool,2, Sunday 20th March 2016.
+Manchester City,0,Manchester United,1, Sunday 20th March 2016.
+Tottenham Hotspur,3,Bournemouth,0, Sunday 20th March 2016.
+Everton,0,Arsenal,2, Saturday 19th March 2016.
+Chelsea,2,West Ham United,2,https://www.skysports.com/football/chelsea-vs-west-ham/341487
+Crystal Palace,0,Leicester City,1, Saturday 19th March 2016.
+Watford,1,Stoke City,2, Saturday 19th March 2016.
+West Bromwich Albion,0,Norwich City,1, Saturday 19th March 2016.
+Swansea City,1,Aston Villa,0, Saturday 19th March 2016.
+Leicester City,1,Newcastle United,0, Monday 14th March 2016.
+Aston Villa,0,Tottenham Hotspur,2, Sunday 13th March 2016.
+Norwich City,0,Manchester City,0, Saturday 12th March 2016.
+Bournemouth,3,Swansea City,2, Saturday 12th March 2016.
+Stoke City,1,Southampton,2, Saturday 12th March 2016.
+Crystal Palace,1,Liverpool,2, Sunday 6th March 2016.
+West Bromwich Albion,1,Manchester United,0, Sunday 6th March 2016.
+Tottenham Hotspur,2,Arsenal,2, Saturday 5th March 2016.
+Chelsea,1,Stoke City,1, Saturday 5th March 2016.
+Everton,2,West Ham United,3, Saturday 5th March 2016.
+Manchester City,4,Aston Villa,0, Saturday 5th March 2016.
+Newcastle United,1,Bournemouth,3, Saturday 5th March 2016.
+Southampton,1,Sunderland,1, Saturday 5th March 2016.
+Swansea City,1,Norwich City,0, Saturday 5th March 2016.
+Watford,0,Leicester City,1, Saturday 5th March 2016.
+Arsenal,1,Swansea City,2, Wednesday 2nd March 2016.
+Stoke City,1,Newcastle United,0, Wednesday 2nd March 2016.
+West Ham United,1,Tottenham Hotspur,0, Wednesday 2nd March 2016.
+Liverpool,3,Manchester City,0, Wednesday 2nd March 2016.
+Manchester United,1,Watford,0, Wednesday 2nd March 2016.
+Aston Villa,1,Everton,3, Tuesday 1st March 2016.
+Bournemouth,2,Southampton,0, Tuesday 1st March 2016.
+Leicester City,2,West Bromwich Albion,2, Tuesday 1st March 2016.
+Norwich City,1,Chelsea,2, Tuesday 1st March 2016.
+Sunderland,2,Crystal Palace,2, Tuesday 1st March 2016.
+Manchester United,3,Arsenal,2, Sunday 28th February 2016.
+Tottenham Hotspur,2,Swansea City,1, Sunday 28th February 2016.
+West Ham United,1,Sunderland,0, Saturday 27th February 2016.
+Leicester City,1,Norwich City,0, Saturday 27th February 2016.
+Southampton,1,Chelsea,2, Saturday 27th February 2016.
+Stoke City,2,Aston Villa,1, Saturday 27th February 2016.
+Watford,0,Bournemouth,0, Saturday 27th February 2016.
+West Bromwich Albion,3,Crystal Palace,2, Saturday 27th February 2016.
+Arsenal,2,Leicester City,1, Sunday 14th February 2016.
+Aston Villa,0,Liverpool,6, Sunday 14th February 2016.
+Manchester City,1,Tottenham Hotspur,2, Sunday 14th February 2016.
+Sunderland,2,Manchester United,1, Saturday 13th February 2016.
+Bournemouth,1,Stoke City,3, Saturday 13th February 2016.
+Crystal Palace,1,Watford,2, Saturday 13th February 2016.
+Everton,0,West Bromwich Albion,1, Saturday 13th February 2016.
+Norwich City,2,West Ham United,2, Saturday 13th February 2016.
+Swansea City,0,Southampton,1, Saturday 13th February 2016.
+Chelsea,5,Newcastle United,1, Saturday 13th February 2016.
+Bournemouth,0,Arsenal,2, Sunday 7th February 2016.
+Chelsea,1,Manchester United,1, Sunday 7th February 2016.
+Manchester City,1,Leicester City,3, Saturday 6th February 2016.
+Aston Villa,2,Norwich City,0, Saturday 6th February 2016.
+Liverpool,2,Sunderland,2, Saturday 6th February 2016.
+Newcastle United,1,West Bromwich Albion,0, Saturday 6th February 2016.
+Stoke City,0,Everton,3, Saturday 6th February 2016.
+Swansea City,1,Crystal Palace,1, Saturday 6th February 2016.
+Tottenham Hotspur,1,Watford,0, Saturday 6th February 2016.
+Southampton,1,West Ham United,0, Saturday 6th February 2016.
+Everton,3,Newcastle United,0, Wednesday 3rd February 2016.
+Watford,0,Chelsea,0, Wednesday 3rd February 2016.
+Arsenal,0,Southampton,0, Tuesday 2nd February 2016.
+Leicester City,2,Liverpool,0, Tuesday 2nd February 2016.
+Norwich City,0,Tottenham Hotspur,3, Tuesday 2nd February 2016.
+Sunderland,0,Manchester City,1, Tuesday 2nd February 2016.
+West Ham United,2,Aston Villa,0, Tuesday 2nd February 2016.
+Crystal Palace,1,Bournemouth,2, Tuesday 2nd February 2016.
+Manchester United,3,Stoke City,0, Tuesday 2nd February 2016.
+West Bromwich Albion,1,Swansea City,1, Tuesday 2nd February 2016.
+Everton,1,Swansea City,2, Sunday 24th January 2016.
+Arsenal,0,Chelsea,1, Sunday 24th January 2016.
+Norwich City,4,Liverpool,5, Saturday 23rd January 2016.
+Crystal Palace,1,Tottenham Hotspur,3, Saturday 23rd January 2016.
+Leicester City,3,Stoke City,0, Saturday 23rd January 2016.
+Manchester United,0,Southampton,1, Saturday 23rd January 2016.
+Sunderland,1,Bournemouth,1, Saturday 23rd January 2016.
+Watford,2,Newcastle United,1, Saturday 23rd January 2016.
+West Bromwich Albion,0,Aston Villa,0, Saturday 23rd January 2016.
+West Ham United,2,Manchester City,2, Saturday 23rd January 2016.
+Swansea City,1,Watford,0, Monday 18th January 2016.
+Liverpool,0,Manchester United,1, Sunday 17th January 2016.
+Stoke City,0,Arsenal,0, Sunday 17th January 2016.
+Tottenham Hotspur,4,Sunderland,1, Saturday 16th January 2016.
+Bournemouth,3,Norwich City,0, Saturday 16th January 2016.
+Chelsea,3,Everton,3, Saturday 16th January 2016.
+Manchester City,4,Crystal Palace,0, Saturday 16th January 2016.
+Newcastle United,2,West Ham United,1, Saturday 16th January 2016.
+Southampton,3,West Bromwich Albion,0, Saturday 16th January 2016.
+Aston Villa,1,Leicester City,1, Saturday 16th January 2016.
+Chelsea,2,West Bromwich Albion,2, Wednesday 13th January 2016.
+Manchester City,0,Everton,0, Wednesday 13th January 2016.
+Southampton,2,Watford,0, Wednesday 13th January 2016.
+Stoke City,3,Norwich City,1, Wednesday 13th January 2016.
+Swansea City,2,Sunderland,4, Wednesday 13th January 2016.
+Liverpool,3,Arsenal,3, Wednesday 13th January 2016.
+Tottenham Hotspur,0,Leicester City,1, Wednesday 13th January 2016.
+Aston Villa,1,Crystal Palace,0, Tuesday 12th January 2016.
+Bournemouth,1,West Ham United,3, Tuesday 12th January 2016.
+Newcastle United,3,Manchester United,3, Tuesday 12th January 2016.
+Crystal Palace,0,Chelsea,3, Sunday 3rd January 2016.
+Everton,1,Tottenham Hotspur,1, Sunday 3rd January 2016.
+West Ham United,2,Liverpool,0, Saturday 2nd January 2016.
+Arsenal,1,Newcastle United,0, Saturday 2nd January 2016.
+Leicester City,0,Bournemouth,0, Saturday 2nd January 2016.
+Manchester United,2,Swansea City,1, Saturday 2nd January 2016.
+Norwich City,1,Southampton,0, Saturday 2nd January 2016.
+Sunderland,3,Aston Villa,1, Saturday 2nd January 2016.
+West Bromwich Albion,2,Stoke City,1, Saturday 2nd January 2016.
+Watford,1,Manchester City,2, Saturday 2nd January 2016.
+Sunderland,0,Liverpool,1, Wednesday 30th December 2015.
+Leicester City,0,Manchester City,0, Tuesday 29th December 2015.
+Crystal Palace,0,Swansea City,0, Monday 28th December 2015.
+Everton,3,Stoke City,4, Monday 28th December 2015.
+Norwich City,2,Aston Villa,0, Monday 28th December 2015.
+Watford,1,Tottenham Hotspur,2, Monday 28th December 2015.
+West Bromwich Albion,1,Newcastle United,0, Monday 28th December 2015.
+Arsenal,2,Bournemouth,0, Monday 28th December 2015.
+Manchester United,0,Chelsea,0, Monday 28th December 2015.
+West Ham United,2,Southampton,1, Monday 28th December 2015.
 Stoke City,2,Manchester United,0, Saturday 26th December 2015.
+Aston Villa,1,West Ham United,1, Saturday 26th December 2015.
+Bournemouth,0,Crystal Palace,0, Saturday 26th December 2015.
+Chelsea,2,Watford,2, Saturday 26th December 2015.
+Liverpool,1,Leicester City,0, Saturday 26th December 2015.
+Manchester City,4,Sunderland,1, Saturday 26th December 2015.
+Swansea City,1,West Bromwich Albion,0, Saturday 26th December 2015.
+Tottenham Hotspur,3,Norwich City,0, Saturday 26th December 2015.
+Newcastle United,0,Everton,1, Saturday 26th December 2015.
+Southampton,4,Arsenal,0, Saturday 26th December 2015.
+Arsenal,2,Manchester City,1, Monday 21st December 2015.
+Watford,3,Liverpool,0, Sunday 20th December 2015.
+Swansea City,0,West Ham United,0, Sunday 20th December 2015.
+Chelsea,3,Sunderland,1, Saturday 19th December 2015.
+Everton,2,Leicester City,3, Saturday 19th December 2015.
+Manchester United,1,Norwich City,2, Saturday 19th December 2015.
+Southampton,0,Tottenham Hotspur,2, Saturday 19th December 2015.
+Stoke City,1,Crystal Palace,2, Saturday 19th December 2015.
+West Bromwich Albion,1,Bournemouth,2, Saturday 19th December 2015.
+Newcastle United,1,Aston Villa,1, Saturday 19th December 2015.
+Leicester City,2,Chelsea,1, Monday 14th December 2015.
+Aston Villa,0,Arsenal,2, Sunday 13th December 2015.
+Liverpool,2,West Bromwich Albion,2, Sunday 13th December 2015.
+Tottenham Hotspur,1,Newcastle United,2, Sunday 13th December 2015.
+Norwich City,1,Everton,1, Saturday 12th December 2015.
+Crystal Palace,1,Southampton,0, Saturday 12th December 2015.
+Manchester City,2,Swansea City,1, Saturday 12th December 2015.
+Sunderland,0,Watford,1, Saturday 12th December 2015.
+West Ham United,0,Stoke City,0, Saturday 12th December 2015.
+Bournemouth,2,Manchester United,1, Saturday 12th December 2015.
+Everton,1,Crystal Palace,1, Monday 7th December 2015.
+Newcastle United,2,Liverpool,0, Sunday 6th December 2015.
+Stoke City,2,Manchester City,0, Saturday 5th December 2015.
+Arsenal,3,Sunderland,1, Saturday 5th December 2015.
+Manchester United,0,West Ham United,0, Saturday 5th December 2015.
+Southampton,1,Aston Villa,1, Saturday 5th December 2015.
+Swansea City,0,Leicester City,3, Saturday 5th December 2015.
+Watford,2,Norwich City,0, Saturday 5th December 2015.
+West Bromwich Albion,1,Tottenham Hotspur,1, Saturday 5th December 2015.
+Chelsea,0,Bournemouth,1, Saturday 5th December 2015.
+Tottenham Hotspur,0,Chelsea,0, Sunday 29th November 2015.
+West Ham United,1,West Bromwich Albion,1, Sunday 29th November 2015.
+Liverpool,1,Swansea City,0, Sunday 29th November 2015.
+Norwich City,1,Arsenal,1, Sunday 29th November 2015.
+Aston Villa,2,Watford,3, Saturday 28th November 2015.
+Bournemouth,3,Everton,3, Saturday 28th November 2015.
+Crystal Palace,5,Newcastle United,1, Saturday 28th November 2015.
+Manchester City,3,Southampton,1, Saturday 28th November 2015.
+Sunderland,2,Stoke City,0, Saturday 28th November 2015.
+Leicester City,1,Manchester United,1, Saturday 28th November 2015.
+Crystal Palace,0,Sunderland,1, Monday 23rd November 2015.
+Tottenham Hotspur,4,West Ham United,1, Sunday 22nd November 2015.
+Watford,1,Manchester United,2, Saturday 21st November 2015.
+Chelsea,1,Norwich City,0, Saturday 21st November 2015.
+Everton,4,Aston Villa,0, Saturday 21st November 2015.
+Newcastle United,0,Leicester City,3, Saturday 21st November 2015.
+Southampton,0,Stoke City,1, Saturday 21st November 2015.
+Swansea City,2,Bournemouth,2, Saturday 21st November 2015.
+West Bromwich Albion,2,Arsenal,1, Saturday 21st November 2015.
+Manchester City,1,Liverpool,4, Saturday 21st November 2015.
+Aston Villa,0,Manchester City,0, Sunday 8th November 2015.
+Arsenal,1,Tottenham Hotspur,1, Sunday 8th November 2015.
+Liverpool,1,Crystal Palace,2, Sunday 8th November 2015.
+Bournemouth,0,Newcastle United,1, Saturday 7th November 2015.
+Leicester City,2,Watford,1, Saturday 7th November 2015.
+Manchester United,2,West Bromwich Albion,0, Saturday 7th November 2015.
+Norwich City,1,Swansea City,0, Saturday 7th November 2015.
+Sunderland,0,Southampton,1, Saturday 7th November 2015.
+West Ham United,1,Everton,1, Saturday 7th November 2015.
+Stoke City,1,Chelsea,0, Saturday 7th November 2015.
+Tottenham Hotspur,3,Aston Villa,1, Monday 2nd November 2015.
+Everton,6,Sunderland,2, Sunday 1st November 2015.
+Southampton,2,Bournemouth,0, Sunday 1st November 2015.
+Chelsea,1,Liverpool,3, Saturday 31st October 2015.
+Crystal Palace,0,Manchester United,0, Saturday 31st October 2015.
+Manchester City,2,Norwich City,1, Saturday 31st October 2015.
+Newcastle United,0,Stoke City,0, Saturday 31st October 2015.
+Swansea City,0,Arsenal,3, Saturday 31st October 2015.
+Watford,2,West Ham United,0, Saturday 31st October 2015.
+West Bromwich Albion,2,Leicester City,3, Saturday 31st October 2015.
+Sunderland,3,Newcastle United,0, Sunday 25th October 2015.
+Bournemouth,1,Tottenham Hotspur,5, Sunday 25th October 2015.
+Manchester United,0,Manchester City,0, Sunday 25th October 2015.
+Liverpool,1,Southampton,1, Sunday 25th October 2015.
+Aston Villa,1,Swansea City,2, Saturday 24th October 2015.
+Leicester City,1,Crystal Palace,0, Saturday 24th October 2015.
+Norwich City,0,West Bromwich Albion,1, Saturday 24th October 2015.
+Stoke City,0,Watford,2, Saturday 24th October 2015.
+West Ham United,2,Chelsea,1, Saturday 24th October 2015.
+Arsenal,2,Everton,1, Saturday 24th October 2015.
+Swansea City,0,Stoke City,1, Monday 19th October 2015.
+Newcastle United,6,Norwich City,2, Sunday 18th October 2015.
+Tottenham Hotspur,0,Liverpool,0, Saturday 17th October 2015.
+Chelsea,2,Aston Villa,0, Saturday 17th October 2015.
+Crystal Palace,1,West Ham United,3, Saturday 17th October 2015.
+Everton,0,Manchester United,3, Saturday 17th October 2015.
+Manchester City,5,Bournemouth,1, Saturday 17th October 2015.
+Southampton,2,Leicester City,2, Saturday 17th October 2015.
+West Bromwich Albion,1,Sunderland,0, Saturday 17th October 2015.
+Watford,0,Arsenal,3, Saturday 17th October 2015.
+Everton,1,Liverpool,1, Sunday 4th October 2015.
+Arsenal,3,Manchester United,0, Sunday 4th October 2015.
+Swansea City,2,Tottenham Hotspur,2, Sunday 4th October 2015.
+Crystal Palace,2,West Bromwich Albion,0, Saturday 3rd October 2015.
+Aston Villa,0,Stoke City,1, Saturday 3rd October 2015.
+Bournemouth,1,Watford,1, Saturday 3rd October 2015.
+Manchester City,6,Newcastle United,1, Saturday 3rd October 2015.
+Norwich City,1,Leicester City,2, Saturday 3rd October 2015.
+Sunderland,2,West Ham United,2, Saturday 3rd October 2015.
+Chelsea,1,Southampton,3, Saturday 3rd October 2015.
+West Bromwich Albion,2,Everton,3, Monday 28th September 2015.
+Watford,0,Crystal Palace,1, Sunday 27th September 2015.
+Tottenham Hotspur,4,Manchester City,1, Saturday 26th September 2015.
+Leicester City,2,Arsenal,5, Saturday 26th September 2015.
+Liverpool,3,Aston Villa,2, Saturday 26th September 2015.
+Manchester United,3,Sunderland,0, Saturday 26th September 2015.
+Southampton,3,Swansea City,1, Saturday 26th September 2015.
+Stoke City,2,Bournemouth,1, Saturday 26th September 2015.
+West Ham United,2,Norwich City,2, Saturday 26th September 2015.
+Newcastle United,2,Chelsea,2, Saturday 26th September 2015.
+Tottenham Hotspur,1,Crystal Palace,0, Sunday 20th September 2015.
+Liverpool,1,Norwich City,1, Sunday 20th September 2015.
+Southampton,2,Manchester United,3, Sunday 20th September 2015.
+Chelsea,2,Arsenal,0, Saturday 19th September 2015.
+Aston Villa,0,West Bromwich Albion,1, Saturday 19th September 2015.
+Bournemouth,2,Sunderland,0, Saturday 19th September 2015.
+Newcastle United,1,Watford,2, Saturday 19th September 2015.
+Stoke City,2,Leicester City,2, Saturday 19th September 2015.
+Swansea City,0,Everton,0, Saturday 19th September 2015.
+Manchester City,1,West Ham United,2, Saturday 19th September 2015.
+West Ham United,2,Newcastle United,0, Monday 14th September 2015.
+Sunderland,0,Tottenham Hotspur,1, Sunday 13th September 2015.
+Leicester City,3,Aston Villa,2, Sunday 13th September 2015.
+Everton,3,Chelsea,1, Saturday 12th September 2015.
+Arsenal,2,Stoke City,0, Saturday 12th September 2015.
+Crystal Palace,0,Manchester City,1, Saturday 12th September 2015.
+Norwich City,3,Bournemouth,1, Saturday 12th September 2015.
+Watford,1,Swansea City,0, Saturday 12th September 2015.
+West Bromwich Albion,0,Southampton,0, Saturday 12th September 2015.
+Manchester United,3,Liverpool,1, Saturday 12th September 2015.
+Southampton,3,Norwich City,0, Sunday 30th August 2015.
+Swansea City,2,Manchester United,1, Sunday 30th August 2015.
+Newcastle United,0,Arsenal,1, Saturday 29th August 2015.
+Aston Villa,2,Sunderland,2, Saturday 29th August 2015.
+Bournemouth,1,Leicester City,1, Saturday 29th August 2015.
+Chelsea,1,Crystal Palace,2, Saturday 29th August 2015.
+Liverpool,0,West Ham United,3, Saturday 29th August 2015.
+Manchester City,2,Watford,0, Saturday 29th August 2015.
+Stoke City,0,West Bromwich Albion,1, Saturday 29th August 2015.
+Tottenham Hotspur,0,Everton,0, Saturday 29th August 2015.
+Arsenal,0,Liverpool,0, Monday 24th August 2015.
+West Bromwich Albion,2,Chelsea,3, Sunday 23rd August 2015.
+Everton,0,Manchester City,2, Sunday 23rd August 2015.
+Watford,0,Southampton,0, Sunday 23rd August 2015.
+Manchester United,0,Newcastle United,0, Saturday 22nd August 2015.
+Crystal Palace,2,Aston Villa,1, Saturday 22nd August 2015.
+Leicester City,1,Tottenham Hotspur,1, Saturday 22nd August 2015.
+Norwich City,1,Stoke City,1, Saturday 22nd August 2015.
+Sunderland,1,Swansea City,1, Saturday 22nd August 2015.
+West Ham United,3,Bournemouth,4, Saturday 22nd August 2015.
+Liverpool,1,Bournemouth,0, Monday 17th August 2015.
+Crystal Palace,1,Arsenal,2, Sunday 16th August 2015.
+Manchester City,3,Chelsea,0, Sunday 16th August 2015.
+Southampton,0,Everton,3,https://www.skysports.com/football/soton-vs-everton/341201
+Sunderland,1,Norwich City,3, Saturday 15th August 2015.
+Swansea City,2,Newcastle United,0, Saturday 15th August 2015.
+Tottenham Hotspur,2,Stoke City,2, Saturday 15th August 2015.
+Watford,0,West Bromwich Albion,0, Saturday 15th August 2015.
+West Ham United,1,Leicester City,2, Saturday 15th August 2015.
+Aston Villa,0,Manchester United,1, Friday 14th August 2015.
+West Bromwich Albion,0,Manchester City,3, Monday 10th August 2015.
+Arsenal,0,West Ham United,2, Sunday 9th August 2015.
+Newcastle United,2,Southampton,2, Sunday 9th August 2015.
+Stoke City,0,Liverpool,1, Sunday 9th August 2015.
+Manchester United,1,Tottenham Hotspur,0, Saturday 8th August 2015.
+Bournemouth,0,Aston Villa,1, Saturday 8th August 2015.
+Everton,2,Watford,2, Saturday 8th August 2015.
+Leicester City,4,Sunderland,2, Saturday 8th August 2015.
+Norwich City,1,Crystal Palace,3, Saturday 8th August 2015.
+Chelsea,2,Swansea City,2,https://www.skysports.com/football/chelsea-vs-swansea/341189

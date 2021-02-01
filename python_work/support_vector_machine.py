@@ -50,8 +50,8 @@ class SVMClassifier (svm.SVC):
         """Functionn to fit model and then test it, using the n_support_ parameter.
         """
         #Data is scaled 1st. Next change the dataframe to a numpy array.
-        X_train = self.scaling_function(fname, asset_class, cols)[0]
-        y_classifier = self.scaling_function(fname, asset_class, cols)[1]
+        X_train = self.scaling_function(fname, asset_class, cols)[0][:-1]  # Exclude the last row, it has an associated null value for y-classifier.
+        y_classifier = self.scaling_function(fname, asset_class, cols)[1][:-1]
         self.fit(X_train, y_classifier)
 
         return self.n_support_
@@ -60,15 +60,15 @@ class SVMClassifier (svm.SVC):
         """Functionn to fit model and then test it, without returning the no of support vectors.
         """
         #Data is scaled 1st. Next change the dataframe to a numpy array.
-        X_train = self.scaling_function(fname, asset_class, cols)[0]
-        y_classifier = self.scaling_function(fname, asset_class, cols)[1]
+        X_train = self.scaling_function(fname, asset_class, cols)[0][:-1]
+        y_classifier = self.scaling_function(fname, asset_class, cols)[1][:-1]
         self.fit(X_train, y_classifier)
 
     def fit_test_CV (self, fname, asset_class, cols):
         """Function to perform cross_validation to yield best output for any metric.
         """
         X, y = self.get_train_data(fname, asset_class, cols)
-        validated_model = cross_validate(self, X, y, cv=5, return_estimator=True)  # This is a dictionary object.
+        validated_model = cross_validate(self, X[:-1], y[:-1], cv=5, return_estimator=True)  # This is a dictionary object.
     
         return validated_model
 
@@ -78,8 +78,8 @@ class SVMClassifier (svm.SVC):
         X_train, y_classifier = self.get_train_data(fname, asset_class, cols)
         
         self.fit_test_model0(fname, asset_class, cols)
-        unvalidated_classified_data = self.predict(X_train)
-        matrix = confusion_matrix(y_classifier, unvalidated_classified_data)
+        unvalidated_classified_data = self.predict(X_train[:-1])
+        matrix = confusion_matrix(y_classifier[:-1], unvalidated_classified_data)
         print('Confusion Matrix: ')
         print(matrix)
         
@@ -92,8 +92,8 @@ class SVMClassifier (svm.SVC):
 
         for score, model in zip(best_scores, best_models):
             if score == max_score:
-                classified_test_data = model.predict(X_train)
-                matrix = confusion_matrix(y_classifier, classified_test_data)
+                classified_test_data = model.predict(X_train[:-1])
+                matrix = confusion_matrix(y_classifier[:-1], classified_test_data)
                 print('Confusion Matrix VC: ')
                 print(matrix)
             else:
@@ -110,6 +110,7 @@ class SVMClassifier (svm.SVC):
         """Function to plot a simple scatter for two features of the data set, while separating up/down movements.
         """
         df = create_features(fname, asset_class)
+        df.dropna(inplace=True)  # Remove any null values.
         df = df[df['return_sign'] != 0.0]  # Remove any zero returns to avoiding multi-class classification.
 
         #Seperate points into up/down moves.
@@ -137,7 +138,7 @@ class SVMClassifier (svm.SVC):
 
         #Train the model on data and give out the decision boundary.
         X_train, y_classifier = self.get_train_data(fname, asset_class, cols)
-        self.fit(X_train, y_classifier)
+        self.fit(X_train[:-1], y_classifier[:-1])
         decision_boundary = self.decision_function(xy_grid).reshape(X.shape)
 
         #Plot the decision boundary for a given C.
@@ -180,7 +181,7 @@ class SVMClassifier (svm.SVC):
             #Create object of GridSearchCV to use for scoring. 
             clf = GridSearchCV(estimator = self, param_grid=params_grid, cv = cv_1)
             X, y = self.get_train_data(fname, asset_class, cols)
-            nested_score = cross_val_score(clf, X=X, y=y, cv=cv_2)
+            nested_score = cross_val_score(clf, X=X[:-1], y=y[:-1], cv=cv_2)
             index += 1
             scores_array[index] = nested_score.mean()
 
@@ -194,14 +195,14 @@ class SVMClassifier (svm.SVC):
         X, y = self.get_train_data(fname, asset_class, cols)
 
         #Split the data into test and training data and train the model on the training data.
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, shuffle=False)
+        X_train, X_test, y_train, y_test = train_test_split(X[:-1], y[:-1], test_size=0.3, shuffle=False)
         self.probability = True
         self.fit(X_train, y_train)
         probability_down = self.predict_proba(X_test)[:, 0]
         probability_up = self.predict_proba(X_test)[:, 1]
         predicted_direction = self.predict(X_test)
         xdata = get_dates(fname, asset_class)
-        df0 = create_features(fname, asset_class)
+        df0 = create_features(fname, asset_class)[:-1]
         df0 = df0[df0['return_sign'] != 0.0]  # Remove any zero returns to avoiding multi-class classification. And select the returns corresponding to the dates on the test data.
         df0 = df0[-X_test.shape[0]:]
         true_realised_return = df0['return']
@@ -222,3 +223,17 @@ class SVMClassifier (svm.SVC):
         
         return df
 
+    def predict_nxtday_price_move (self, fname, asset_class, cols):
+        """Function to predict the next day's price movement of the given asset class using the ML technique.
+        """
+        X, y = self.get_train_data(fname, asset_class, cols) # Store all previous data on these variables.
+
+        self.fit(X[:-1], y[:-1])  # Fit data of the previous days, expcept for the current day'.
+
+        #Now let's predict the direction for the next days' move. 
+        probability_down = self.predict_proba(X[-1])[:, 0]
+        probability_up = self.predict_proba(X[-1])[:, 1]
+        next_day_predicted_direction = self.predict(X[-1])
+
+        print('Predicted direction: ')
+        print(next_day_predicted_direction)

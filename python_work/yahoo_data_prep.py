@@ -10,9 +10,9 @@ def get_ticker(ticker, start, end):
     return ticker
 
 #tickers = [['BTC-USD', 'BitCoin']]#, ['ETH-USD', 'Etherium'], ['USDT-USD', 'tETHER'], ['XRP-USD', 'XRP'], ['LTC-USD', 'Litecoin']]
-tickers = [['ZAR=X', 'USDZAR'], ['GBPUSD=X', 'GBPUSD']]
-prices = pd.DataFrame({ ticker[1] : get_ticker(ticker[0], '01-01-2001', '28-01-2021')['Adj Close'] for ticker in tickers}).dropna()
-prices.to_excel("currency_data.xlsx") 
+#tickers = [['ZAR=X', 'USDZAR'], ['GBPUSD=X', 'GBPUSD']]
+#prices = pd.DataFrame({ ticker[1] : get_ticker(ticker[0], '01-01-2001', '28-01-2021')['Adj Close'] for ticker in tickers}).dropna()
+#prices.to_excel("currency_data.xlsx") 
 
 def create_features (fname, col_name):
     """Function to compute the essential features for the Machine Learning algos to be able to construct feature vectors.
@@ -21,7 +21,7 @@ def create_features (fname, col_name):
     df_temp = df.copy()
     df_size = df.shape[0]
 
-    df['return'] = np.log(df_temp/df_temp.shift(1))
+    df['return_0'] = np.log(df_temp/df_temp.shift(1))
 
     #Create more sophisticated features; Momentum, MA, EMA, and Std.
     #Momentum
@@ -50,7 +50,7 @@ def create_features (fname, col_name):
         if i < 21:
             moving_std[i] = None
         else:    
-            moving_std[i] = np.std(df['return'][i - 21: i - 1])
+            moving_std[i] = np.std(df['return_0'][i - 21: i - 1])
 
     df['Std_Dev_21d'] = moving_std
 
@@ -59,13 +59,14 @@ def create_features (fname, col_name):
     cols = []
     for lag in range(1, lags+1):
         col = 'ret_%d' % lag
-        df[col] = df['return'].shift(lag)
+        df[col] = df['return_0'].shift(lag)
         cols.append(col)
     #print(df.head(21))
     
     df.dropna(inplace=True)
+    df['return'] = df['return_0'].shift(-1)
     df['return_sign'] = np.sign(df['return'].values)
-
+    #print(df.tail(21))
     del df_temp
 
     return df
@@ -80,6 +81,6 @@ def get_dates (fname, col_name):
     df = create_features(fname, col_name)
     df = df[df['return_sign'] != 0.0]
     return df.index
-#fname = "currency_data.xlsx"
-#asset_class = 'USDZAR'
-#create_features (fname, asset_class)
+fname = "currency_data.xlsx"
+asset_class = 'USDZAR'
+create_features (fname, asset_class)

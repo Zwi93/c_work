@@ -11,8 +11,9 @@ import numpy as np
 import pandas as pd
 import csv
 import asyncio 
+import datetime 
 
-url_championship = "https://www.skysports.com/championship-results"
+url_championship = "https://www.skysports.com/championship-results/"
 url_championship_2019_20 = "https://www.skysports.com/championship-results/2019-20"
 
 url_pl_2020_21 = "https://www.skysports.com/premier-league-results"
@@ -27,6 +28,8 @@ url_pl_2012_13 = "https://www.skysports.com/premier-league-results/2012-13"
 url_pl_2011_12 = "https://www.skysports.com/premier-league-results/2011-12"
 url_pl_2010_11 = "https://www.skysports.com/premier-league-results/2010-11"
 url_pl_2009_10 = "https://www.skysports.com/premier-league-results/2009-10"
+
+url_budesliga = "https://www.skysports.com/bundesliga-results/"
 
 #Add the two scores arrays; 1st convert them numpy arrays.
 #fixture_score = np.array(fixture_score)
@@ -45,41 +48,54 @@ async def write_scores_to_file (url):
     hidden_scores = soup_object.find_all('script', type='text/show-more')[0].string
     hidden_scores_soup_object = BeautifulSoup(hidden_scores, 'lxml')
     hidden_scores = hidden_scores_soup_object.find_all('div', 'fixres__item')
-    file_name = "score_results_" + url[-7:] + "_pl.csv"
+    file_name = "score_results_" + url[-7:] + "_efl.csv"
     
     with open(file_name, 'w') as file1:
         stream_to_file = csv.writer(file1, delimiter=',')
         stream_to_file.writerow(['Home Team', 'Home Score', 'Away Team', 'Away Score', 'Match Date'])
         for elem in fixture_score:
             match_link = elem.find_all('a', 'matches__item matches__link')[0].get('href')
-            html_match_stats = urlopen(match_link, timeout=5000)
-            soup_obj = BeautifulSoup(html_match_stats, 'lxml')
-            match_date = soup_obj.find_all('time')[0].string.split(',')[1]
+            
+            #await asyncio.sleep(10)
+            
             home_team = elem.find_all('span', 'swap-text__target')[0].string
             away_team = elem.find_all('span', 'swap-text__target')[1].string
             match_score_home = elem.find_all('span', 'matches__teamscores-side')[0].string.strip()
             match_score_away = elem.find_all('span', 'matches__teamscores-side')[1].string.strip()
 
-            stream_to_file.writerow([home_team, match_score_home, away_team, match_score_away, match_date])
+            try:
+                html_match_stats = urlopen(match_link, timeout=60)
+                soup_obj = BeautifulSoup(html_match_stats, 'lxml')
+                match_date = soup_obj.find_all('time')[0].string.split(',')[1]
+                stream_to_file.writerow([home_team, match_score_home, away_team, match_score_away, match_date])
+            except:
+                print('Error with match_stats link, writing the link instead ')
+                stream_to_file.writerow([home_team, match_score_home, away_team, match_score_away, match_link])
+
             #stream_to_file.writerow(home_team + ' ' + match_score_home + ' ' + away_team + ' ' + match_score_away + ' ' + match_date + '\n')
 
-            await asyncio.sleep(10)
+            
 
         for elem in hidden_scores:
             match_link = elem.find_all('a', 'matches__item matches__link')[0].get('href')
-            html_match_stats = urlopen(match_link, timeout=5000)
-            soup_obj = BeautifulSoup(html_match_stats, 'lxml')
-            match_date = soup_obj.find_all('time')[0].string.split(',')[1]
+            #await asyncio.sleep(10)
+            
             home_team = elem.find_all('span', 'swap-text__target')[0].string
             away_team = elem.find_all('span', 'swap-text__target')[1].string
             match_score_home = elem.find_all('span', 'matches__teamscores-side')[0].string.strip()
             match_score_away = elem.find_all('span', 'matches__teamscores-side')[1].string.strip()
 
-            stream_to_file.writerow([home_team, match_score_home, away_team, match_score_away, match_date])
+            try:
+                html_match_stats = urlopen(match_link, timeout=60)
+                soup_obj = BeautifulSoup(html_match_stats, 'lxml')
+                match_date = soup_obj.find_all('time')[0].string.split(',')[1]
+                stream_to_file.writerow([home_team, match_score_home, away_team, match_score_away, match_date])
+            except:
+                print('Error with match_stats link, writing the link instead ')
+                stream_to_file.writerow([home_team, match_score_home, away_team, match_score_away, match_link])
 
             #stream_to_file.writerow(home_team + ' ' + match_score_home + ' ' + away_team + ' ' + match_score_away + ' ' + match_date + '\n')
 
-            await asyncio.sleep(10)
 
 #asyncio.get_event_loop().run_until_complete(write_scores_to_file(url_pl_2018_19))
 
@@ -89,5 +105,16 @@ async def write_scores_to_file (url):
 
 #print(hidden_scores)
 
-for url in [url_pl_2016_17, url_pl_2015_16, url_pl_2014_15, url_pl_2013_14, url_pl_2012_13, url_pl_2011_12, url_pl_2010_11, url_pl_2009_10]:
+#for url in [url_pl_2016_17, url_pl_2015_16, url_pl_2014_15, url_pl_2013_14, url_pl_2012_13, url_pl_2011_12, url_pl_2010_11, url_pl_2009_10]:
+#    asyncio.get_event_loop().run_until_complete(write_scores_to_file(url))
+
+counter = 1 
+
+while counter < 11:
+    this_year = datetime.date.today().year 
+    prev_year = this_year - counter 
+    counter += 1
+    url = url_budesliga + str(prev_year - 1) + "-" + str(prev_year)[-2:]
+    print(url)
     asyncio.get_event_loop().run_until_complete(write_scores_to_file(url))
+

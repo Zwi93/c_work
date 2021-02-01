@@ -41,7 +41,7 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
         """
         X_train, y_classifier = self.get_train_data(fname, asset_class, cols)
         #To determine the minimum C that gives a non 'null' model, only applicable when applying l1 penalty.
-        min_c = l1_min_c(X_train, y_classifier, loss='log')
+        min_c = l1_min_c(X_train[:-1], y_classifier[:-1], loss='log')
 
         return min_c
 
@@ -63,13 +63,13 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
         #Perform cross_validation on the model.
         X_train, y_classifier = self.get_train_data(fname, asset_class, cols)
 
-        self.fit(X_train, y_classifier)
+        self.fit(X_train[:-1], y_classifier[:-1])
 
     def fit_test_CV (self, fname, asset_class, cols):
         """Function to perform cross_validation to yield best output for any metric.
         """
         X, y = self.get_train_data(fname, asset_class, cols)
-        validated_model = cross_validate(self, X, y, cv=5, return_estimator=True)  # This is a dictionary object.
+        validated_model = cross_validate(self, X[:-1], y[:-1], cv=5, return_estimator=True)  # This is a dictionary object.
     
         return validated_model
 
@@ -79,8 +79,8 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
         X_train, y_classifier = self.get_train_data(fname, asset_class, cols)
         
         self.fit_test_model(fname, asset_class, cols)
-        unvalidated_classified_data = self.predict(X_train)
-        matrix = confusion_matrix(y_classifier, unvalidated_classified_data)
+        unvalidated_classified_data = self.predict(X_train[:-1])
+        matrix = confusion_matrix(y_classifier[:-1], unvalidated_classified_data)
         print('Confusion Matrix: ')
         print(matrix)
         
@@ -93,8 +93,8 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
 
         for score, model in zip(best_scores, best_models):
             if score == max_score:
-                classified_test_data = model.predict(X_train)
-                matrix = confusion_matrix(y_classifier, classified_test_data)
+                classified_test_data = model.predict(X_train[:-1])
+                matrix = confusion_matrix(y_classifier[:-1], classified_test_data)
                 print('Confusion Matrix VC: ')
                 print(matrix)
             else:
@@ -111,6 +111,7 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
         """Function to compute the overall realised up/down moves.
         """
         df = create_features(fname, asset_class)
+        df.dropna(inplace=True)  # Remove any null values.
         df = df[df['return_sign'] != 0.0]  # Remove any zero returns to avoiding multi-class classification.
 
         #Seperate points into up/down moves.
@@ -166,7 +167,7 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
             #Create object of GridSearchCV to use for scoring. 
             clf = GridSearchCV(estimator = self, param_grid=params_grid, cv = cv_1)
             X, y = self.get_train_data(fname, asset_class, cols)
-            nested_score = cross_val_score(clf, X=X, y=y, cv=cv_2)
+            nested_score = cross_val_score(clf, X=X[:-1], y=y[:-1], cv=cv_2)
             index += 1
             scores_array[index] = nested_score.mean()
 
@@ -180,13 +181,13 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
         X, y = self.get_train_data(fname, asset_class, cols)
 
         #Split the data into test and training data and train the model on the training data.
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, shuffle=False)
+        X_train, X_test, y_train, y_test = train_test_split(X[:-1], y[:-1], test_size=0.3, shuffle=False)
         self.fit(X_train, y_train)
         probability_down = self.predict_proba(X_test)[:, 0]
         probability_up = self.predict_proba(X_test)[:, 1]
         predicted_direction = self.predict(X_test)
         xdata = get_dates(fname, asset_class)
-        df0 = create_features(fname, asset_class)
+        df0 = create_features(fname, asset_class)[:-1]
         df0 = df0[df0['return_sign'] != 0.0]  # Remove any zero returns to avoiding multi-class classification. And select the returns corresponding to the dates on the test data.
         df0 = df0[-X_test.shape[0]:]
         true_realised_return = df0['return']
@@ -209,7 +210,7 @@ class LogisticRegressionClassifier (skl_lm.LogisticRegression):
         """
         X, y = self.get_train_data(fname, asset_class, cols) # Store all previous data on these variables.
 
-        self.fit(X[:-1], y)  # Fit data of the previous days, expcept for the current days'.
+        self.fit(X[:-1], y[:-1])  # Fit data of the previous days, expcept for the current day'.
 
         #Now let's predict the direction for the next days' move. 
         probability_down = self.predict_proba(X[-1])[:, 0]
