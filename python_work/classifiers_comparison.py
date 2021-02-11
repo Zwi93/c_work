@@ -14,7 +14,7 @@ fname = "currency_data.xlsx"
 #fname = "SA_equities.xlsx"
 #fname = "index_data.xlsx"
 #fname = "bitcoin_data.xlsx"
-asset_class = 'USDZAR'
+asset_class = 'GBPUSD'
 all_cols = get_colums_names(fname, asset_class)
 metric = ['manhattan', 'euclidean', 'mahalanobis']
 
