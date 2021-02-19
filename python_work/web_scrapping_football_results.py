@@ -17,6 +17,10 @@ import matplotlib.pyplot as plt
 url_championship = "https://www.skysports.com/championship-results/"
 url_championship_2019_20 = "https://www.skysports.com/championship-results/2019-20"
 
+url_league_one = "https://www.skysports.com/league-1-results/"
+
+url_league_two = "https://www.skysports.com/league-2-results/"
+
 url_pl_2020_21 = "https://www.skysports.com/premier-league-results"
 url_pl_2019_20 = "https://www.skysports.com/premier-league-results/2019-20"
 url_pl_2018_19 = "https://www.skysports.com/premier-league-results/2018-19"
@@ -55,7 +59,7 @@ async def write_scores_to_file (url, league):
     hidden_scores = soup_object.find_all('script', type='text/show-more')[0].string
     hidden_scores_soup_object = BeautifulSoup(hidden_scores, 'lxml')
     hidden_scores = hidden_scores_soup_object.find_all('div', 'fixres__item')
-    file_name = "score_results_" + url[-7:] + "_" + league + ".csv"
+    file_name = "/home/zwi/zwi_work/python_work/database/score_results_" + url[-7:] + "_" + league + ".csv"
     
     with open(file_name, 'w') as file1:
         stream_to_file = csv.writer(file1, delimiter=',')
@@ -121,9 +125,9 @@ while counter < 11:
     this_year = datetime.date.today().year 
     prev_year = this_year - counter 
     counter += 1
-    url = url_serie_a + str(prev_year - 1) + "-" + str(prev_year)[-2:]
+    url = url_league_two + str(prev_year - 1) + "-" + str(prev_year)[-2:]
     print(url)
-    asyncio.get_event_loop().run_until_complete(write_scores_to_file(url, "serie_a"))
+    asyncio.get_event_loop().run_until_complete(write_scores_to_file(url, "league_two"))
 
 def draw_betting (filename, teams_in_league):
     "Function to analyze historic behaviour of draws in a givem game-week."
