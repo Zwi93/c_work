@@ -119,33 +119,75 @@ async def write_scores_to_file (url, league):
 #for url in [url_pl_2016_17, url_pl_2015_16, url_pl_2014_15, url_pl_2013_14, url_pl_2012_13, url_pl_2011_12, url_pl_2010_11, url_pl_2009_10]:
 #    asyncio.get_event_loop().run_until_complete(write_scores_to_file(url))
 
-counter = 1 
+def scrap_leagues (league_url, league_name):
+    "Function to scrap the url league_url and write the fixtures scores to a file"
 
-while counter < 11:
-    this_year = datetime.date.today().year 
-    prev_year = this_year - counter 
-    counter += 1
-    url = url_league_two + str(prev_year - 1) + "-" + str(prev_year)[-2:]
-    print(url)
-    asyncio.get_event_loop().run_until_complete(write_scores_to_file(url, "league_two"))
+    counter = 1 
 
-def draw_betting (filename, teams_in_league):
-    "Function to analyze historic behaviour of draws in a givem game-week."
+    while counter < 11:
+        this_year = datetime.date.today().year 
+        prev_year = this_year - counter 
+        counter += 1
+        url = league_url + str(prev_year - 1) + "-" + str(prev_year)[-2:]
+        print(url)
+        asyncio.get_event_loop().run_until_complete(write_scores_to_file(url, league_name))
+
+def draw_trends (filename, teams_in_league):
+    "Function to analyze historic behaviour of draws in a given game-week."
     #Read the file into a pandas dataframe.
     data_df = pd.read_csv(filename)
+    nrows = int(data_df.shape[0])
 
-    total_games = (teams_in_league - 1)*2
+    total_gameweeks = int((teams_in_league - 1)*2)
+    fixtures_per_gw = int(teams_in_league/2)
 
-    x_data = range(total_games, 0, -1)
+    x_data = range(total_gameweeks)
     y_data = []
 
-    for i in range(total_games):
-        #Slice the data frame in chuncks os size 10.
-        chuncked_df = data_df[10*i:10*i + 10]
+    for i in range(total_gameweeks):
+        #Slice the data frame in chuncks of size 10.
+        chuncked_df = data_df[nrows - fixtures_per_gw*i - fixtures_per_gw : nrows - fixtures_per_gw*i] 
+        #chuncked_df = data_df[fixtures_per_gw*i:fixtures_per_gw*i + fixtures_per_gw]
         draws_df = chuncked_df[chuncked_df['Home Score'] == chuncked_df['Away Score']]
         y_data.append(draws_df.shape[0])
 
-    plt.plot(x_data, y_data)
-    plt.show()
+    #plt.plot(x_data, y_data)
+    #plt.show()
 
-#draw_betting('score_results_2011-12_laliga.csv', 20)
+    return x_data, y_data
+
+def get_size_of_league (filename):
+    "Function to determine the size of a league, i.e number of teams"
+    data_df = pd.read_csv(filename)
+    teams_list = np.array(data_df['Home Team'])
+    unique_teams = np.unique(teams_list)
+    no_of_teams = unique_teams.size
+    return no_of_teams
+
+def aggregate_draw_trends (league_list):
+    "Function to analyze draws trends in various leagues."
+    
+    container_list = []
+    
+    for filename in league_list:
+        no_of_teams = get_size_of_league(filename)
+        x_data, y_data = draw_trends(filename, no_of_teams)  # Assuming 20 teams per league.
+        container_list.append(y_data)
+        #plt.scatter(x_data, y_data)
+
+    df = pd.DataFrame(container_list)
+    transposed_df = df.transpose()
+    transposed_df.fillna(0)
+    transposed_df['sum'] = transposed_df[0] + transposed_df[1] + transposed_df[2] + transposed_df[3] + transposed_df[4]
+    #print(transposed_df)
+    
+
+    #plt.show()
+
+league_list = ['/home/zwi/zwi_work/python_work/database/score_results_2010-11_bundesliga.csv', '/home/zwi/zwi_work/python_work/database/score_results_2010-11_pl.csv', 
+'/home/zwi/zwi_work/python_work/database/score_results_2010-11_laliga.csv', '/home/zwi/zwi_work/python_work/database/score_results_2010-11_serie_a.csv', 
+'/home/zwi/zwi_work/python_work/database/score_results_2010-11_efl.csv']
+
+aggregate_draw_trends(league_list)
+
+#draw_betting('/home/zwi/zwi_work/python_work/database/score_results_2016-17_efl.csv', 24)

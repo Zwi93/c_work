@@ -83,11 +83,12 @@ async def find_fpl_captain ():
         players_df_raw['goal_involvement'] = players_df_raw['goals_scored'] + players_df_raw['assists']
         players_df = players_df_raw.sort_values(by=['goal_involvement', 'points_per_game', 'form', 'threat'], ascending=False)
         
-        print(players_df.columns)
-        #print(players_df[['web_name','form', 'points_per_game', 'threat', 'goals_scored', 'assists', 'goal_involvement','bonus','clean_sheets', 'own_goals','penalties_order', 'now_cost']].head(3))
+        #print(players_df.columns)
+        print(players_df[['web_name','form', 'points_per_game', 'threat', 'goals_scored', 'assists', 'goal_involvement','bonus','clean_sheets', 'own_goals','penalties_order', 'now_cost']].head(3))
 
     await session.close()
 
-asyncio.get_event_loop().run_until_complete(my_teams_performance(my_user_id))
-#asyncio.get_event_loop().run_until_complete(find_fpl_captain())
+
+#asyncio.get_event_loop().run_until_complete(my_teams_performance(my_user_id))
+asyncio.get_event_loop().run_until_complete(find_fpl_captain())
 
