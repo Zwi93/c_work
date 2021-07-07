@@ -1,0 +1,37 @@
+html
+{
+    background-color:;
+}
+
+body
+{
+    /*background-image: url('App_icon_2.jpg');*/
+    /*background-image: url('App_icon.jpg');*/
+    background-image: url('App_icon_3.png');
+    background-size: cover;
+    background-attachment: scroll;
+    background-repeat: no-repeat;
+    background-position: 50% 40%;
+    background-color: whitesmoke;
+}
+
+h1
+{
+    font: optional;
+    color: darkblue;
+}
+
+nav ul li
+{
+    display: inline;
+}
+
+div.main-tabs
+{
+    float: left;
+}
+
+div.sign-in-tabs
+{
+    float: right;
+}
