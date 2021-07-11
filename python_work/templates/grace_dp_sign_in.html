@@ -3,13 +3,13 @@
     <title>{{ escape(title) }} </title>
     <link rel='stylesheet' type='text/css' href='{{ static_url('grace_dp_login.css') }}'>
 
-<body onload="loadFunction()">
+<body>
     <div class="login-message"> 
-        <p> {{ escape(my_paragraph) }} </p>
+        <p> .</p>
     </div>
     
 <div class="login">
-    <form method="POST" action={{ "{}".format(escape(action)) }}>
+    <form method="POST" action="/login">
         <br>
         <label>Username</label><br><br>
         <input type="text" id="username" name="username"><br><br>
@@ -21,6 +21,6 @@
 </div>
 </body>
     <!-- JS scripts-->
-    <script type="text/javascript" src="{{ static_url('grace_dp.js') }}"></script>
+    <!--script type="text/javascript" src="{{ static_url('grace_dp.js') }}"></script-->
 
 </html>

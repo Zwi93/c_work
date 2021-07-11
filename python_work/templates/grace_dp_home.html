@@ -1,0 +1,27 @@
+{% extends 'grace_dp_main.html' %}
+
+{% block page_content %}
+
+<section>
+    <div class="main-tabs">
+        <nav>
+            <a class='nav-home' href='{{ escape(my_server) }}/'> Home </a>|
+            <a class='nav-tenant' href='{{ escape(my_server) }}/tenant'> Tenant </a>|
+            <a class='nav-buyer' href='{{ escape(my_server) }}/'> Home Buyer </a>|
+            <a class='nav-both' href='{{ escape(my_server) }}/'> Both </a>|
+            <a class='nav-maintainance' href='{{ escape(my_server) }}/'> Maintainance </a>            
+        </nav>
+    </div>
+
+    <div class="sign-in-tabs">
+        <nav>
+            <a class='nav' href='{{ escape(my_server) }}/sign-in'> Sign In </a></li>|
+            <a class='nav' href='{{ escape(my_server) }}/register'> Register </a>|
+            <a class='nav' href='{{ escape(my_server) }}/logout'> Logout </a>
+        </nav>
+    </div>
+</section>  
+{% end %}
+
+
+

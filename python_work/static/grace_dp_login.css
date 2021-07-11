@@ -1,0 +1,27 @@
+body
+{
+    background-color: white;
+    background-image: url('Full Logo.jpg');
+    background-size: cover;
+    /*background-color: rgba(98, 79, 121, 1);*/
+}
+
+div.login
+{
+    background-color: whitesmoke;
+    width: 300px;
+    margin: -100px 0 0 -150px;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+} 
+
+div.login-message
+{
+    width: 300px;
+    margin: -100px 0 0 -150px;
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    background-color: white;
+}

@@ -3,30 +3,13 @@
     <title>{{ escape(my_title) }} </title>
     <link rel='stylesheet' type='text/css' href='{{ static_url('grace_dp_style.css') }}'>
 
-<body>
+<body onload="loadFunction()">
     <header>
         <h1>{{ escape(my_title) }} </h1>
     </header>
 
-    <div class="main-tabs">
-        <nav>
-            <a class='nav' href='{{ escape(my_server) }}/'> Home </a></li><br>
-            <a class='nav' href='{{ escape(my_server) }}/tenant'> Tenant </a><br>
-            <a class='nav' href='{{ escape(my_server) }}/'> Home Buyer </a><br>
-            <a class='nav' href='{{ escape(my_server) }}/'> Both </a><br>
-            <a class='nav' href='{{ escape(my_server) }}/'> Maintainance </a>            
-        </nav>
-    </div>
-
     {% block page_content %}
     {% end %}
-
-    <div class="sign-in-tabs">
-        <nav>
-            <a class='nav' href='{{ escape(my_server) }}/'> Sign In </a></li>|
-            <a class='nav' href='{{ escape(my_server) }}/register'> Register </a>
-        </nav>
-    </div>
     
 </body>
     <!-- JS scripts-->
