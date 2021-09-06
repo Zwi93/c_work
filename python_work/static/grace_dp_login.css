@@ -1,27 +1,169 @@
-body
-{
-    background-color: white;
+@import "https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/fontawesome.min.css";
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,600,700&display=swap');
+
+
+
+body{
+    /*background-color: white;*/
     background-image: url('Full Logo.jpg');
     background-size: cover;
+
     /*background-color: rgba(98, 79, 121, 1);*/
+    font-family: sans-serif;
+    background-repeat: no-repeat;
+    overflow: hidden;
+}
+#btn{
+    position: center;
+    display: flex;
+    justify-content: center;
+
+    font-weight: bold;
+    padding-left: 0;
+    background-color: #83acf1;
+    letter-spacing: 1px;
+    
+
+
+}
+
+#btn:hover{
+    box-shadow: 2px 2px 5px #555;
+    background-color: #7799d4;
+}
+
+input:hover{
+    box-shadow: 2px 2px 5px #555;
+    background-color: #ddd;
 }
 
 div.login
 {
-    background-color: whitesmoke;
-    width: 300px;
-    margin: -100px 0 0 -150px;
-    position: absolute;
-    top: 30%;
-    left: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    margin: 7% auto;
+    background-color: rgb(0,0,0,0.1);
+    width: 290px; 
+    height: 170px;
+    outline: none;
+    padding-left: 40px;
+    box-sizing: border-box;
+    font-size: 15px;
+    color: #333;
+    border-radius: 10px;
+    box-shadow: 0 0 15px #333;
+    
+    
+    
+
+
 } 
 
+
 div.login-message
-{
-    width: 300px;
-    margin: -100px 0 0 -150px;
-    position: absolute;
-    top: 20%;
-    left: 50%;
-    background-color: white;
+{   
+    text-align: center;
+
+    margin: 1em 0 0.5em 0;
+	color: #343434;
+	font-weight: normal;
+	font-family: 'Ultra', sans-serif;   
+	font-size: 15px;
+	line-height: 42px;
+	text-transform: uppercase;
+	text-shadow: 0 2px white, 0 3px #777;
 }
+
+.login i{
+    position: center;
+    left: 15px;
+    color: #333;
+    font-size: 16px;
+    
+}
+
+
+/*Social media part*/
+
+    .wrapper{
+        position: center;
+        display: flex;
+        /*flex-direction: column;*/
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+        border-collapse: collapse;
+
+    }
+  .wrapper .button{
+    
+    display: inline-block;
+    height: 60px;
+    width: 60px;
+    float: left;
+    /*margin: 0 5px;*/
+    overflow: hidden;
+    background: #fff;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0px 10px 10px rgba(0,0,0,0.1);
+    transition: all 0.3s ease-out;
+  }
+  .wrapper .button:hover{
+    width: 200px;
+  }
+  .wrapper .button .icon{
+    display: inline-block;
+    height: 60px;
+    width: 60px;
+    text-align: center;
+    border-radius: 50px;
+    box-sizing: border-box;
+    line-height: 60px;
+    transition: all 0.3s ease-out;
+  }
+  .wrapper .button:nth-child(1):hover .icon{
+    background: #4267B2;
+  }
+  .wrapper .button:nth-child(2):hover .icon{
+    background: #1DA1F2;
+  }
+  .wrapper .button:nth-child(3):hover .icon{
+    background: #E1306C;
+  }
+  
+  
+  
+  .wrapper .button:nth-child(4):hover .icon{
+    background: #ff0000;
+  }
+  .wrapper .button .icon i{
+    font-size: 25px;
+    line-height: 60px;
+    transition: all 0.3s ease-out;
+  }
+  .wrapper .button:hover .icon i{
+    color: #fff;
+  }
+  .wrapper .button span{
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 60px;
+    margin-left: 10px;
+    transition: all 0.3s ease-out;
+  }
+  .wrapper .button:nth-child(1) span{
+    color: #4267B2;
+  }
+  .wrapper .button:nth-child(2) span{
+    color: #1DA1F2;
+  }
+  .wrapper .button:nth-child(3) span{
+    color: #E1306C;
+  }
+  .wrapper .button:nth-child(4) span{
+    color: #ff0000;
+  }
+
+
+

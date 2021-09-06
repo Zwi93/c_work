@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Info</title>
+        <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+
+        <link rel="stylesheet" href="../static/grace_dp_info.css">
+
+        <!--Using FontAwesome----------->
+        <script src="https://kit.fontawesome.com/c8e4d183c2.js" crossorigin="anonymous"> </script>
+        <script src="../static/grace_dp.js"></script>
+
+        <style>
+            <!--
+             /* Font Definitions */
+             @font-face
+                {font-family:"Cambria Math";
+                panose-1:2 4 5 3 5 4 6 3 2 4;}
+            @font-face
+                {font-family:Calibri;
+                panose-1:2 15 5 2 2 2 4 3 2 4;}
+             /* Style Definitions */
+             p.MsoNormal, li.MsoNormal, div.MsoNormal
+                {margin-top:0cm;
+                margin-right:0cm;
+                margin-bottom:18.05pt;
+                margin-left:.5pt;
+                text-align:justify;
+                text-justify:inter-ideograph;
+                text-indent:-.5pt;
+                line-height:130%;
+                font-size:10.0pt;
+                font-family:"Arial",sans-serif;
+                color:black;}
+            h1
+                {mso-style-link:"Heading 1 Char";
+                margin-top:0cm;
+                margin-right:0cm;
+                margin-bottom:13.95pt;
+                margin-left:0cm;
+                line-height:107%;
+                page-break-after:avoid;
+                font-size:11.0pt;
+                font-family:"Arial",sans-serif;
+                color:black;}
+            h2
+                {mso-style-link:"Heading 2 Char";
+                margin-top:0cm;
+                margin-right:0cm;
+                margin-bottom:20.3pt;
+                margin-left:.5pt;
+                text-indent:-.5pt;
+                line-height:110%;
+                page-break-after:avoid;
+                font-size:10.0pt;
+                font-family:"Arial",sans-serif;
+                color:black;}
+            h3
+                {mso-style-link:"Heading 3 Char";
+                margin-top:0cm;
+                margin-right:0cm;
+                margin-bottom:20.3pt;
+                margin-left:.5pt;
+                text-indent:-.5pt;
+                line-height:110%;
+                page-break-after:avoid;
+                font-size:10.0pt;
+                font-family:"Arial",sans-serif;
+                color:black;}
+            span.Heading1Char
+                {mso-style-name:"Heading 1 Char";
+                mso-style-link:"Heading 1";
+                font-family:"Arial",sans-serif;
+                color:black;
+                font-weight:bold;}
+            span.Heading3Char
+                {mso-style-name:"Heading 3 Char";
+                mso-style-link:"Heading 3";
+                font-family:"Arial",sans-serif;
+                color:black;
+                font-weight:bold;}
+            span.Heading2Char
+                {mso-style-name:"Heading 2 Char";
+                mso-style-link:"Heading 2";
+                font-family:"Arial",sans-serif;
+                color:black;
+                font-weight:bold;}
+            .MsoChpDefault
+                {font-family:"Calibri",sans-serif;}
+            @page WordSection1
+                {size:595.45pt 841.7pt;
+                margin:28.75pt 53.5pt 71.85pt 54.0pt;}
+            div.WordSection1
+                {page:WordSection1;}
+            -->
+            </style>
+
+    </head>
+
+    <body>
+        <section class="small-logo">
+            <div class="welcome-client">
+                <h1> Good {{ "{}, {}".format(escape(noon_night), escape(client_name)) }}  </h1>
+            </div>
+        </section>
+
+        <section class="tenant_onboarding">
+
+            <a href="/client" style="float: right;background-color:cornflowerblue;"> Save & Exit</a>
+
+            <br><br>
+            <label for="completion_status"> Completion Status </label>
+            <progress id="completion_status" value="{{ escape(completion_percentage) }}" max=1></progress><br><br><br><br>
+
+            <h1>{{ "{}".format(heading) }}</h1>
+            
+            {% if heading == "Personal Details" %}
+                <div class="onboard">
+                    <form method="POST" action="/tenant_onboard" id="personal_details">
+                        <input type="hidden" id="increment" name="increment" value="1">
+                        <input type="hidden" id="status" name="status" value="personal_details">
+                        <label> Phone Number</label><br>
+                        <input type="text" id="phone_number" name="phone_number"><br><br>
+                        <label>Identification Number</label><br>
+                        <input type="text" id="id_number" name="id_number"><br><br>
+                        <label>Physical Address</label><br>
+                        <input type="text" id="address" name="address"><br><br>
+                        <button type="submit"> Next </button>
+                    </form>
+                    
+                </div>
+
+            {% elif heading == "Landlord Details" %}
+                <div class="onboard">
+                    <form method="POST" action="/tenant_onboard" id="landlord_details">
+                        <input type="hidden" id="increment" name="increment" value="2">
+                        <input type="hidden" id="status" name="status" value="landlord_details">
+                        <label> Name</label><br>
+                        <input type="text" id="ll_name" name="ll_name"><br><br>
+                        <label> Phone Number</label><br>
+                        <input type="text" id="phone_number" name="phone_number"><br><br>
+                        <label>Identification Number</label><br>
+                        <input type="text" id="id_number" name="id_number"><br><br>
+                        <label>Physical Address</label><br>
+                        <input type="text" id="address" name="address"><br><br>
+                        <button type="submit"> Next </button>
+                    </form>
+                
+                </div>
+
+            {% elif heading == "Tripartite Agreement" %}
+                <div class="tripartite">
+                    <h2>
+                        This is a Tripartite Agreement between {{ escape(client_name)}} and {{ escape(ll_name) }}
+                    </h2>
+
+                    <div class=WordSection1 lang=EN-ZA style='word-wrap:break-word; margin-left:50px;'>
+    
+    <p class=MsoNormal align=left style='margin-top:0cm;margin-right:0cm;
+    margin-bottom:20.3pt;margin-left:-.25pt;text-align:left;line-height:110%'><b>TERM
+    SHEET </b></p>
+    
+    <p class=MsoNormal align=left style='margin-top:0cm;margin-right:0cm;
+    margin-bottom:20.4pt;margin-left:0cm;text-align:left;text-indent:0cm;
+    line-height:107%'> </p>
+    
+    <p class=MsoNormal style='margin-left:-.25pt'>between </p>
+    
+    <p class=MsoNormal align=left style='margin-top:0cm;margin-right:0cm;
+    margin-bottom:20.4pt;margin-left:0cm;text-align:left;text-indent:0cm;
+    line-height:107%'> </p>
+    
+    <p class=MsoNormal align=left style='margin-top:0cm;margin-right:0cm;
+    margin-bottom:2.35pt;margin-left:-.25pt;text-align:left;line-height:110%'><b>{{ escape(ll_name) }} </b></p>
+    
+    <p class=MsoNormal style='margin-left:-.25pt'>Registration number: [<b>insert</b>]
+    </p>
+    
+    <p class=MsoNormal align=left style='margin-top:0cm;margin-right:0cm;
+    margin-bottom:20.3pt;margin-left:-.25pt;text-align:left;line-height:110%'>[<b>insert
+    physical address</b>] (&quot;<b>Landlord</b>&quot;) </p>
+    
+    <p class=MsoNormal align=left style='margin-top:0cm;margin-right:0cm;
+    margin-bottom:20.6pt;margin-left:0cm;text-align:left;text-indent:0cm;
+    line-height:107%'> </p>
+    
+    <p class=MsoNormal style='margin-left:-.25pt'>And </p>
+    
+    <p class=MsoNormal align=left style='margin-top:0cm;margin-right:0cm;
+    margin-bottom:2.35pt;margin-left:-.25pt;text-align:left;line-height:110%'><b> {{ escape(client_name)}} </b></p>
+    
+    <p class=MsoNormal style='margin-left:-.25pt'>Registration number: [<b>insert</b>]
+    </p>
+    
+    <h1 style='margin-top:0cm;margin-right:0cm;margin-bottom:20.3pt;margin-left:
+    -.25pt;text-indent:-.5pt;line-height:110%'><span style='font-size:10.0pt;
+    line-height:110%;font-weight:normal'>[</span><span style='font-size:10.0pt;
+    line-height:110%'>insert physical address</span><span style='font-size:10.0pt;
+    line-height:110%;font-weight:normal'>] (&quot;</span><span style='font-size:
+    10.0pt;line-height:110%'>Tenant</span><span style='font-size:10.0pt;line-height:
+    110%;font-weight:normal'>&quot;)</span><span style='font-size:10.0pt;
+    line-height:110%'> </span></h1>
+    
+    <p class=MsoNormal align=left style='margin-top:0cm;margin-right:0cm;
+    margin-bottom:20.6pt;margin-left:0cm;text-align:left;text-indent:0cm;
+    line-height:107%'><b> </b></p>
+    
+    <p class=MsoNormal align=left style='margin-top:0cm;margin-right:0cm;
+    margin-bottom:20.35pt;margin-left:0cm;text-align:left;text-indent:0cm;
+    line-height:107%'> </p>
+    
+    <p class=MsoNormal style='margin-left:-.25pt'>and </p>
+    
+    <p class=MsoNormal align=left style='margin-top:0cm;margin-right:0cm;
+    margin-bottom:20.35pt;margin-left:0cm;text-align:left;text-indent:0cm;
+    line-height:107%'> </p>
+    
+    <p class=MsoNormal style='margin-top:0cm;margin-right:0cm;margin-bottom:.35pt;
+    margin-left:-.25pt'>The Grace Investments Co Proprietary Limited <b> </b></p>
+    
+    <p class=MsoNormal style='margin-left:-.25pt'>Registration Number: [<b><span
+    style='background:yellow'>insert</span></b>] </p>
+    
+    <p class=MsoNormal align=left style='margin-top:0cm;margin-right:343.45pt;
+    margin-bottom:20.3pt;margin-left:-.25pt;text-align:left;line-height:110%'>[<b>insert
+    physical address</b>] (&quot;<b>The Company</b>&quot;)<b> </b></p>
+    
+    <p class=MsoNormal align=left style='margin-top:0cm;margin-right:0cm;
+    margin-bottom:20.4pt;margin-left:0cm;text-align:left;text-indent:0cm;
+    line-height:107%'><b> </b></p>
+    
+    <h1 style='margin-top:0cm;margin-right:0cm;margin-bottom:.15pt;margin-left:
+    .5pt;text-indent:-.5pt'><span style='font-size:10.0pt;line-height:107%;
+    color:red'>INDICATIVE DRAFT ONLY: NOT FOR EXECUTION SUBJECT TO CONTRACT </span></h1>
+    
+        
+    </div>
+
+                    <form method="POST" action="/tenant_onboard" id="tripartite_agreement">
+                        <input type="hidden" id="increment" name="increment" value="3">
+                        <input type="hidden" id="status" name="status" value="tripartite_agreement"><br><br>
+                        <button type="submit"> Next </button>
+                    </form>
+
+                </div>
+
+            {% elif heading == "Deposit Payment" %}
+            <div class="onboard">
+                <form method="POST" action="/tenant_onboard">
+                    <input type="hidden" id="increment" name="increment" value="4">
+                    <input type="hidden" id="status" name="status" value="deposit_payment">
+                    <label>Card Number</label><br>
+                    <input type="text" id="card_number" name="card_number"><br><br>
+                    <label>CVV</label><br>
+                    <input type="text" id="ccv_number" name="ccv_number"><br><br>
+                    <label>Deposit Amount</label><br>
+                    <input type="text" id="amount" name="amount"><br><br>
+                    <button type="submit"> Next </button>
+                </form>
+                
+            </div>
+
+            {% elif heading == "Confirmation" %}
+            <div>
+                <p> Thank you for investing your rental deposit with us&excl; </p><br>
+                <p> Your payment from the card number with the last four digits {{ escape(client_card_number) }} was successful&excl; </p><br>
+                <p> Here is your unique deposit key: {{ escape(deposit_key) }}</p><br>
+                <p> </p>
+                
+                <form method="POST" action="/tenant_onboard">
+                    <input type="hidden" id="status" name="status" value="completed">
+                    <input type="hidden" id="increment" name="increment" value="5">
+                    <button type="submit"> Email this to me </button>                                            
+
+                    <button type="submit"> Complete </button>
+                </form>
+    
+            </div>
+            
+            {% end %}
+        </section>
+    </body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Info</title>
+        <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
+
+        <link rel="stylesheet" href="../static/grace_dp_info.css">
+
+        <!--Using FontAwesome----------->
+        <script src="https://kit.fontawesome.com/c8e4d183c2.js" crossorigin="anonymous"> </script>
+    </head>
+
+    <body>
+        <section class="small-logo">
+            <div class="welcome-client">
+                <h1> Good {{ "{}, {}".format(escape(noon_night), escape(client_name)) }}  </h1>
+            </div>
+        </section>
+
+        <nav class="client-offerings">
+            <ul>
+                <li><a href="/client"> Log a Maintainance Request</a></li>
+                <li><a href="/client"> Log a Dispute</a></li>
+                <li><a href="/client"> I want to Move Out</a></li>
+                <li><a href="/client"> Update/View Personal Details</a></li>
+                <li><a href="/logout_2" > LogOut</a></li>
+            </ul>
+        </nav>
+
+        <div class="transact">
+            <h1> Transact</h1>
+
+            <ul>
+                <li><p>Protect your deposit with us</p></li>
+                <li><p>We can help you fund your deposit</p></li>
+                <li><p>Let us help you save for your first home</p></li>
+            </ul>
+
+            <br><br><br>
+
+            <nav class="transact">
+                <div class="deposit-protection">
+                    <p> Deposit Protection</p><br>
+                    <a href="/tenant_onboard">Click Here</a>
+                </div>
+    
+                <div class="deposit-lending">
+                    <p> Borrow for Deposit</p><br>
+                    <a href="/client">Click Here</a>
+                </div>
+    
+                <div class="home-saving">
+                    <p> Future Home Saver</p><br>
+                    <a href="/client">Click Here</a>
+                </div>
+            </nav>
+
+            
+        </div>
+
+        <div class="view-portfolio">
+            <h1> My Portfolio</h1>
+
+            <div class="client_balance">
+                <h2> Deposits </h2>
+                <table>
+                    <th> Account </th><th> Amount </th>
+                    <tr><td> {{ escape(client_name) }} </td> <td>{{ escape(client_balance) }} </td></tr>
+                </table>
+            </div>
+
+        </div>
+    </body>
+</html>

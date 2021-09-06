@@ -1,3 +1,9 @@
+function pageLoad()
+{
+    
+}
+
+
 function submitForm()
 {
     var x = document.getElementById("name").value;

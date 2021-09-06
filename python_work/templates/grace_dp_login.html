@@ -1,26 +1,71 @@
 <!DOCTYPE html>
 <html>
+
+  <head>
     <title>{{ escape(title) }} </title>
     <link rel='stylesheet' type='text/css' href='{{ static_url('grace_dp_login.css') }}'>
+    <link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.3/css/fontawesome.min.css">
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css">
 
-<body onload="loadFunction()">
-    <div class="login-message"> 
-        <p> {{ escape(my_paragraph) }} </p>
-    </div>
-    
-<div class="login">
-    <form method="POST" action={{ "{}".format(escape(action)) }}>
-        <br>
-        <label>Username</label><br><br>
-        <input type="text" id="username" name="username"><br><br>
-        <label>Password </label><br><br>
-        <input type="password" id="password" name="password"><br><br>
-        <input type="submit" name="submit" value="Submit" autofocus>
-        <br>
-    </form>
-</div>
-</body>
     <!-- JS scripts-->
     <script type="text/javascript" src="{{ static_url('grace_dp.js') }}"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+
+  </head>
+
+  <body onload="loadFunction()">
+    <div class="login-message">
+      <h1 class="header"> {{ escape(my_paragraph) }} </h1>
+    </div>
+
+    <div class="login">
+      <form method="POST" action={{ "{}" .format(escape(action)) }}>
+        <br>
+        <label></label><br>
+        <i class="fa fa-user"></i>
+        <input type="text" id="username" placeholder="Username" name="username"><br><br>
+        <i class="fa fa-lock"></i>
+        <input type="password" placeholder="Password" id="password" name="password">
+        <br><br>
+
+
+        <span class="btn"><input type="submit" name="submit" value="Submit" autofocus></span>
+        <br>
+      </form>
+    </div>
+
+
+    <div class="wrapper">
+      <div class="button">
+
+
+
+
+        <div class="icon"><i class="fab fa-facebook-f"></i></div>
+        <span>Facebook</span>
+      </div>
+      <div class="button">
+        <div class="icon"><i class="fab fa-twitter"></i></div>
+        <span>Twitter</span>
+      </div>
+      <div class="button">
+        <div class="icon"><i class="fab fa-instagram"></i></div>
+        <span>Instagram</span>
+      </div>
+
+
+      <div class="button">
+        <div class="icon"><i class="fab fa-youtube"></i></div>
+        <span>YouTube</span>
+      </div>
+    </div>
+
+
+
+  </body>
+
+
+
 
 </html>
