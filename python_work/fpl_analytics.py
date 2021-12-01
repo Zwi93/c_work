@@ -18,8 +18,6 @@ url = "https://fantasy.premierleague.com/api/element-summary/1/"
 url_1 = "https://fantasy.premierleague.com/api/bootstrap-static/"
 url_2 = "https://fantasy.premierleague.com/api/fixtures/?event=1"
 
-my_user_id = 4463037
-
 async def my_teams_performance (id):
     "Function to assess FPL team performance throughout the season. Player's previous records are analyzed, and future points per game assessed"
     session = aiohttp.ClientSession()

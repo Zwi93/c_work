@@ -14,6 +14,7 @@ import java.util.Date;
     {
         ServerSocket listener;
         Socket connection;
+        BufferedReader incoming;
 
         try
         {
@@ -22,8 +23,27 @@ import java.util.Date;
 
             while (true)
             {
+
                 connection = listener.accept();
-                sendDate(connection);
+                
+                incoming = new BufferedReader( new InputStreamReader(connection.getInputStream() ) );
+
+                String messageIn = incoming.readLine();
+                System.out.println(messageIn);
+
+                if (messageIn.equals("Hi Server!"))
+                {
+                    sendDate(connection);
+                }
+                if (messageIn.equals("Hi"))
+                {
+                    PrintWriter outgoing;
+                    outgoing = new PrintWriter(connection.getOutputStream());
+                    outgoing.println("Hi");
+                    outgoing.flush();
+                    connection.close();
+                }
+            
             }
         }
 
@@ -47,10 +67,11 @@ import java.util.Date;
             outgoing = new PrintWriter(client.getOutputStream());
 
             outgoing.println(now.toString());
+            //outgoing.println("Hi");
 
             outgoing.flush();
 
-            client.close();
+            //client.close();
         }
 
         catch (Exception e)

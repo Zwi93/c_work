@@ -268,7 +268,7 @@ async def get_season_stats ():
         player_surname = player['second_name']
         player_id = str(player['history'][0]['element'])
 
-        fname = "/home/zwi/zwi_work/Fantasy-Premier-League/data/2020-21/players/" + player_name + "_" + player_surname + "_" + player_id +  "/gw.csv"
+        fname = "/home/zwi/zwi_work/Fantasy-Premier-League/data/2021-22/players/" + player_name + "_" + player_surname + "_" + player_id +  "/gw.csv"
         #stream_to_file = open(fname, "w+")
         player_df = pd.DataFrame(player['history'])
         try:
@@ -286,7 +286,7 @@ async def get_season_stats ():
         player_surname = player['second_name']
         player_id = str(player['history'][0]['element'])
 
-        fname = "/home/zwi/zwi_work/Fantasy-Premier-League/data/2020-21/players/" + player_name + "_" + player_surname + "_" + player_id +  "/gw.csv"
+        fname = "/home/zwi/zwi_work/Fantasy-Premier-League/data/2021-22/players/" + player_name + "_" + player_surname + "_" + player_id +  "/gw.csv"
         
         try:
             player_rolling_stats = create_model_features(fname, True)  # This will give the player's rolling stats going into the next match.
@@ -311,7 +311,7 @@ rootdir = ["/home/zwi/zwi_work/Fantasy-Premier-League/data/2016-17", "/home/zwi/
 "/home/zwi/zwi_work/Fantasy-Premier-League/data/2019-20", "/home/zwi/zwi_work/Fantasy-Premier-League/data/2020-21"]
 
 #fname = "/home/zwi/zwi_work/Fantasy-Premier-League/data/2018-19/players/Adam_Lallana_250/gw.csv"
-fname = "/home/zwi/zwi_work/Fantasy-Premier-League/data/2020-21/players/Pierre-Emerick_Aubameyang_4/gw.csv"
+#fname = "/home/zwi/zwi_work/Fantasy-Premier-League/data/2020-21/players/Pierre-Emerick_Aubameyang_4/gw.csv"
 #print(create_model_features(fname, False))
 #visualize_football_data(fname, '')
 #players_stats = pd.read_csv('pl_players_stats_detailed.csv')
