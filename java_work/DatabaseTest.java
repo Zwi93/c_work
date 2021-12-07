@@ -18,12 +18,21 @@ public class DatabaseTest
 
         try 
         {
-            connection = DriverManager.getConnection(URL, "zwi", "Zwi");
+            //First obtain connection credentials from DB User. 
+            String username, dbPassword;
+
+            Scanner scanner = new Scanner( System.in );
+
+            System.out.println("Please enter Database username: ");
+            username = scanner.nextLine();
+
+            System.out.println("Please enter DB password: ");
+            dbPassword = scanner.nextLine();
+
+            connection = DriverManager.getConnection(URL, username, dbPassword);
             System.out.println("Connected");
             
             Map< String, String > mapCollection = new HashMap< String, String>();
-            
-            Scanner scanner = new Scanner( System.in );
             
             System.out.println("Enter your Name: ");
             String name = scanner.nextLine();
@@ -41,7 +50,7 @@ public class DatabaseTest
             String password = scanner.nextLine();
             mapCollection.put("Password", password);
 
-            updateTable("tenants_details", connection, mapCollection);
+            //updateTable("tenants_details", connection, mapCollection);
 
             queryTable("tenants_details", connection);
 
@@ -119,5 +128,43 @@ public class DatabaseTest
         {
             e.printStackTrace();
         }   
+    }
+
+    private static void removeNullRows (String tableName, Connection connectedness)
+    {
+        //Very sensitive operation this. Treat with care.
+        Statement tableDeletion;
+        ResultSet result;
+
+        try
+        {
+            Scanner scanner = new Scanner( System.in );
+            String selectedChoice;
+
+            //first ask user to confirm operation!
+            System.out.println("Please confirm to proceed (Y/N): ");
+            selectedChoice = scanner.nextLine();
+        
+            if (selectedChoice.equals("Y"))
+            {
+                tableDeletion = connectedness.createStatement();
+                result = tableDeletion.executeQuery(
+                    "DELETE FROM " + tableName);
+                
+                tableDeletion.close();
+                result.close();
+            }
+            else
+            {
+                System.out.println("Aborting");
+            }
+
+            scanner.close();
+            
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }

@@ -1,5 +1,7 @@
 import java.net.*;
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Program to listen to client's connections and respond accordingly depending on information provided.
@@ -69,6 +71,10 @@ public class FormValidator
     private static void sendMessage (Socket client, String messageIn)
     {
         PrintWriter outgoing;
+
+        //Convert messageIn to a Map. 
+        Map< String, String > userCredentials;
+        userCredentials = stringToMap (messageIn);
         
         try
         {
@@ -76,7 +82,7 @@ public class FormValidator
             outgoing = new PrintWriter(client.getOutputStream());
 
             //Verify that message contains required info before sending a response back to client.
-            if (messageIn.equals("zwi") )
+            if (userCredentials.get("Password").equals("Zwi") )
             {
                 outgoing.println("1");
                 outgoing.flush();
@@ -91,5 +97,25 @@ public class FormValidator
         {
             System.out.println("Server says: " + e);
         }
+    }
+
+    private static Map< String, String > stringToMap (String message)
+    {
+        /**
+         * Function to convert a comma separated string to a HashMap 
+         */
+
+        Map< String, String > messageMap = new HashMap < String, String > ();
+
+        String[] commaTokens = message.split(",");
+
+        for (String pairs : commaTokens)
+        {
+            String[] keyValuePair = pairs.split(" ");
+
+            messageMap.put(keyValuePair[0], keyValuePair[1]);
+        }
+
+        return messageMap;
     }
 }
