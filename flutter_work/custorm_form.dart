@@ -99,8 +99,8 @@ class SignInFormState extends State<SignInForm> {
       ),
       body: Form (
         key: _formkey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
+          //crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
             child: TextFormField(
@@ -163,7 +163,7 @@ class SignInFormState extends State<SignInForm> {
           successErrorResponse = 'Success';
           Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => MainDashBoard()));
+              MaterialPageRoute(builder: (context) => MainDashBoard(name: _controllerUsername.text,)));
               //MaterialPageRoute(builder: (context) => FormSubmissionResult(response: successErrorResponse,)));
         }
         else {
@@ -212,6 +212,7 @@ class RegistrationFormState extends State<RegistrationForm> {
       body: Form (
         key: _formkey,
         child: ListView(
+          //Initially a Column Widget was used, but had issues with rendering on screen.
           //crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
@@ -338,7 +339,7 @@ class RegistrationFormState extends State<RegistrationForm> {
           if (serverResponse.contains("1")){
             Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => MainDashBoard()));
+                MaterialPageRoute(builder: (context) => MainDashBoard(name:_controllerName.text,)));
           }
 
           //If error occurred redirect to error page.
@@ -402,7 +403,8 @@ class FormSubmissionResultState extends State<FormSubmissionResult> {
 
 //Definition of the Main Dashboard page.MyHomePage
 class MainDashBoard extends StatefulWidget {
-  const MainDashBoard({Key? key}) : super(key : key);
+  final String name;
+  const MainDashBoard({Key? key, required this.name}) : super(key : key);
 
   @override
   MainDashBoardState createState() {
@@ -418,7 +420,7 @@ class MainDashBoardState extends State<MainDashBoard> {
       appBar: AppBar(
         title: Center(
           child: Text(
-          'Welcome',
+          'Welcome ' + widget.name,
           style: TextStyle(fontSize: 32, color: Colors.green),
         ),)
       ),
