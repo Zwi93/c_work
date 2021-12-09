@@ -3,16 +3,27 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
+//Import custom packages.
+import com.gracedp.operation.GraceDatabaseOperator;
+
 /**
  * Program to listen to client's connections and respond accordingly depending on information provided.
+ * to run this program successfully, type 
+ * java -classpath .:com:postgresql-42.3.1.jar FormValidator
  */
 
 public class FormValidator
 {
     public static final int PORT = 8000;
+    static final String URL = "jdbc:postgresql://localhost/grace_dp";
+    static final String USERNAME = "zwi";
+    static final String PASSWORD = "Zwi";
+    static final String TABLE = "tenants_details";
+    
 
     public static void main (String[] args)
     {
+        //Variables to handle socket communication
         ServerSocket listener;
         Socket connection;
 
@@ -40,8 +51,6 @@ public class FormValidator
         {
             System.out.println("Error: " + e);
         }
-
-
 
     }
 
@@ -75,23 +84,47 @@ public class FormValidator
         //Convert messageIn to a Map. 
         Map< String, String > userCredentials;
         userCredentials = stringToMap (messageIn);
+
+        String formType = userCredentials.get("FormType");
         
         try
         {
-            
             outgoing = new PrintWriter(client.getOutputStream());
 
-            //Verify that message contains required info before sending a response back to client.
-            if (userCredentials.get("Password").equals("Zwi") )
+            switch (formType)
             {
-                outgoing.println("1");
-                outgoing.flush();
-            }
-            else
-            {
-                outgoing.println("0");
-                outgoing.flush();
-            }
+                case "SignIn":
+                    //Verify that message contains required info before sending a response back to client.
+                    if (userCredentials.get("Password").equals("Zwi") )
+                    {
+                        outgoing.println("1");
+                        outgoing.flush();
+                    }
+                    else
+                    {
+                        outgoing.println("0");
+                        outgoing.flush();
+                    }
+                    break;
+
+                case "Register":
+                    //User info to be pushed to the database here.
+                    GraceDatabaseOperator dbOperator = new GraceDatabaseOperator(URL, USERNAME, PASSWORD, TABLE);
+                    int result;
+                    
+                    result = dbOperator.updateTable(userCredentials);
+                        
+                    if (result == 1)
+                    {
+                        outgoing.println("1");
+                        outgoing.flush();
+                    }
+                    else 
+                    {
+                        outgoing.println("0");
+                        outgoing.flush();
+                    }
+            }        
         }
         catch (Exception e)
         {

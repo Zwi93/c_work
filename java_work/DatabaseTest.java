@@ -34,7 +34,7 @@ public class DatabaseTest
             
             Map< String, String > mapCollection = new HashMap< String, String>();
             
-            System.out.println("Enter your Name: ");
+            /*System.out.println("Enter your Name: ");
             String name = scanner.nextLine();
             mapCollection.put("Name", name);
             
@@ -48,9 +48,10 @@ public class DatabaseTest
 
             System.out.println("Enter your Password: ");
             String password = scanner.nextLine();
-            mapCollection.put("Password", password);
+            mapCollection.put("Password", password);*/
 
             //updateTable("tenants_details", connection, mapCollection);
+            //removeNullRows("tenants_details", connection);
 
             queryTable("tenants_details", connection);
 
