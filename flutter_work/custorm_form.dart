@@ -151,24 +151,29 @@ class SignInFormState extends State<SignInForm> {
       //sock.write(_controllerUsername.text);
 
       sock.writeln("Username " +_controllerUsername.text + "," +
-                    "Password " + _controllerPassword.text);
+                    "Password " + _controllerPassword.text + "," +
+                    "FormType SignIn");
       await sock.flush();
 
       sock.listen((Uint8List data) {
-        final serverResponse = String.fromCharCodes(data);
+        var serverResponse = String.fromCharCodes(data);
         var successErrorResponse;
 
-
-        if (serverResponse.contains('1') ) {
+        if (serverResponse.contains("1")) {
           successErrorResponse = 'Success';
+          Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MainDashBoard()));
+              //MaterialPageRoute(builder: (context) => FormSubmissionResult(response: successErrorResponse,)));
         }
         else {
           successErrorResponse = 'Incorrect';
+          Navigator.push(
+              context,
+              //MaterialPageRoute(builder: (context) => MainDashBoard()));
+              MaterialPageRoute(builder: (context) => FormSubmissionResult(response: successErrorResponse,)));
         }
-        Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => MainDashBoard()));
-            //MaterialPageRoute(builder: (context) => FormSubmissionResult(response: successErrorResponse,)));
+
       },
           onError: (error) {print(error);}
       );
@@ -206,8 +211,8 @@ class RegistrationFormState extends State<RegistrationForm> {
       ),
       body: Form (
         key: _formkey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        child: ListView(
+          //crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
               child: TextFormField(
@@ -316,30 +321,48 @@ class RegistrationFormState extends State<RegistrationForm> {
       Socket socket = await Socket.connect('10.0.0.109', 8000);
 
       //Write the users' registration details into a comma separated string.
-      socket.writeln("Name " + _controllerName.text + "," +
-                    "Surname " + _controllerSurname.text + "," +
-                    "Email " + _controllerEmail.text + "," +
-                    "Password " + _controllerPassword0.text + "," +
-                    "CellNo " + _controllerCell.text);
+      //First ensure passwords entered match.
+      if (_controllerPassword0.text.contains(_controllerPassword1.text)) {
+        socket.writeln("Name " + _controllerName.text + "," +
+            "Surname " + _controllerSurname.text + "," +
+            "Email " + _controllerEmail.text + "," +
+            "Password " + _controllerPassword0.text + "," +
+            "CellNo " + _controllerCell.text + "," +
+            "FormType Register");
+        await socket.flush();
 
-      await socket.flush();
+        socket.listen((Uint8List data) {
+          final serverResponse = String.fromCharCodes(data);
 
-      socket.listen((Uint8List data) {
-        final serverResponse = String.fromCharCodes(data);
-      },
-          onError: (error) {print(error);
+          //test if form was submitted successfully.
+          if (serverResponse.contains("1")){
+            Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MainDashBoard()));
+          }
+
+          //If error occurred redirect to error page.
+          else{
+            Navigator.push(
+                context,
+                //MaterialPageRoute(builder: (context) => MainDashBoard()));
+                MaterialPageRoute(builder: (context) => FormSubmissionResult(response: "Error",)));
+          }
+        },
+            onError: (error) {print(error);
+            }
+        );
       }
-      );
 
+      //If passwords don't match redirect to homepage.
+      else {
+        Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => MyHomePage())
+        );
+      }
       socket.close();
     }
-
-
-
-    Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => MyHomePage())
-    );
   }
 }
 
