@@ -15,10 +15,11 @@ class MyApp extends StatelessWidget{
 
   @override
   Widget build(BuildContext context){
-    const appTitle = '';
+    const appTitle = 'Grace DP';
 
     return MaterialApp(
       title: appTitle,
+      //color: Colors.black,
       theme: ThemeData.dark(),
       home: MyHomePage(),
     );
@@ -43,8 +44,8 @@ class MyHomePageState extends State<MyHomePage> {
     return Scaffold(
         appBar: AppBar(
         title: Center(child: Text(
-          'Grace',
-          style: TextStyle(fontSize: 40, ),),),
+          'GraceDp',
+          style: TextStyle(fontSize: 40, color: Colors.yellow),),),
     ),
     body: Center(
       child: Padding(
@@ -420,32 +421,101 @@ class MainDashBoardState extends State<MainDashBoard> {
       appBar: AppBar(
         title: Center(
           child: Text(
-          'Welcome ' + widget.name,
-          style: TextStyle(fontSize: 32, color: Colors.green),
+          'Dashboard', //+ widget.name,
+          style: TextStyle(fontSize: 32, color: Colors.yellowAccent),
         ),)
       ),
       body: Center(
         child: Container(
-          decoration: const BoxDecoration(color: Colors.black, shape: BoxShape.rectangle),
+          decoration: const BoxDecoration(color: Colors.black12, shape: BoxShape.rectangle),
           child: ListView(
             children: [
               Container(
-                decoration: const BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
-                child: Text(
-                    'Here',
-                    style: TextStyle(fontSize: 25, color: Colors.green),
-                ),
+                decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.rectangle),
+                  padding: const EdgeInsets.only(bottom: 10, top: 10),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text("Deposit: ", style: TextStyle(fontSize: 15, color: Colors.black),),
+                            Text("R0", style: TextStyle(fontSize: 10, color: Colors.blue),),
+                            Text("Rating", style: TextStyle(fontSize: 15, color: Colors.black),),
+                            Icon(Icons.star, color: Colors.blue,size: 10,)
+                          ],
+                        )
+                      ],
+                    )
+                  ],
+                )
               ),
-              Container(
-                decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle),
-                child: Text(
-                  'Here',
-                  style: TextStyle(fontSize: 25, color: Colors.green),),
-              ),
+              _products("Name One"),
+              _products("Name Two"),
+              _products("Name Three"),
+              _products("Name Four"),
+              _products("Name Five"),
+              _products("Name Six")
             ],
           ),
         ),
       ),
     );
   }
+
+  //Widget to build products container.
+  Widget _products (var productName) {
+    return Container(
+      decoration: const BoxDecoration(
+        shape: BoxShape.rectangle,
+        border: Border(top: BorderSide(color: Colors.white), left: BorderSide(color: Colors.white), right: BorderSide(color: Colors.white), bottom: BorderSide(color: Colors.white)),
+        borderRadius: BorderRadius.all(Radius.circular(20) ),
+      ),
+      //padding: const EdgeInsets.only(right: 100), //works for the children inside this container.
+      margin: const EdgeInsets.all(10),  // gives the inner margin as measured from all sides.
+      child: Column(
+        children: [
+          Text(
+            productName,
+            style: TextStyle(fontSize: 25, color: Colors.white),
+          ),
+          Container(
+            //decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.rectangle, ),
+            height: 20.0,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(child:
+              ElevatedButton(
+                  onPressed: () {},
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.black12),
+                      foregroundColor: MaterialStateProperty.resolveWith((states) => Colors.white),
+                      side: MaterialStateProperty.resolveWith((states) => BorderSide(color: Colors.white))
+                  ),
+                  child: Text('Get')
+              ),
+              ),
+              Expanded(child:
+              ElevatedButton(
+                  onPressed: () {},
+                  style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.black12),
+                      foregroundColor: MaterialStateProperty.resolveWith((states) => Colors.white),
+                      side: MaterialStateProperty.resolveWith((states) => BorderSide(color: Colors.white))
+                  ),
+                  child: Text('Info')
+              )
+              )
+
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
 }

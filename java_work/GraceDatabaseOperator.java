@@ -36,7 +36,7 @@ public class GraceDatabaseOperator
         
         try
         {
-            this.connection = DriverManager.getConnection(dbUrl, dbUsername, password);
+            this.connection = DriverManager.getConnection(dbUrl, dbUsername, dbPassword);
         }
         catch (Exception e)
         {
