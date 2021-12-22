@@ -45,7 +45,9 @@ class MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
         title: Center(child: Text(
           'GraceDp',
-          style: TextStyle(fontSize: 40, color: Colors.yellow),),),
+          style: TextStyle(fontSize: 40, color: Colors.yellow),)
+          ,),
+          //backgroundColor: Colors.black87,
     ),
     body: Center(
       child: Padding(
@@ -98,50 +100,54 @@ class SignInFormState extends State<SignInForm> {
             'Sign In',
             style: TextStyle(fontSize: 32),),),
       ),
-      body: Form (
-        key: _formkey,
-        child: ListView(
-          //crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-            child: TextFormField(
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter some text';
-                }
-                return null;
-              }, // validator ends
-              controller: _controllerUsername,
-              decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Username'),
-            ),
-            ),
-            Padding(padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-            child: TextFormField(
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter some text';
-                }
-                return null;
-              },
-              obscureText: true,
-              controller: _controllerPassword,
-              decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: 'Password'),
-            ),
-            ),
-
-            Center(
-              child: ElevatedButton(
-                onPressed: _submitSignInForm,
-                child: const Text("Submit"),
+      body: Padding(
+        padding: EdgeInsets.symmetric(vertical: 160, horizontal: 0),
+        child: Form (
+          key: _formkey,
+          child: ListView(
+            //crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                child: TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter some text';
+                    }
+                    return null;
+                  }, // validator ends
+                  controller: _controllerUsername,
+                  decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'Username'),
+                ),
               ),
-            ),
-          ], // Children list
+              Padding(padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                child: TextFormField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter some text';
+                    }
+                    return null;
+                  },
+                  obscureText: true,
+                  controller: _controllerPassword,
+                  decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      hintText: 'Password'),
+                ),
+              ),
+
+              Center(
+                child: ElevatedButton(
+                  onPressed: _submitSignInForm,
+                  child: const Text("Submit"),
+                ),
+              ),
+            ], // Children list
+          ),
         ),
-      ),
+      )
+
     );
   }
 
@@ -368,7 +374,7 @@ class RegistrationFormState extends State<RegistrationForm> {
   }
 }
 
-//class to navigate onto after submission of form.
+//class to navigate onto after submission of form. Useless now.
 class FormSubmissionResult extends StatefulWidget {
   final String response;
   const FormSubmissionResult({Key? key, required this.response}) : super(key: key);
@@ -419,12 +425,56 @@ class MainDashBoardState extends State<MainDashBoard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(
+            Icons.menu,
+            semanticLabel: 'menu',
+          ),
+          onPressed: () {
+            print('Menu button');
+          },
+        ),
         title: Center(
           child: Text(
           'Dashboard', //+ widget.name,
           style: TextStyle(fontSize: 32, color: Colors.yellowAccent),
-        ),)
+        ),
+        ),
+        actions: [
+
+        ],
       ),
+      /*bottomNavigationBar: BottomNavigation() No longer neccessary*/
+      persistentFooterButtons: [
+        Container(
+          child: TextButton(
+            onPressed: () {},
+            child: Text("To do List"),
+          ),
+          height: 50,
+        ),
+        Container(
+          child: TextButton(
+            onPressed: () {},
+            child: Text("Log a Complaint"),
+          ),
+          height: 50,
+        ),
+        Container(
+          child: TextButton(
+            onPressed: () {},
+            child: Text("My Products"),
+          ),
+          height: 50,
+        ),
+        Container(
+          child: TextButton(
+            onPressed: () {},
+            child: Text("Logout"),
+          ),
+          height: 50,
+        )
+      ],
       body: Center(
         child: Container(
           decoration: const BoxDecoration(color: Colors.black12, shape: BoxShape.rectangle),
@@ -471,7 +521,7 @@ class MainDashBoardState extends State<MainDashBoard> {
       decoration: const BoxDecoration(
         shape: BoxShape.rectangle,
         border: Border(top: BorderSide(color: Colors.white), left: BorderSide(color: Colors.white), right: BorderSide(color: Colors.white), bottom: BorderSide(color: Colors.white)),
-        borderRadius: BorderRadius.all(Radius.circular(20) ),
+        borderRadius: BorderRadius.all(Radius.circular(10) ),
       ),
       //padding: const EdgeInsets.only(right: 100), //works for the children inside this container.
       margin: const EdgeInsets.all(10),  // gives the inner margin as measured from all sides.
@@ -496,7 +546,7 @@ class MainDashBoardState extends State<MainDashBoard> {
                       foregroundColor: MaterialStateProperty.resolveWith((states) => Colors.white),
                       side: MaterialStateProperty.resolveWith((states) => BorderSide(color: Colors.white))
                   ),
-                  child: Text('Get')
+                  child: Text('Get Product')
               ),
               ),
               Expanded(child:
@@ -507,7 +557,7 @@ class MainDashBoardState extends State<MainDashBoard> {
                       foregroundColor: MaterialStateProperty.resolveWith((states) => Colors.white),
                       side: MaterialStateProperty.resolveWith((states) => BorderSide(color: Colors.white))
                   ),
-                  child: Text('Info')
+                  child: Text('More Info')
               )
               )
 
