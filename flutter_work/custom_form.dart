@@ -55,16 +55,20 @@ class MyHomePageState extends State<MyHomePage> {
         child: Column(
           children: [
             Text(
-              'Welcome',
-              style: TextStyle(fontSize: 32, color: Colors.green),
+              'Hello',
+              style: TextStyle(fontSize: 40, color: Colors.green),
             ),
             ElevatedButton(
-                onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => SignInForm()));},
-                child: Text('Sign In')
+              onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationForm()));},
+              child: Text('Register', style: TextStyle(fontSize: 20),),
+              //style: ButtonStyle(backgroundColor: ),
             ),
-            ElevatedButton(onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationForm()));},
-                child: Text('Register')
-            )
+            Text("Already a Grace customer?", style: TextStyle(fontSize: 20),),
+            ElevatedButton(
+              onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => SignInForm()));},
+              child: Text('Sign In', style: TextStyle(fontSize: 20),),
+              //style: ButtonStyle(backgroundColor: ),
+            ),
           ],
         ),
       )
@@ -421,6 +425,10 @@ class MainDashBoard extends StatefulWidget {
 
 class MainDashBoardState extends State<MainDashBoard> {
 
+  //Get the current time of day in string format.
+  var today = DateTime.now().toString();
+  //var todayFormatted = DateTime(today.year, today.month, today.day).toString();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -449,27 +457,32 @@ class MainDashBoardState extends State<MainDashBoard> {
         Container(
           child: TextButton(
             onPressed: () {},
-            child: Text("To do List"),
+            child: Text("ToDo"),
           ),
           height: 50,
         ),
         Container(
           child: TextButton(
             onPressed: () {},
-            child: Text("Log a Complaint"),
+            child: Text("Complaint"),
           ),
           height: 50,
         ),
         Container(
           child: TextButton(
             onPressed: () {},
-            child: Text("My Products"),
+            child: Text("Products"),
           ),
           height: 50,
         ),
         Container(
           child: TextButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyHomePage())
+              );
+            },
             child: Text("Logout"),
           ),
           height: 50,
@@ -489,13 +502,27 @@ class MainDashBoardState extends State<MainDashBoard> {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("Deposit: ", style: TextStyle(fontSize: 15, color: Colors.black),),
-                            Text("R0", style: TextStyle(fontSize: 10, color: Colors.blue),),
-                            Text("Rating", style: TextStyle(fontSize: 15, color: Colors.black),),
-                            Icon(Icons.star, color: Colors.blue,size: 10,)
+                            Text("Current Deposit: ", style: TextStyle(fontSize: 15, color: Colors.black),),
+                            Text("R10 000", style: TextStyle(fontSize: 20, color: Colors.blue),),
+                            Text("Tenant's Rating:", style: TextStyle(fontSize: 15, color: Colors.black),),
+                            Icon(Icons.star, color: Colors.blue,size: 15,),
+                            Text("Occupation date: ", style: TextStyle(fontSize: 15, color: Colors.black), ),
+                            Text(today, style: TextStyle(fontSize: 15, color: Colors.blue),)
                           ],
+                        ),
+                        Container(
+                          decoration: const BoxDecoration(
+                              color: Colors.blue,
+                              shape: BoxShape.circle,
+                              border: Border(top: BorderSide(color: Colors.black), left: BorderSide(color: Colors.black), right: BorderSide(color: Colors.black), bottom: BorderSide(color: Colors.black)),
+                          ),
+                          height: 50.0,
+                          width: 50.0,
+                          margin: const EdgeInsets.only(left: 100),
+                          padding: const EdgeInsets.only(left: 100),
+                          child: Text("Here", style: TextStyle(fontSize: 10, color: Colors.black),),
                         )
                       ],
                     )
@@ -529,7 +556,7 @@ class MainDashBoardState extends State<MainDashBoard> {
         children: [
           Text(
             productName,
-            style: TextStyle(fontSize: 25, color: Colors.white),
+            style: TextStyle(fontSize: 25, color: Colors.yellowAccent),
           ),
           Container(
             //decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.rectangle, ),
@@ -540,7 +567,11 @@ class MainDashBoardState extends State<MainDashBoard> {
             children: [
               Expanded(child:
               ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(
+                        context: context, 
+                        builder: (BuildContext context) => Text("On the way!"));
+                  },
                   style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.black12),
                       foregroundColor: MaterialStateProperty.resolveWith((states) => Colors.white),
