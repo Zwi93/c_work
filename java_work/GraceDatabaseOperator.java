@@ -44,10 +44,12 @@ public class GraceDatabaseOperator
         }
     }
 
-    public void queryTable ()
+    public String findUserPassword (String name)
     {
+        //This function obtains a user's password given their username.
         Statement queryStatement;
         ResultSet resultSet;
+        String password = "None";
 
         try 
         {
@@ -57,18 +59,32 @@ public class GraceDatabaseOperator
 
             while ( resultSet.next() )
             {
-                for ( int i = 1; i <= 5; i++)
-                    System.out.printf("%-8s\t", resultSet.getObject(i));
-                System.out.println();
+                String username = resultSet.getString(2);
+
+                if ( username.equals(name) )
+                {
+                    password = resultSet.getString(5);
+                    //System.out.println(username);
+                    //System.out.println(password);
+                    break;
+                }
+                else
+                {
+                    password = "None";
+                }
             }
 
             queryStatement.close();
             resultSet.close();
+            
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            //password = "None";
         }
+
+        return password;
         
     }
 

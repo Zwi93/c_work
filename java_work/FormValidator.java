@@ -90,12 +90,17 @@ public class FormValidator
         try
         {
             outgoing = new PrintWriter(client.getOutputStream());
+            GraceDatabaseOperator dbOperator = new GraceDatabaseOperator(URL, USERNAME, PASSWORD, TABLE);
 
             switch (formType)
             {
                 case "SignIn":
                     //Verify that message contains required info before sending a response back to client.
-                    if (userCredentials.get("Password").equals("Zwi") )
+                    
+                    String username = userCredentials.get("Username");
+                    String userPassword = dbOperator.findUserPassword(username);
+
+                    if (userCredentials.get("Password").equals(userPassword) )
                     {
                         outgoing.println("1");
                         outgoing.flush();
@@ -109,7 +114,7 @@ public class FormValidator
 
                 case "Register":
                     //User info to be pushed to the database here.
-                    GraceDatabaseOperator dbOperator = new GraceDatabaseOperator(URL, USERNAME, PASSWORD, TABLE);
+                    
                     int result;
                     
                     result = dbOperator.updateTable(userCredentials);
