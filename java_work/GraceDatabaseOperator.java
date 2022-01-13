@@ -46,7 +46,7 @@ public class GraceDatabaseOperator
 
     public String findUserPassword (String name)
     {
-        //This function obtains a user's password given their username.
+        //This function obtains a user's password given their username querying through the DB.
         Statement queryStatement;
         ResultSet resultSet;
         String password = "None";

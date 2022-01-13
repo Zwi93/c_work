@@ -55,8 +55,8 @@ class MyHomePageState extends State<MyHomePage> {
         child: Column(
           children: [
             Text(
-              'Hello',
-              style: TextStyle(fontSize: 40, color: Colors.green),
+              'Hello.',
+              style: TextStyle(fontSize: 50, color: Colors.green),
             ),
             ElevatedButton(
               onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationForm()));},
@@ -303,6 +303,9 @@ class RegistrationFormState extends State<RegistrationForm> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter some text';
                   }
+                  if (value != _controllerPassword0.text) {
+                    return 'Please enter matching passwords';
+                  }
                   return null;
                 },
                 obscureText: true,
@@ -426,8 +429,8 @@ class MainDashBoard extends StatefulWidget {
 class MainDashBoardState extends State<MainDashBoard> {
 
   //Get the current time of day in string format.
-  var today = DateTime.now().toString();
-  //var todayFormatted = DateTime(today.year, today.month, today.day).toString();
+  String today = DateTime.now().toString();
+  //String todayFormatted = today.split(" ")[0];
 
   @override
   Widget build(BuildContext context) {
@@ -439,7 +442,10 @@ class MainDashBoardState extends State<MainDashBoard> {
             semanticLabel: 'menu',
           ),
           onPressed: () {
-            print('Menu button');
+            //print('Menu button');
+            showDialog(
+                context: context,
+                builder: (BuildContext context) => Center(child: Text("On the way!"),));
           },
         ),
         title: Center(
@@ -509,7 +515,7 @@ class MainDashBoardState extends State<MainDashBoard> {
                             Text("Tenant's Rating:", style: TextStyle(fontSize: 15, color: Colors.black),),
                             Icon(Icons.star, color: Colors.blue,size: 15,),
                             Text("Occupation date: ", style: TextStyle(fontSize: 15, color: Colors.black), ),
-                            Text(today, style: TextStyle(fontSize: 15, color: Colors.blue),)
+                            Text("", style: TextStyle(fontSize: 15, color: Colors.blue),)
                           ],
                         ),
                         Container(
@@ -570,7 +576,7 @@ class MainDashBoardState extends State<MainDashBoard> {
                   onPressed: () {
                     showDialog(
                         context: context, 
-                        builder: (BuildContext context) => Text("On the way!"));
+                        builder: (BuildContext context) => Center(child: Text("On the way!"),));
                   },
                   style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.black12),
@@ -582,7 +588,11 @@ class MainDashBoardState extends State<MainDashBoard> {
               ),
               Expanded(child:
               ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) => Center(child: Text("On the way!"),));
+                  },
                   style: ButtonStyle(
                       backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.black12),
                       foregroundColor: MaterialStateProperty.resolveWith((states) => Colors.white),
