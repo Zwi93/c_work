@@ -445,7 +445,10 @@ class MainDashBoardState extends State<MainDashBoard> {
             //print('Menu button');
             showDialog(
                 context: context,
-                builder: (BuildContext context) => Center(child: Text("On the way!"),));
+                builder: (BuildContext context) => _popupMenu(),
+                barrierColor: Colors.black87,
+
+            );
           },
         ),
         title: Center(
@@ -539,7 +542,7 @@ class MainDashBoardState extends State<MainDashBoard> {
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("Current Deposit: ", style: TextStyle(fontSize: 15, color: Colors.black),),
+                            Text("Current Deposit:", style: TextStyle(fontSize: 15, color: Colors.black),),
                             Text("R10 000", style: TextStyle(fontSize: 20, color: Colors.blue),),
                             Text("Tenant's Rating:", style: TextStyle(fontSize: 15, color: Colors.black),),
                             Icon(Icons.star, color: Colors.blue,size: 15,),
@@ -576,6 +579,37 @@ class MainDashBoardState extends State<MainDashBoard> {
       ),
     );
   }
+
+  //Widget for the popup menu defined here.
+  Widget _popupMenu (){
+    return Container(
+      //decoration: BoxDecoration(color: Colors.black),
+      child:Column(
+          children: [
+            TextButton(
+              onPressed: () {
+
+              },
+              child: Text("Profile"),
+            ),
+            TextButton(
+                onPressed: () {
+
+                },
+                child: Text("Something")
+            ),
+            TextButton(
+                onPressed: () {
+
+                },
+                child: Text("Logout"))
+          ]
+      ),
+
+      //height: 100,
+      //width: 100,
+      );
+}
 
   //Widget to build product icon depending on the name of the product
   Widget _productIcon (String productName) {
