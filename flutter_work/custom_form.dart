@@ -458,21 +458,50 @@ class MainDashBoardState extends State<MainDashBoard> {
 
         ],
       ),
-      /*bottomNavigationBar: BottomNavigation() No longer neccessary*/
+      /*bottomNavigationBar: BottomNavigation() No longer necessary*/
       persistentFooterButtons: [
         Container(
-          child: TextButton(
+            child: Column(
+              children: [
+                Icon(
+                  Icons.dashboard,
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => MainDashBoard(name: "",))
+                    );
+                  },
+                  child: Text("Dashboard"),
+                ),
+              ],
+            )
+        ),
+        Container(
+          child: Column(
+        children: [
+          Icon(
+        Icons.checklist,
+        ),
+          TextButton(
             onPressed: () {},
             child: Text("ToDo"),
           ),
-          height: 50,
+        ],
+          )
         ),
         Container(
-          child: TextButton(
-            onPressed: () {},
-            child: Text("Complaint"),
-          ),
-          height: 50,
+          child: Column(
+          children: [
+            Icon(Icons.chat_bubble_rounded,),
+            TextButton(
+              onPressed: () {},
+              child: Text("Complaint"),
+            ),
+    ],
+    )
+
         ),
         Container(
           child: TextButton(
@@ -481,7 +510,7 @@ class MainDashBoardState extends State<MainDashBoard> {
           ),
           height: 50,
         ),
-        Container(
+        /*Container(
           child: TextButton(
             onPressed: () {
               Navigator.push(
@@ -492,7 +521,7 @@ class MainDashBoardState extends State<MainDashBoard> {
             child: Text("Logout"),
           ),
           height: 50,
-        )
+        )*/
       ],
       body: Center(
         child: Container(
@@ -535,12 +564,12 @@ class MainDashBoardState extends State<MainDashBoard> {
                   ],
                 )
               ),
-              _products("Name One"),
-              _products("Name Two"),
-              _products("Name Three"),
+              _products("Deposit Protection"),
+              _products("Deposit Lending"),
+              _products("Home Saver"),
               _products("Name Four"),
-              _products("Name Five"),
-              _products("Name Six")
+              //_products("Name Five"),
+              //_products("Name Six")
             ],
           ),
         ),
@@ -548,8 +577,28 @@ class MainDashBoardState extends State<MainDashBoard> {
     );
   }
 
+  //Widget to build product icon depending on the name of the product
+  Widget _productIcon (String productName) {
+    switch (productName) {
+      case 'Deposit Protection':
+        return Icon(Icons.privacy_tip, size: 50,);
+        break;
+      case 'Deposit Lending':
+        return Icon(Icons.credit_card, size: 50,);
+        break;
+      case 'Home Saver':
+        return Icon(Icons.home, size: 50,);
+        break;
+      default:
+        return Text("data");
+    }
+  }
+
   //Widget to build products container.
-  Widget _products (var productName) {
+  Widget _products (String productName) {
+
+    //Depending on the product name, the icon will vary.
+
     return Container(
       decoration: const BoxDecoration(
         shape: BoxShape.rectangle,
@@ -566,7 +615,9 @@ class MainDashBoardState extends State<MainDashBoard> {
           ),
           Container(
             //decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.rectangle, ),
-            height: 20.0,
+            height: 50.0,
+            width: 50.0,
+            child: _productIcon(productName), //or home_outlined.
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
