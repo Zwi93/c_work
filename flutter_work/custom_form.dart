@@ -56,7 +56,7 @@ class MyHomePageState extends State<MyHomePage> {
           children: [
             Text(
               'Hello.',
-              style: TextStyle(fontSize: 50, color: Colors.green),
+              style: TextStyle(fontSize: 60, color: Colors.green),
             ),
             ElevatedButton(
               onPressed: () {Navigator.push(context, MaterialPageRoute(builder: (context) => RegistrationForm()));},
@@ -364,8 +364,9 @@ class RegistrationFormState extends State<RegistrationForm> {
                 MaterialPageRoute(builder: (context) => FormSubmissionResult(response: "Error",)));
           }
         },
-            onError: (error) {print(error);
-            }
+            onError: (error) {
+          print(error);
+        }
         );
       }
 
@@ -429,8 +430,7 @@ class MainDashBoard extends StatefulWidget {
 class MainDashBoardState extends State<MainDashBoard> {
 
   //Get the current time of day in string format.
-  String today = DateTime.now().toString();
-  //String todayFormatted = today.split(" ")[0];
+  String today = DateTime.now().toString().split(' ')[0];
 
   @override
   Widget build(BuildContext context) {
@@ -442,18 +442,17 @@ class MainDashBoardState extends State<MainDashBoard> {
             semanticLabel: 'menu',
           ),
           onPressed: () {
-            //print('Menu button');
             showDialog(
                 context: context,
                 builder: (BuildContext context) => _popupMenu(),
                 barrierColor: Colors.black87,
-
+                barrierDismissible: false,
             );
           },
         ),
         title: Center(
           child: Text(
-          'Dashboard', //+ widget.name,
+          widget.name,
           style: TextStyle(fontSize: 32, color: Colors.yellowAccent),
         ),
         ),
@@ -473,7 +472,7 @@ class MainDashBoardState extends State<MainDashBoard> {
                   onPressed: () {
                     Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => MainDashBoard(name: "",))
+                        MaterialPageRoute(builder: (context) => MainDashBoard(name: widget.name,))
                     );
                   },
                   child: Text("Dashboard"),
@@ -507,24 +506,19 @@ class MainDashBoardState extends State<MainDashBoard> {
 
         ),
         Container(
-          child: TextButton(
-            onPressed: () {},
-            child: Text("Products"),
-          ),
-          height: 50,
+          child: Column(
+            children: [
+              Icon(
+                Icons.warning_amber_rounded,
+              ),
+              TextButton(
+                onPressed: () {},
+                child: Text("Maintenance"),
+              ),
+            ],
+          )
+
         ),
-        /*Container(
-          child: TextButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MyHomePage())
-              );
-            },
-            child: Text("Logout"),
-          ),
-          height: 50,
-        )*/
       ],
       body: Center(
         child: Container(
@@ -547,7 +541,7 @@ class MainDashBoardState extends State<MainDashBoard> {
                             Text("Tenant's Rating:", style: TextStyle(fontSize: 15, color: Colors.black),),
                             Icon(Icons.star, color: Colors.blue,size: 15,),
                             Text("Occupation date: ", style: TextStyle(fontSize: 15, color: Colors.black), ),
-                            Text("", style: TextStyle(fontSize: 15, color: Colors.blue),)
+                            Text(today, style: TextStyle(fontSize: 15, color: Colors.blue),)
                           ],
                         ),
                         Container(
@@ -584,6 +578,7 @@ class MainDashBoardState extends State<MainDashBoard> {
   Widget _popupMenu (){
     return Container(
       //decoration: BoxDecoration(color: Colors.black),
+      padding: EdgeInsets.symmetric(vertical: 160, horizontal: 0),
       child:Column(
           children: [
             TextButton(
@@ -600,7 +595,7 @@ class MainDashBoardState extends State<MainDashBoard> {
             ),
             TextButton(
                 onPressed: () {
-
+                  Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
                 },
                 child: Text("Logout"))
           ]
