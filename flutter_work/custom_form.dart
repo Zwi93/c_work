@@ -50,7 +50,7 @@ class MyHomePageState extends State<MyHomePage> {
           //backgroundColor: Colors.black87,
     ),
     body: Center(
-      child: Padding(
+      child: Container(
         padding: EdgeInsets.symmetric(vertical: 160, horizontal: 0),
         child: Column(
           children: [
@@ -104,8 +104,8 @@ class SignInFormState extends State<SignInForm> {
             'Sign In',
             style: TextStyle(fontSize: 32),),),
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(vertical: 160, horizontal: 0),
+      body: Container(
+        padding: EdgeInsets.symmetric(vertical: 100, horizontal: 0),
         child: Form (
           key: _formkey,
           child: ListView(
@@ -141,11 +141,29 @@ class SignInFormState extends State<SignInForm> {
                 ),
               ),
 
-              Center(
-                child: ElevatedButton(
-                  onPressed: _submitSignInForm,
-                  child: const Text("Submit"),
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: _submitSignInForm,
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.green),
+                        foregroundColor: MaterialStateProperty.resolveWith((states) => Colors.white),
+                        //side: MaterialStateProperty.resolveWith((states) => BorderSide(color: Colors.white))
+                    ),
+                    child: const Text("Submit"),
+                  ),
+                  Container(width: 50,),
+                  ElevatedButton(
+                    onPressed: () {Navigator.pop(context);},
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.red),
+                        foregroundColor: MaterialStateProperty.resolveWith((states) => Colors.white),
+                        //side: MaterialStateProperty.resolveWith((states) => BorderSide(color: Colors.white))
+                    ),
+                    child: const Text("Cancel"),
+                  ),
+                ]
               ),
             ], // Children list
           ),
@@ -161,7 +179,7 @@ class SignInFormState extends State<SignInForm> {
       Socket sock = await Socket.connect('10.0.0.109', 8000);
       //sock.write(_controllerUsername.text);
 
-      sock.writeln("Username " +_controllerUsername.text + "," +
+      sock.writeln("Username " + _controllerUsername.text + "," +
                     "Password " + _controllerPassword.text + "," +
                     "FormType SignIn");
       await sock.flush();
@@ -303,6 +321,7 @@ class RegistrationFormState extends State<RegistrationForm> {
                   if (value == null || value.isEmpty) {
                     return 'Please enter some text';
                   }
+                  //First ensure passwords entered match.
                   if (value != _controllerPassword0.text) {
                     return 'Please enter matching passwords';
                   }
@@ -316,11 +335,29 @@ class RegistrationFormState extends State<RegistrationForm> {
               ),
             ),
 
-            Center(
-              child: ElevatedButton(
-                onPressed: _submitRegistrationForm,
-                child: const Text("Submit"),
-              ),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: _submitRegistrationForm,
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.green),
+                      foregroundColor: MaterialStateProperty.resolveWith((states) => Colors.white),
+                      //side: MaterialStateProperty.resolveWith((states) => BorderSide(color: Colors.white))
+                    ),
+                    child: const Text("Submit"),
+                  ),
+                  Container(width: 50,),
+                  ElevatedButton(
+                    onPressed: () {Navigator.pop(context);},
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.red),
+                      foregroundColor: MaterialStateProperty.resolveWith((states) => Colors.white),
+                      //side: MaterialStateProperty.resolveWith((states) => BorderSide(color: Colors.white))
+                    ),
+                    child: const Text("Cancel"),
+                  ),
+                ]
             ),
           ], // Children list
         ),
@@ -336,47 +373,36 @@ class RegistrationFormState extends State<RegistrationForm> {
       Socket socket = await Socket.connect('10.0.0.109', 8000);
 
       //Write the users' registration details into a comma separated string.
-      //First ensure passwords entered match.
-      if (_controllerPassword0.text.contains(_controllerPassword1.text)) {
-        socket.writeln("Name " + _controllerName.text + "," +
-            "Surname " + _controllerSurname.text + "," +
-            "Email " + _controllerEmail.text + "," +
-            "Password " + _controllerPassword0.text + "," +
-            "CellNo " + _controllerCell.text + "," +
-            "FormType Register");
-        await socket.flush();
+      socket.writeln("Name " + _controllerName.text + "," +
+          "Surname " + _controllerSurname.text + "," +
+          "Email " + _controllerEmail.text + "," +
+          "Password " + _controllerPassword0.text + "," +
+          "CellNo " + _controllerCell.text + "," +
+          "FormType Register");
+      await socket.flush();
 
-        socket.listen((Uint8List data) {
-          final serverResponse = String.fromCharCodes(data);
+      socket.listen((Uint8List data) {
+        final serverResponse = String.fromCharCodes(data);
 
-          //test if form was submitted successfully.
-          if (serverResponse.contains("1")){
-            Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => MainDashBoard(name:_controllerName.text,)));
-          }
-
-          //If error occurred redirect to error page.
-          else{
-            Navigator.push(
-                context,
-                //MaterialPageRoute(builder: (context) => MainDashBoard()));
-                MaterialPageRoute(builder: (context) => FormSubmissionResult(response: "Error",)));
-          }
-        },
-            onError: (error) {
-          print(error);
+        //test if form was submitted successfully.
+        if (serverResponse.contains("1")){
+          Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => MainDashBoard(name:_controllerName.text,)));
         }
-        );
-      }
 
-      //If passwords don't match redirect to homepage.
-      else {
-        Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => MyHomePage())
-        );
-      }
+        //If error occurred redirect to error page.
+        else{
+          Navigator.push(
+              context,
+              //MaterialPageRoute(builder: (context) => MainDashBoard()));
+              MaterialPageRoute(builder: (context) => FormSubmissionResult(response: "Error",)));
+        }
+      },
+          onError: (error) {
+            print(error);
+          }
+      );
       socket.close();
     }
   }
@@ -626,13 +652,14 @@ class MainDashBoardState extends State<MainDashBoard> {
   //Widget to build products container.
   Widget _products (String productName) {
 
-    //Depending on the product name, the icon will vary.
+    //Depending on the product name, the icon and container's color will vary.
 
     return Container(
       decoration: const BoxDecoration(
         shape: BoxShape.rectangle,
         border: Border(top: BorderSide(color: Colors.white), left: BorderSide(color: Colors.white), right: BorderSide(color: Colors.white), bottom: BorderSide(color: Colors.white)),
         borderRadius: BorderRadius.all(Radius.circular(10) ),
+        //color: Colors.pink
       ),
       //padding: const EdgeInsets.only(right: 100), //works for the children inside this container.
       margin: const EdgeInsets.all(10),  // gives the inner margin as measured from all sides.
