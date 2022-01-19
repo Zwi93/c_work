@@ -1,3 +1,12 @@
+/**
+ * Author : Zwi Mudau
+ * Date : Began somewhere around 2021/11.. . 
+ * 
+ * Program to handle the backend work for a mobile App. Mainly handling socket connections from the client mobile apps. 
+ * 
+ */
+
+
 import java.net.*;
 import java.io.*;
 import java.util.HashMap;
@@ -7,7 +16,7 @@ import java.util.Map;
 import com.gracedp.operation.GraceDatabaseOperator;
 
 /**
- * Program to listen to client's connections and respond accordingly depending on information provided.
+ * Class to listen to client's connections and respond accordingly depending on information provided.
  * to run this program successfully, type 
  * java -classpath .:com:postgresql-42.3.1.jar FormValidator
  */
@@ -15,7 +24,7 @@ import com.gracedp.operation.GraceDatabaseOperator;
 public class FormValidator
 {
     public static final int PORT = 8000;
-    static final String URL = "jdbc:postgresql://localhost/grace_dp";
+    static final String URL = "jdbc:postgresql://localhost/grace_dp";  //Worth trying a combination of server and DB at different locations.
     static final String USERNAME = "zwi";
     static final String PASSWORD = "Zwi";
     static final String TABLE = "tenants_details";
@@ -145,15 +154,22 @@ public class FormValidator
 
         Map< String, String > messageMap = new HashMap < String, String > ();
 
-        String[] commaTokens = message.split(",");
-
-        for (String pairs : commaTokens)
+        try
         {
-            String[] keyValuePair = pairs.split(" ");
+            String[] commaTokens = message.split(",");
 
-            messageMap.put(keyValuePair[0], keyValuePair[1]);
+            for (String pairs : commaTokens)
+            {
+                String[] keyValuePair = pairs.split(" ");
+
+                messageMap.put(keyValuePair[0], keyValuePair[1]);
+            }
         }
-
+        catch (NullPointerException exception)
+        {
+            messageMap.put("", "");
+        }
+        
         return messageMap;
     }
 }
