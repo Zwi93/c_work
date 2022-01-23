@@ -491,8 +491,22 @@ class MainDashBoardState extends State<MainDashBoard> {
         Container(
             child: Column(
               children: [
-                Icon(
-                  Icons.dashboard,
+                ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => MainDashBoard(name: widget.name,))
+                      );
+                    },
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.transparent),
+                        foregroundColor: MaterialStateProperty.resolveWith((states) => Colors.white),
+                        elevation: MaterialStateProperty.resolveWith((states) => 0),
+                        //side: MaterialStateProperty.resolveWith((states) => BorderSide(color: Colors.white))
+                    ),
+                    child: Icon(
+                      Icons.dashboard,
+                    ),
                 ),
                 TextButton(
                   onPressed: () {
@@ -509,12 +523,23 @@ class MainDashBoardState extends State<MainDashBoard> {
         Container(
           child: Column(
         children: [
-          Icon(
-        Icons.checklist,
-        ),
+          ElevatedButton(
+            onPressed: () {
+
+            },
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.transparent),
+              foregroundColor: MaterialStateProperty.resolveWith((states) => Colors.white),
+              elevation: MaterialStateProperty.resolveWith((states) => 0),
+              //side: MaterialStateProperty.resolveWith((states) => BorderSide(color: Colors.white))
+            ),
+            child: Icon(
+              Icons.checklist,
+            ),
+          ),
           TextButton(
             onPressed: () {},
-            child: Text("ToDo"),
+            child: Text("ToDo"),//Icons check_circle_outlined and check_circle_rounded will be useful.
           ),
         ],
           )
@@ -522,7 +547,21 @@ class MainDashBoardState extends State<MainDashBoard> {
         Container(
           child: Column(
           children: [
-            Icon(Icons.chat_bubble_rounded,),
+            ElevatedButton(
+              onPressed: () {
+
+              },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.transparent),
+                foregroundColor: MaterialStateProperty.resolveWith((states) => Colors.white),
+                elevation: MaterialStateProperty.resolveWith((states) => 0),
+                //side: MaterialStateProperty.resolveWith((states) => BorderSide(color: Colors.white))
+              ),
+              child: Icon(
+                Icons.chat_bubble_rounded,
+              ),
+            ),
+
             TextButton(
               onPressed: () {},
               child: Text("Complaint"),
@@ -534,9 +573,21 @@ class MainDashBoardState extends State<MainDashBoard> {
         Container(
           child: Column(
             children: [
-              Icon(
-                Icons.warning_amber_rounded,
+              ElevatedButton(
+                onPressed: () {
+
+                },
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.resolveWith((states) => Colors.transparent),
+                  foregroundColor: MaterialStateProperty.resolveWith((states) => Colors.white),
+                  elevation: MaterialStateProperty.resolveWith((states) => 0),
+                  //side: MaterialStateProperty.resolveWith((states) => BorderSide(color: Colors.white))
+                ),
+                child: Icon(
+                  Icons.warning_amber_rounded,
+                ),
               ),
+
               TextButton(
                 onPressed: () {},
                 child: Text("Maintenance"),
@@ -562,11 +613,11 @@ class MainDashBoardState extends State<MainDashBoard> {
                         Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text("Current Deposit:", style: TextStyle(fontSize: 15, color: Colors.black),),
+                            Text("Current Deposit", style: TextStyle(fontSize: 15, color: Colors.black),),
                             Text("R10 000", style: TextStyle(fontSize: 20, color: Colors.blue),),
-                            Text("Tenant's Rating:", style: TextStyle(fontSize: 15, color: Colors.black),),
+                            Text("Tenant's Rating", style: TextStyle(fontSize: 15, color: Colors.black),),
                             Icon(Icons.star, color: Colors.blue,size: 15,),
-                            Text("Occupation date: ", style: TextStyle(fontSize: 15, color: Colors.black), ),
+                            Text("Occupation date", style: TextStyle(fontSize: 15, color: Colors.black), ),
                             Text(today, style: TextStyle(fontSize: 15, color: Colors.blue),)
                           ],
                         ),
@@ -576,10 +627,10 @@ class MainDashBoardState extends State<MainDashBoard> {
                               shape: BoxShape.circle,
                               border: Border(top: BorderSide(color: Colors.black), left: BorderSide(color: Colors.black), right: BorderSide(color: Colors.black), bottom: BorderSide(color: Colors.black)),
                           ),
-                          height: 50.0,
-                          width: 50.0,
-                          margin: const EdgeInsets.only(left: 100),
-                          padding: const EdgeInsets.only(left: 100),
+                          height: 100.0,
+                          width: 100.0,
+                          margin: const EdgeInsets.only(left: 100), //controls the spacing of the container widget itself.
+                          padding: const EdgeInsets.all(30), //controls the spacing of the child widget.
                           child: Text("Here", style: TextStyle(fontSize: 10, color: Colors.black),),
                         )
                       ],
@@ -623,12 +674,17 @@ class MainDashBoardState extends State<MainDashBoard> {
                 onPressed: () {
                   Navigator.of(context).pushNamedAndRemoveUntil('/', (route) => false);
                 },
-                child: Text("Logout"))
+                child: Text("Logout")
+            ),
+            FloatingActionButton(
+                onPressed: () {Navigator.pop(context);},
+                backgroundColor: Colors.white,
+                child: Icon(Icons.clear, )
+                ),
           ]
       ),
 
-      //height: 100,
-      //width: 100,
+
       );
 }
 
