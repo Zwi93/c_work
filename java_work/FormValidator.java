@@ -24,6 +24,7 @@ import com.gracedp.operation.GraceDatabaseOperator;
 public class FormValidator
 {
     public static final int PORT = 8000;
+    //static final String URL = "jdbc:postgresql://41.0.50.128:5432/grace_dp";
     static final String URL = "jdbc:postgresql://localhost/grace_dp";  //Worth trying a combination of server and DB at different locations.
     static final String USERNAME = "zwi";
     static final String PASSWORD = "Zwi";
