@@ -115,10 +115,20 @@ public class FormValidator
                         outgoing.println("1");
                         outgoing.flush();
                     }
+    
                     else
                     {
-                        outgoing.println("0");
-                        outgoing.flush();
+                        if (userPassword.equals("Server Error") )  // Handle database connection error.
+                        {
+                            outgoing.println("2");
+                            outgoing.flush();
+                        }
+                        else
+                        {
+                            outgoing.println("0");
+                            outgoing.flush();
+                        }
+                        
                     }
                     break;
 

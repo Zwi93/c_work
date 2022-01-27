@@ -1,8 +1,9 @@
 //import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'dart:io';
+import 'package:pie_chart/pie_chart.dart';
 
 void main (){
 
@@ -176,7 +177,7 @@ class SignInFormState extends State<SignInForm> {
   void _submitSignInForm() async {
     if (_formkey.currentState!.validate()) {
       //Socket sock = await Socket.connect('3.16.36.117', 8000);
-      Socket sock = await Socket.connect('10.0.0.109', 8000);
+      Socket sock = await Socket.connect('10.0.0.107', 8000);
       //sock.write(_controllerUsername.text);
 
       sock.writeln("Username " + _controllerUsername.text + "," +
@@ -204,7 +205,7 @@ class SignInFormState extends State<SignInForm> {
         }
 
       },
-          onError: (error) {print(error);}
+          onError: (error) {print(error);}  //Need to handle SocketException better here.
       );
 
       sock.close();
@@ -370,7 +371,7 @@ class RegistrationFormState extends State<RegistrationForm> {
     if (_formkey.currentState!.validate()) {
       //First setup a socket connection to the server listening on the other side.
       //Socket socket = await Socket.connect('3.16.36.117', 8000);
-      Socket socket = await Socket.connect('10.0.0.109', 8000);
+      Socket socket = await Socket.connect('10.0.0.107', 8000);
 
       //Write the users' registration details into a comma separated string.
       socket.writeln("Name " + _controllerName.text + "," +
@@ -508,15 +509,7 @@ class MainDashBoardState extends State<MainDashBoard> {
                       Icons.dashboard,
                     ),
                 ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => MainDashBoard(name: widget.name,))
-                    );
-                  },
-                  child: Text("Dashboard"),
-                ),
+                Text("Dashboard"),
               ],
             )
         ),
@@ -537,10 +530,7 @@ class MainDashBoardState extends State<MainDashBoard> {
               Icons.checklist,
             ),
           ),
-          TextButton(
-            onPressed: () {},
-            child: Text("ToDo"),//Icons check_circle_outlined and check_circle_rounded will be useful.
-          ),
+          Text("ToDo"),//Icons check_circle_outlined and check_circle_rounded will be useful.
         ],
           )
         ),
@@ -562,10 +552,7 @@ class MainDashBoardState extends State<MainDashBoard> {
               ),
             ),
 
-            TextButton(
-              onPressed: () {},
-              child: Text("Complaint"),
-            ),
+            Text("Complaint"),
     ],
     )
 
@@ -588,10 +575,7 @@ class MainDashBoardState extends State<MainDashBoard> {
                 ),
               ),
 
-              TextButton(
-                onPressed: () {},
-                child: Text("Maintenance"),
-              ),
+              Text("Maintenance"),
             ],
           )
 
@@ -623,16 +607,24 @@ class MainDashBoardState extends State<MainDashBoard> {
                         ),
                         Container(
                           decoration: const BoxDecoration(
-                              color: Colors.blue,
-                              shape: BoxShape.circle,
-                              border: Border(top: BorderSide(color: Colors.black), left: BorderSide(color: Colors.black), right: BorderSide(color: Colors.black), bottom: BorderSide(color: Colors.black)),
+                              //color: Colors.blue,
+                              //shape: BoxShape.circle,
+                              //border: Border(top: BorderSide(color: Colors.black), left: BorderSide(color: Colors.black), right: BorderSide(color: Colors.black), bottom: BorderSide(color: Colors.black)),
                           ),
                           height: 100.0,
                           width: 100.0,
                           margin: const EdgeInsets.only(left: 100), //controls the spacing of the container widget itself.
-                          padding: const EdgeInsets.all(30), //controls the spacing of the child widget.
-                          child: Text("Here", style: TextStyle(fontSize: 10, color: Colors.black),),
+                          //padding: const EdgeInsets.all(30), //controls the spacing of the child widget.
+                          child: PieChart(
+                            dataMap: {"Paid": 15, "Remaining": 5},
+                            chartType: ChartType.ring,
+                            legendOptions: LegendOptions(showLegends: false),
+                            colorList: [Colors.green, Colors.blue],
+                            chartRadius: 100,
+                            chartValuesOptions: ChartValuesOptions(showChartValues: false),
+                          )
                         )
+
                       ],
                     )
                   ],

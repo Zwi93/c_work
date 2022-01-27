@@ -78,10 +78,15 @@ public class GraceDatabaseOperator
             resultSet.close();
             
         }
+        catch (NullPointerException e)
+        {
+            password = "Server Error";
+            e.printStackTrace();
+            
+        }
         catch (Exception e)
         {
             e.printStackTrace();
-            //password = "None";
         }
 
         return password;
